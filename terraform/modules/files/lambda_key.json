@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "stellarismus",
+  "private_key_id": "6cb9c623c5108ba85fbc0cf07487cf85f56b946d",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCzQzgGKEh22Ndv\n4S82TJ47F9OD/AAkbkE4f98pxZWYtY64yGOwJ3kKzbli5ZnWRaEpe3bU0Fk7wDst\nidrOCR2020gRcQsE2+ErGnVrJkXRlTc0wbuGAXE13j1psxZS6hVh6YYG4Tdu1756\ntcZ0S8kNNtcp3NFV9IHx2CQqkw9RgvchFCik5XaEdHdQznyYSbpsDRTgtLBup6tF\nYBRdPnyv1skcuksX0nrNm7HfzmPX5UQM13i4X5QF6ZUdlWIG+jQ5KsncwyRQ4YJh\n7xgWfQEjpdnIq1r7kvCil4bhSUiFIZLdIPBCqsLDnXow1FoobIGWAty4y3p7554E\nrv66v4m9AgMBAAECggEACCALWYgY5L4mYa1QwQLPBzmovio9bWlL7n4pRNDuW2ob\nSnfWwOTBIUK63OcwRlyIlgNBGxtIeCNZ61H8x2r1XD22MggwKiu3NIdx/AXTk1DS\nnEMNt2C4W2sz2GckI2T1zCbUCtrJcu43dYNot9u5hK5QKVcXa/B1tVsJJJ7eymB0\nUDQPyX2EU2F2qrOvx9KlhYQS5xYLKtidzuFqVKyQu0jbNxAXhdS/1Y70SF61Zmj+\nTxh8Dqc8fR8kG2324TrB3mZ54vR+Ou7wA8x1wQsv3uTZXZDU2SJ4i3ki2uqf1EUi\nuiUWlYzOJTvGEnGDwVcWP2DJeHN/YqiExPd9LC1VkQKBgQDl7QXjba/ynj1M9LX4\nsxXTliegtikNmW+b3QIuKp26QjmEQG+5H6yiVYOLh1gTAu8nC7ulgZNZHP6yrtBN\nwnpGJgLV0MSfuK+xpXtUFTQBOXEeOjntWOuBG20Zd5vu+wF2x5bmX+Ikr356xATT\nBCX8ydx5aMwfm87Lq0G79/TrlQKBgQDHl2POPRYTOgthrG3K6E/AYoj9IwJfD6sO\nHX/hGvr0rzvBZhFhwgC7Awk2C60EbCGzrwoPAvpTGIVuFSK7I9NNKWdxnkDcdk+j\nbYNGDS7k7u1PPAmLdPNjd65BdMDOMcAEtHj0gEnfL1FuJgx70km+MmaE/RglYwOK\nj97r1VHbiQKBgQC4uXYqo1xh00oywsRUXCUkChYqY0+WUni9w5FV3/06wKwPGeno\n1I7RGV0HQ6S6GXhkaWPH89ObG9VxX0uRvbaZFz7d482k+S+GzQnJowNWHH1KKMOT\ncgY7gvpjJJqOJPGnKXGOAujgSnKWVVf+5O1ULCXLESw2FOrO7Pdx+iO3BQKBgDNU\n3SdSkJXbTMgPB6Gyw6gP73ljAp4eMnkL3zKutLIvSyf/LyM8OOHf8wOCVzoW8Uf8\nEZMwyd6LJO3d47PLj/F9X4xaDgZlKzA13xgqFdBtHn1NTIsgReRkCF3vQBMHuoG7\nRIxlXhpXWhMBGB7UQ4D2B2XWjdo3r9Z4D/YJQ+c5AoGAZLJ0SnQ7t0FGseAIVSuO\nYMx3WXWvGTpXyOIaD6J4qPof19IZvrK+DfnRluv+Dw7uJ6W7MviKjJv2pHjAntB6\nLGicHckIzwYCoYbTp6g+W5nVtnOjbF8EckHLz8VWaLgNWYsJfFiTu8dhm5xXSmQA\n0CZyncBeJpGQlHMHx30bz1E=\n-----END PRIVATE KEY-----\n",
+  "client_email": "lambda-svc@stellarismus.iam.gserviceaccount.com",
+  "client_id": "107107906797876272191",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/lambda-svc%40stellarismus.iam.gserviceaccount.com"
+}

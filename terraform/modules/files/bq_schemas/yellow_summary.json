@@ -1,0 +1,87 @@
+[
+    {
+        "name": "VendorID",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "first_day_of_month",
+        "type": "DATE",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "pickup_zone",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "dropoff_zone",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "store_and_fwd_flag",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "monthly_fare_amount",
+        "type": "FLOAT",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "average_passenger_count",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "average_trip_distance",
+        "type": "FLOAT",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "monthly_extra_amount",
+        "type": "FLOAT",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "monthly_mta_tax",
+        "type": "FLOAT",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "monthly_tip_amount",
+        "type": "FLOAT",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "monthly_tolls_amount",
+        "type": "FLOAT",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "monthly_improvement_surcharge",
+        "type": "FLOAT",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "monthly_total_amount",
+        "type": "FLOAT",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "payment_type",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "monthly_congestion_surcharge",
+        "type": "FLOAT",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "monthly_airport_fee",
+        "type": "FLOAT",
+        "mode": "NULLABLE"
+    }
+]

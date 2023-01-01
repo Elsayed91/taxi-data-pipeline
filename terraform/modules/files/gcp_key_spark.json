@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "stellarismus",
+  "private_key_id": "3fff019068c873ee6ebfacd1ea8fd49d18f137f7",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCefMti870TedYz\nrRREShBgBA43e4gpUz1b2RZRsOnNNbrF6RnQJtctBrV4oB9aBM/ZttnQG/3OppBe\nJwnMXQRLpqQmgArqjqW8cdmQCILuHabM1EGkkQSEMWEzCt6n0dBcGpOzE8Ya2lna\nK4pVV3OEU8JCcIDmWxUgK/UWv32kh6r1owaWSX1v5T47Yk7Z4p0zUoPV1dMT+25G\noFAa5eJEm8ZmDxKQMrBoqdq+XVYEDicK+XFIaEhQ6QPM3bJl9M/4zfoz9GZwajt/\n2DCzPOx+MZ1hlCBMVQxSNp6j4/V+z6jEqxDGzsqzL/db45TAGk/NgOMt5pIMbHQY\n9S2l9B63AgMBAAECggEANDkU369G/1LnRTHj+riY+rp7YMbg0BUwo8I9u39bGxZ4\nS9yKd+9Eef6671t72TK6tpes4AlJMb3q1ktwzBleX/syHcmVT0Lf09+D/BUB56p3\nmwjZ9HsgjNqkl6geRBg72w2a26hJX/HRJ7WvKH3ff5wF59SgdMdQh8BUS0GgCgVx\nYOqj9C+vH7x/c3Mn6ujAGYlR5+VxXlUhedccOWNmez0rX1iedNYsHRKGes44yco4\n+MhYQdhQc85HFSI6F+1dna5oxyKmtcNFt4dBRfCwZI/r9Yp5v/dqNOcvcdO61umv\nS8kw+GHJYPDxPGos0NQF+Ct3B+3/BSVnnNAEVbHIsQKBgQDUEu3rKSJ+L3KrWsKb\nxF1cgnVfZTEoIjSB5ZVefqjhRlBm8UBKdK2HDOglUUB+DnHvN/hYdpDtHHqKcrYG\n9b6+DTmuqhj33t/zhOJZR9pkrOfuln59GDF0yaXn0x27N16S3TGcNll+iwPtcg+Y\nwvmg4HV014ggNXgZadDhtS8VuQKBgQC/UHsUlpy1pD54d0znFuNCcSPx0X2770sj\n0sfYlE/gwMwC/wVEii/td1Ko/6moRKscOgdhIWcK1Eg4d5MLwU2VRMLXtm/spirY\nkrwr1W/BnhiQIb+R1+J18hQSHpX4ty1MavvJo09UfnIrHSdRxMLPJPs5MESXJPbt\n9ovhXwEP7wKBgF9TCuJTIQ/7H93p8+O0RgrZEQ0KHShfB58DpTpOUHbB9k3vTuio\nvX8gzBBKD2UZ9RiD3ftVgBs0W9hza2KBf3VJ2I2sI4D3C08Yge2DoKT0G2Rg/QYZ\no9FM+mfTu191qer1xeDjhSKeNeu7A0u1CCPKAMG+R4/CuPMjXyK1IC7xAoGAFXzz\nphdYmKpO/fbgY2BVvEO69tFB3xb8iJSHL9NQuXzOLVP5gn5G7dQmK6czphu4YF5A\nL++xhCzdw8HieUKH9UkY3WO3ZIwxacvpaL77Y3LfbWjs/HOUEw1Spcpbq+jfJKMr\njrVSFrpxFlia7vs7qkqMERtTyOo09ftoMLMcCm8CgYEAjIjZ0Pr8Z539c09Iskmw\nOLOUWP15cHtDE+gJ+9CQsLIxFdnhdyggDRxCSAuqmT/c+sRSS6lMxCsO4dXPPpIn\nL62E1elzWXWlQrLsukFBQKcboGyD6v1XXe4dhN4Sc4JjCZlTckFAyp8w1/HC46Tp\nrct+bnfXq0apUjOmrudpJQg=\n-----END PRIVATE KEY-----\n",
+  "client_email": "toxicity@stellarismus.iam.gserviceaccount.com",
+  "client_id": "106826488910142517238",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/toxicity%40stellarismus.iam.gserviceaccount.com"
+}

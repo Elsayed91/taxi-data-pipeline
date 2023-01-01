@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgresql
+spec:
+  serviceName: postgresql
+  selector:
+    matchLabels:
+      app: postgresql
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+        - name: postgresql
+          image: eu.gcr.io/${PROJECT}/postgres
+          imagePullPolicy: Always
+          ports:
+            - name: postgresql
+              containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: postgres-db-config
+            - secretRef:
+                name: postgres-secret
+          volumeMounts:
+            - name: postgresql-db-disk
+              mountPath: /data
+      nodeSelector:
+        cloud.google.com/gke-nodepool: ${BASE_NODE_POOL}
+        iam.gke.io/gke-metadata-server-enabled: "true"
+  volumeClaimTemplates:
+    - metadata:
+        name: postgresql-db-disk
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 20Gi
