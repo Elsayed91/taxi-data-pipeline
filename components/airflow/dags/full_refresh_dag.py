@@ -70,8 +70,8 @@ with DAG(
             "nodeSelector": JOBS_NODE_POOL,
             "volumes": [
                 {
-                    "type": "secret",
                     "name": "aws-creds",
+                    "type": "secret",
                     "reference": "aws-creds",
                     "mountPath": "/etc/aws",
                 }
