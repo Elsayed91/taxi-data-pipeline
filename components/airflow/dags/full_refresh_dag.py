@@ -40,7 +40,7 @@ with DAG(
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
     STAGING_BUCKET = os.getenv("STAGING_BUCKET")
     BASE = "/git/repo/components"
-    POD_TEMPLATE_PATH = f"{BASE}/airflow/dags/manifests/pod_template.yaml"
+    POD_TEMPLATE_PATH = f"{BASE}/airflow/dags/template/pod_template.yaml"
     SCRIPTS_PATH = f"{BASE}/airflow/dags/scripts"
     JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL", "jobs")
 
