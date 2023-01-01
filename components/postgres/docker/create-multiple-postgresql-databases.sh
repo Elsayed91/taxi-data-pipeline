@@ -43,3 +43,5 @@ if [[ -n "$databases" ]]; then
         echo "created database and admin user for for ${type,,}"
     done
 fi
+
+#HELLO
