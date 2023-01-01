@@ -34,7 +34,7 @@ spec:
         {% for volume in job.volumes %}
         - name: {{ volume.name }}
           mountPath: {{ volume.mountPath }}
-          {% if volume.subPath %}
+          {% if volume.subPath is defined %}
           subPath: {{ volume.subPath }}
           {% endif %}
         {% endfor %}
