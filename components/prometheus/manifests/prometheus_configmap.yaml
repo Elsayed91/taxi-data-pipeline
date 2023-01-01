@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-server-conf
+  labels:
+    name: prometheus-server-conf
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    rule_files:
+      - 'alert.rules'
+    alerting:
+      alertmanagers:
+      - scheme: http
+        static_configs:
+        - targets:
+          - "alertmanager:9093"
+
+    scrape_configs:
+      - job_name: 'prometheus'
+        scrape_interval: 5s
+        static_configs:
+          - targets: ['localhost:9090']
+      - job_name: 'statsd'
+        scrape_interval: 10s
+        static_configs:
+          - targets: ['metric-exporters.default.svc.cluster.local:9102']
+      - job_name: 'spark-operator'
+        scrape_interval: 5s
+        static_configs:
+          - targets: ['spark-operator.default.svc.cluster.local:10254']
+      - job_name: 'kube-state-metrics'
+        scrape_interval: 5s
+        static_configs:
+          - targets: ['metric-exporters.default.svc.cluster.local:8085']
+      - job_name: 'prometheus-postgres-exporter'
+        scrape_interval: 5s
+        static_configs:
+          - targets: ['metric-exporters.default.svc.cluster.local:9187']
+
+# - job_name: 'service'
+#   scrape_interval: 10s
+#   static_configs:
+#     - targets: ['evidently-service:8085']
+# , 'onemansvc.default.svc.cluster.local:10254', '10.75.248.193:10254'

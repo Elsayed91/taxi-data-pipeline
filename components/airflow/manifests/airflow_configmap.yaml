@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-config
+data:
+  airflow.cfg: |-
+    [celery]
+    flower_url_prefix = /
+    worker_concurrency = 1
+
+    [celery_kubernetes_executor]
+    kubernetes_queue = kubernetes
+
+    [core]
+    colored_console_log = False
+    dags_folder = /git/repo/components/airflow/dags/
+    executor = LocalExecutor
+    load_examples = False
+    remote_logging = False
+    # plugins_folder = {AIRFLOW_HOME}/utilities
+
+    [elasticsearch]
+    json_format = True
+    log_id_template = {dag_id}_{task_id}_{execution_date}_{try_number}
+
+    [elasticsearch_configs]
+    max_retries = 3
+    retry_timeout = True
+    timeout = 30
+
+    [kerberos]
+    ccache = /var/kerberos-ccache/cache
+    keytab = /etc/airflow.keytab
+    principal = airflow@FOO.COM
+    reinit_frequency = 3600
+
+    [kubernetes_executor]
+    airflow_configmap = airflow-airflow-config
+    airflow_local_settings_configmap = airflow-airflow-config
+    multi_namespace_mode = False
+    namespace = airflow
+    pod_template_file = /opt/airflow/pod_templates/pod_template_file.yaml
+    worker_container_repository = apache/airflow
+    worker_container_tag = 2.5.0
+
+    [logging]
+    colored_console_log = False
+    remote_logging = False
+
+    [metrics]
+    statsd_host = internal-svc.default.svc.cluster.local
+    statsd_on = True
+    statsd_port = 9125
+    statsd_prefix = airflow
+
+    [scheduler]
+    run_duration = 41460
+    standalone_dag_processor = False
+    statsd_host = internal-svc.default.svc.cluster.local
+    statsd_on = True
+    statsd_port = 9125
+    statsd_prefix = airflow
+
+    [webserver]
+    enable_proxy_fix = True
+    rbac = True
+
+    [kubernetes_job_operator]
+    # The task kube resources delete policy. Can be: Never, Always, IfFailed, IfSucceeded
+    delete_policy=Never
+    # The default object type to execute with (legacy, or image). Can be: Pod, Job
+    default_execution_object=Pod
+
+    # Logs
+    detect_kubernetes_log_level=True
+    show_kubernetes_timestamps=False
+    # Shows the runner id in the log (for all runner logs.)
+    show_runner_id=False
+
+    # Tasks (Defaults)
+    # Wait to first connect to kubernetes.
+    startup_timeout_seconds=120
+    # if true, will parse the body when building the dag. Otherwise only while executing.
+    validate_body_on_init=False
+
+    # Comma seperated list of where to look for the kube config file. Will be added to the top
+    # of the search list, in order.
+    kube_config_extra_locations=
+
+  airflow_local_settings.py: |2
+
+
+    from airflow.www.utils import UIAlert
+
+    DASHBOARD_UIALERTS = [
+      UIAlert(
+        'Usage of a dynamic webserver secret key detected. We recommend a static webserver secret key instead.'
+        ' See the <a href='
+        '"https://airflow.apache.org/docs/helm-chart/stable/production-guide.html#webserver-secret-key">'
+        'Helm Chart Production Guide</a> for more details.',
+        category="warning",
+        roles=["Admin"],
+        html=True,
+      ) ]

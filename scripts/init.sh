@@ -18,6 +18,7 @@ gcloud projects create $PROJECT >/dev/null
 
 echo "Setting the project as default project"
 gcloud config set project $PROJECT >/dev/null
+
 export GOOGLE_APPLICATION_CREDENTIALS="/home/$USER/.config/gcloud/application_default_credentials.json"
 
 echo "Linking the billing account with the project"

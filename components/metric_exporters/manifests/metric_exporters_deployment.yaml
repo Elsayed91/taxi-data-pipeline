@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metric-exporters
+spec:
+  selector:
+    matchLabels:
+      app: metric-exporters
+  template:
+    metadata:
+      labels:
+        app: metric-exporters
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9102"
+        prometheus.io/path: /metrics
+    spec:
+      containers:
+        - name: statsd
+          args:
+            - --statsd.mapping-config=/etc/statsd-exporter/mappings.yml
+          image: quay.io/prometheus/statsd-exporter:v0.22.8
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9125
+              name: statsd-ingest
+              protocol: UDP
+            - containerPort: 9102
+              name: statsd-scrape
+          volumeMounts:
+            - mountPath: /etc/statsd-exporter/mappings.yml
+              name: statsd-config
+              subPath: mappings.yml
+          resources: {}
+        - name: prometheus-postgres-exporter
+          args:
+            - "--extend.query-path=/etc/config.yaml"
+          envFrom:
+            - secretRef:
+                name: postgres-exporter-secret
+          image: "quay.io/prometheuscommunity/postgres-exporter:v0.11.1"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: pg-exporter
+              containerPort: 9187
+          livenessProbe:
+            initialDelaySeconds: 0
+            timeoutSeconds: 1
+            httpGet:
+              path: /
+              port: pg-exporter
+          readinessProbe:
+            initialDelaySeconds: 0
+            timeoutSeconds: 1
+            httpGet:
+              path: /
+              port: pg-exporter
+          resources: {}
+          volumeMounts:
+            - name: queries
+              mountPath: /etc/config.yaml
+              subPath: config.yaml
+        - name: kube-state-metrics
+          args:
+            - --port=8085
+            - --resources=certificatesigningrequests,configmaps,cronjobs,daemonsets,deployments,endpoints,horizontalpodautoscalers,ingresses,jobs,leases,limitranges,mutatingwebhookconfigurations,namespaces,networkpolicies,nodes,persistentvolumeclaims,persistentvolumes,poddisruptionbudgets,pods,replicasets,replicationcontrollers,resourcequotas,secrets,services,statefulsets,storageclasses,validatingwebhookconfigurations,volumeattachments
+          imagePullPolicy: IfNotPresent
+          image: "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.7.0"
+          ports:
+            - containerPort: 8085
+              name: kube-metrics
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8085
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8085
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          resources: {}
+      securityContext: {}
+      volumes:
+        - name: queries
+          configMap:
+            defaultMode: 420
+            name: prometheus-postgres-exporter-cm
+        - name: statsd-config
+          configMap:
+            defaultMode: 420
+            name: statsd-config
+      nodeSelector:
+        cloud.google.com/gke-nodepool: ${BASE_NODE_POOL}
+        iam.gke.io/gke-metadata-server-enabled: "true"

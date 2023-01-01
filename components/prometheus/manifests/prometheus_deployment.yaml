@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  labels:
+    app: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: prometheus
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - image: prom/prometheus:latest
+          args:
+            # - "--storage.tsdb.retention.time=12h"
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus/data"
+          name: prometheus
+          ports:
+            - containerPort: 9090
+              name: prometheus-port
+          volumeMounts:
+            - name: prometheus-persistent-storage
+              mountPath: /etc/prometheus/data
+            - name: prometheus-config-volume
+              mountPath: /etc/prometheus/
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+      volumes:
+        - name: prometheus-persistent-storage
+          persistentVolumeClaim:
+            claimName: prometheus-pv-claim
+        - name: prometheus-config-volume
+          configMap:
+            defaultMode: 420
+            name: prometheus-server-conf
+      nodeSelector:
+        cloud.google.com/gke-nodepool: ${BASE_NODE_POOL}
+        iam.gke.io/gke-metadata-server-enabled: "true"

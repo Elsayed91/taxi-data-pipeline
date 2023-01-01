@@ -1,0 +1,148 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-operator
+  labels:
+    app.kubernetes.io/name: spark-operator
+    app.kubernetes.io/instance: spark-operator
+    app.kubernetes.io/version: "v1beta2-1.3.8-3.1.1"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: spark-operator
+      app.kubernetes.io/instance: spark-operator
+      app.kubernetes.io/version: "v1beta2-1.3.8-3.1.1"
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+        prometheus.io/path: /metrics
+      labels:
+        app.kubernetes.io/name: spark-operator
+        app.kubernetes.io/instance: spark-operator
+        app.kubernetes.io/version: "v1beta2-1.3.8-3.1.1"
+    spec:
+      serviceAccountName: spark-operator
+      securityContext: {}
+      containers:
+        - name: spark-operator
+          image: ghcr.io/googlecloudplatform/spark-operator:v1beta2-1.3.8-3.1.1
+          imagePullPolicy: IfNotPresent
+          securityContext: {}
+          ports:
+            - name: "metrics"
+              containerPort: 10254
+          args:
+            - -v=2
+            - -logtostderr
+            - -namespace=
+            - -enable-ui-service=true
+            - -ingress-url-format=
+            - -controller-threads=10
+            - -resync-interval=30
+            - -enable-batch-scheduler=false
+            - -label-selector-filter=
+            - -enable-metrics=true
+            - -metrics-labels=app_type
+            - -metrics-port=10254
+            - -metrics-endpoint=/metrics
+            - -metrics-prefix=
+            - -enable-webhook=true
+            - -webhook-svc-namespace=default
+            - -webhook-port=8080
+            - -webhook-timeout=30
+            - -webhook-svc-name=spark-operator
+            - -webhook-config-name=spark-operator-webhook-config
+            - -webhook-namespace-selector=
+            - -enable-resource-quota-enforcement=false
+          resources: {}
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /etc/webhook-certs
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: spark-operator-webhook-certs
+---
+# # Source: spark-operator/templates/webhook-cleanup-job.yaml
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: spark-operator-webhook-cleanup
+#   annotations:
+#     helm.sh/hook: pre-delete, pre-upgrade
+#     helm.sh/hook-delete-policy: hook-succeeded
+#   labels:
+#     app.kubernetes.io/name: spark-operator
+#     app.kubernetes.io/instance: spark-operator
+#     app.kubernetes.io/version: "v1beta2-1.3.8-3.1.1"
+# spec:
+#   template:
+#     metadata:
+#       name: spark-operator-webhook-cleanup
+#     spec:
+#       serviceAccountName: spark-operator
+#       restartPolicy: OnFailure
+#       containers:
+#         - name: clean-secret
+#           image: ghcr.io/googlecloudplatform/spark-operator:v1beta2-1.3.8-3.1.1
+#           imagePullPolicy: IfNotPresent
+#           securityContext: {}
+#           command:
+#             - "/bin/sh"
+#             - "-c"
+#             - "curl -ik \
+#               -X DELETE \
+#               -H \"Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)\" \
+#               -H \"Accept: application/json\" \
+#               -H \"Content-Type: application/json\" \
+#               https://kubernetes.default.svc/api/v1/namespaces/default/secrets/spark-operator-webhook-certs \
+#               && \
+#               curl -ik \
+#               -X DELETE \
+#               -H \"Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)\" \
+#               -H \"Accept: application/json\" \
+#               -H \"Content-Type: application/json\" \
+#               --data \"{\\\"kind\\\":\\\"DeleteOptions\\\",\\\"apiVersion\\\":\\\"batch/v1\\\",\\\"propagationPolicy\\\":\\\"Foreground\\\"}\" \
+#               https://kubernetes.default.svc/apis/batch/v1/namespaces/default/jobs/spark-operator-webhook-init"
+# ---
+# Source: spark-operator/templates/webhook-init-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: spark-operator-webhook-init
+  annotations:
+    helm.sh/hook: pre-install, pre-upgrade
+    helm.sh/hook-weight: "50"
+  labels:
+    app.kubernetes.io/name: spark-operator
+    app.kubernetes.io/instance: spark-operator
+    app.kubernetes.io/version: "v1beta2-1.3.8-3.1.1"
+spec:
+  template:
+    metadata:
+      name: spark-operator-webhook-init
+    spec:
+      ttlSecondsAfterFinished: 10
+      serviceAccountName: spark-operator
+      restartPolicy: OnFailure
+      containers:
+        - name: main
+          image: ghcr.io/googlecloudplatform/spark-operator:v1beta2-1.3.8-3.1.1
+          imagePullPolicy: IfNotPresent
+          securityContext: {}
+          command:
+            [
+              "/usr/bin/gencerts.sh",
+              "-n",
+              "default",
+              "-s",
+              "spark-operator",
+              "-r",
+              "spark-operator-webhook-certs",
+              "-p",
+            ]

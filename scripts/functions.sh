@@ -65,3 +65,13 @@ kill_failed() {
     kubectl get pods -n $namespace | grep Error | cut -d' ' -f 1 | xargs kubectl delete pod
     kubectl get pods -n $namespace | grep CrashLoopBackOff | cut -d' ' -f 1 | xargs kubectl delete pod
 }
+
+# wait_for_all_pods() {
+#     pods=$(kubectl get pods -o name)
+#     for pod in "${pods}"; do
+#         while [[ $(kubectl get pods ${pod#*2} -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
+#             echo "pod ${pod#*2} still not ready, sleeping 2 seconds"
+#             sleep 2
+#         done
+#     done
+# }

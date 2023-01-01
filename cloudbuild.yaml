@@ -1,83 +1,78 @@
 steps:
   - id: build_postgres_image
     waitFor: ['-']
-    description: placeholder
     name: "gcr.io/kaniko-project/executor:latest"
     args:
       [
-        "--context=dir://components/postgres",
+        "--context=dir://${_COMPONENTS_PATH}/postgres/docker",
         "--cache=true",
         "--cache-ttl=6h",
         "--destination=eu.gcr.io/$PROJECT_ID/${_POSTGRES_IMAGE_NAME}:$COMMIT_SHA",
       ]
 
-  - id: build_flask_image
-    waitFor: ['-']
-    description: placeholder
-    name: "gcr.io/kaniko-project/executor:latest"
-    args:
-      [
-        "--context=dir://components/docs_app",
-        "--cache=true",
-        "--cache-ttl=6h",
-        "--destination=eu.gcr.io/$PROJECT_ID/${_FLASK_IMAGE_NAME}:$COMMIT_SHA",
-      ]
+  # - id: build_flask_image
+  #   waitFor: ['-']
+  #   name: "gcr.io/kaniko-project/executor:latest"
+  #   args:
+  #     [
+  #       "--context=dir://${_COMPONENTS_PATH}/docs_app",
+  #       "--cache=true",
+  #       "--cache-ttl=6h",
+  #       "--destination=eu.gcr.io/$PROJECT_ID/${_FLASK_IMAGE_NAME}:$COMMIT_SHA",
+  #     ]
 
-  - id: build_dbt_image
-    waitFor: ['-']
-    description: placeholder
-    name: "gcr.io/kaniko-project/executor:latest"
-    args:
-      [
-        "--context=dir://components/dbt",
-        "--cache=true",
-        "--cache-ttl=6h",
-        "--destination=eu.gcr.io/$PROJECT_ID/${_DBT_IMAGE_NAME}:$COMMIT_SHA",
-      ]   
+  # - id: build_dbt_image
+  #   waitFor: ['-']
+  #
+  #   name: "gcr.io/kaniko-project/executor:latest"
+  #   args:
+  #     [
+  #       "--context=dir://${_COMPONENTS_PATH}/dbt",
+  #       "--cache=true",
+  #       "--cache-ttl=6h",
+  #       "--destination=eu.gcr.io/$PROJECT_ID/${_DBT_IMAGE_NAME}:$COMMIT_SHA",
+  #     ]   
 
-  - id: build_spark_image
-    waitFor: ['-']
-    description: placeholder
-    name: "gcr.io/kaniko-project/executor:latest"
-    args:
-      [
-        "--context=dir://components/spark",
-        "--cache=true",
-        "--cache-ttl=6h",
-        "--destination=eu.gcr.io/$PROJECT_ID/${_SPARK_IMAGE_NAME}",
-      ]
+  # - id: build_spark_image
+  #   waitFor: ['-']
+  #   name: "gcr.io/kaniko-project/executor:latest"
+  #   args:
+  #     [
+  #       "--context=dir://${_COMPONENTS_PATH}/spark/docker",
+  #       "--cache=true",
+  #       "--cache-ttl=6h",
+  #       "--destination=eu.gcr.io/$PROJECT_ID/${_SPARK_IMAGE_NAME}",
+  #     ]
 
-  - id: build_airflow_image
-    waitFor: ['-']
-    description: placeholder
-    name: "gcr.io/kaniko-project/executor:latest"
-    args:
-      [
-        "--context=dir://components/airflow",
-        "--cache=true",
-        "--cache-ttl=6h",
-        "--destination=eu.gcr.io/$PROJECT_ID/${_AIRFLOW_IMAGE_NAME}:$COMMIT_SHA",
-      ]
+  # - id: build_airflow_image
+  #   waitFor: ['-']
+  #   name: "gcr.io/kaniko-project/executor:latest"
+  #   args:
+  #     [
+  #       "--context=dir://${_COMPONENTS_PATH}/airflow/docker",
+  #       "--cache=true",
+  #       "--cache-ttl=6h",
+  #       "--destination=eu.gcr.io/$PROJECT_ID/${_AIRFLOW_IMAGE_NAME}:$COMMIT_SHA",
+  #     ]
 
-  # mlflow
-  - id: build_mlflow_image
-    waitFor: ['-']
-    description: placeholder
-    name: "gcr.io/kaniko-project/executor:latest"
-    args:
-      [
-        "--context=dir://components/mlflow",
-        "--cache=true",
-        "--cache-ttl=6h",
-        "--destination=eu.gcr.io/$PROJECT_ID/${_MLFLOW_IMAGE_NAME}:$COMMIT_SHA",
-      ]
+  # # mlflow
+  # - id: build_mlflow_image
+  #   waitFor: ['-']
+  #   name: "gcr.io/kaniko-project/executor:latest"
+  #   args:
+  #     [
+  #       "--context=dir://${_COMPONENTS_PATH}/mlflow/docker",
+  #       "--cache=true",
+  #       "--cache-ttl=6h",
+  #       "--destination=eu.gcr.io/$PROJECT_ID/${_MLFLOW_IMAGE_NAME}:$COMMIT_SHA",
+  #     ]
 
 
 substitutions:
   _POSTGRES_IMAGE_NAME: postgres
-  _FLASK_IMAGE_NAME: flask
-  _DBT_IMAGE_NAME: dbt
-  _SPARK_IMAGE_NAME: spark
-  _AIRFLOW_IMAGE_NAME: airflow
-  _MLFLOW_IMAGE_NAME: mlflow
-
+  # _FLASK_IMAGE_NAME: flask
+  # _DBT_IMAGE_NAME: dbt
+  # _SPARK_IMAGE_NAME: spark
+  # _AIRFLOW_IMAGE_NAME: airflow
+  # _MLFLOW_IMAGE_NAME: mlflow
+  _COMPONENTS_PATH: "components"

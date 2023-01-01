@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlflow
+spec:
+  selector:
+    matchLabels:
+      app: mlflow
+  template:
+    metadata:
+      labels:
+        app: mlflow
+    spec:
+      containers:
+      - name: mlflow
+        image: eu.gcr.io/${PROJECT}/mlflow
+        imagePullPolicy: Always
+        env:
+          - name: MLFLOW_DB
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: MLFLOW_DB
+          - name: MLFLOW_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: MLFLOW_DB_USER
+          - name: MLFLOW_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: MLFLOW_DB_PASSWORD
+          - name: POSTGRES_HOST
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: POSTGRES_HOST
+          - name: MLFLOW_BUCKET
+            valueFrom:
+              configMapKeyRef:
+                name: pipeline-env
+                key: MLFLOW_BUCKET
+        ports:
+        - name: mlflow
+          containerPort: 5000
+          protocol: TCP
+
+          

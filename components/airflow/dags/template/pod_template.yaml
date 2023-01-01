@@ -1,0 +1,160 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ job.name }}-pod"
+spec:
+  replicas: 1
+  restartPolicy: {{ job.restartPolicy | default('OnFailure') }}
+  containers:
+    - name: "{{ job.name }}-container"
+      image: "{{ job.image }}"
+      imagePullPolicy: {{ job.imagePullPolicy | default('Always') }}
+      {% if job.resources is defined %}
+      resources:
+          limits:
+              cpu: {{ job.resources.cpu }}
+              memory: {{ job.resources.memory }}
+             {% if job.nodeSelector is defined and job.nodeSelector.startswith("gpu") %}
+              nvidia.com/gpu: {{ job.gpu_count | default(1) }}
+              {% endif %}
+          requests:
+              cpu: {{ job.resources.cpu }}
+              memory: {{ job.resources.memory }}
+              core: {{ job.resources.core }}
+      {% else %}
+      resources:
+          {% if job.nodeSelector is defined and job.nodeSelector.startswith("gpu") %}
+          limits:
+              nvidia.com/gpu: {{ job.gpu_count | default(1) }}
+          {% endif %}
+      {% endif %}
+      {% if job.volumes is defined or (job.gitsync is defined and job.gitsync) %}
+      volumeMounts:
+      {% if job.volumes is defined %}
+        {% for volume in job.volumes %}
+        - name: {{ volume.name }}
+          mountPath: {{ volume.mountPath }}
+          {% if volume.subPath %}
+          subPath: {{ volume.subPath }}
+          {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% if job.gitsync is defined and job.gitsync %}
+        - name: code
+          mountPath: /git
+        {% endif %}
+      {% endif %}
+      {% if job.envFrom is defined  %}
+      envFrom:
+        {% for envFrom in job.envFrom %}
+        - {% if envFrom.type == 'configMapRef' %}
+            configMapRef:
+              name: {{ envFrom.name }}
+          {% else %}
+            secretRef:
+              name: {{ envFrom.name }}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
+{% if job.volumes is defined or (job.gitsync is defined and job.gitsync) %}
+  volumes:
+  {% if job.volumes is defined %}
+    {% for volume in job.volumes %}
+    - name: {{ volume.name }}
+      {% if volume.type == 'secret' %}
+      secret:
+        secretName: {{ volume.reference }}
+      {% elif volume.type == 'configMap' %}
+      configMap:
+        name: {{ volume.reference }}
+      {% elif volume.type == 'emptyDir' %}
+      emptyDir: {}
+      {% endif %}
+    {% endfor %}
+    {% endif %}
+    {% if job.gitsync is defined and job.gitsync %}
+    - name: code
+      emptyDir: {}
+    {% endif %}
+  {% endif %}
+  nodeSelector:
+    iam.gke.io/gke-metadata-server-enabled: "true"
+    {% if job.nodeSelector is defined %}
+    cloud.google.com/gke-nodepool: {{ job.nodeSelector }}
+    {% endif %}
+    # {% if job.nodeSelector is defined and job.nodeSelector.startswith("gpu") %}
+    # cloud.google.com/gke-accelerator: {{ job.gpu | default("nvidia-tesla-t4") }}
+    # {% endif %}
+  {% if job.initContainer is defined or (job.gitsync is defined and job.gitsync) %}
+  initContainers:
+    {% if job.initContainer is defined %}
+    {% for initContainer in job.initContainer %}
+    - name: {{ initContainer.name }}
+      image: {{ initContainer.image }}
+      imagePullPolicy: {{ initContainer.imagePullPolicy | default('Always') }}
+      {% if initContainer.securityContext is defined %}
+      securityContext:
+        runAsUser: {{ initContainer.securityContext.runAsUser }}
+      {% endif %}
+      {% if initContainer.command is defined %}
+      command: {{ initContainer.command }}
+      {% endif %}
+      {% if initContainer.args is defined %}
+      args: {{ initContainer.args }}
+      {% endif %}
+      {% if initContainer.env is defined %}
+      env:
+        {% for env in initContainer.env %}
+        - name: {{ env.name }}
+          value: {{ env.value }}
+        {% endfor %}
+      {% endif %}
+      {% if initContainer.envFrom is defined %}
+      envFrom:
+        {% for envFrom in initContainer.envFrom %}
+        - {% if envFrom.type == 'configMapRef' %}
+          configMapRef:
+            name: {{ envFrom.name }}
+          {% else %}
+          secretRef:
+            name: {{ envFrom.name }}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {% if initContainer.volumeMounts is defined %}
+      volumeMounts:
+        {% for volumeMount in initContainer.volumeMounts %}
+        - name: {{ volumeMount.name }}
+          mountPath: {{ volumeMount.mountPath }}
+          {% if volumeMount.subPath %}
+          subPath: {{ volumeMount.subPath }}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+   {% endfor %}
+  {% endif %}
+    {% if job.gitsync is defined and job.gitsync %}
+    - name: git-sync
+      image: k8s.gcr.io/git-sync/git-sync:v3.6.2
+      imagePullPolicy: Always
+      securityContext:
+        runAsUser: 65533
+      env:
+        - name: GIT_SYNC_ONE_TIME
+          value: "true"
+      envFrom:
+        - configMapRef:
+            name: git-env
+      resources:
+        limits:
+            cpu: "100m"
+            memory: "256Mi"
+        requests:
+            cpu: "50m"
+            memory: "128Mi"
+      volumeMounts:
+        - name: code
+          mountPath: /git
+    {% endif %} 
+{% endif %}

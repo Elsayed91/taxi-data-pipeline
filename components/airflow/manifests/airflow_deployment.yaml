@@ -1,0 +1,121 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: airflow
+spec:
+  selector:
+    matchLabels:
+      app: airflow
+  template:
+    metadata:
+      labels:
+        app: airflow
+    spec:
+      securityContext:
+        runAsUser: 50000
+        fsGroup: 0
+      initContainers:
+        - name: run-airflow-migrations
+          image: eu.gcr.io/${PROJECT}/airflow #apache/airflow:2.5.0
+          imagePullPolicy: Always
+          command: ["/bin/bash", "/opt/airflow/init.sh"]
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          envFrom:
+            - secretRef:
+                name: airflow-secret
+            - configMapRef:
+                name: pipeline-env
+          resources: {}
+          volumeMounts:
+            - name: config
+              mountPath: "/opt/airflow/airflow.cfg"
+              subPath: airflow.cfg
+      containers:
+        # Always run the main scheduler container.
+        - name: scheduler
+          image: eu.gcr.io/${PROJECT}/airflow #apache/airflow:2.5.0
+          imagePullPolicy: Always
+          args:
+            - bash
+            - -c
+            - exec airflow scheduler
+          envFrom:
+            - secretRef:
+                name: airflow-secret
+            - configMapRef:
+                name: pipeline-env
+          ports:
+            - name: worker-logs
+              containerPort: 8793
+          livenessProbe:
+            initialDelaySeconds: 10
+            timeoutSeconds: 20
+            failureThreshold: 5
+            periodSeconds: 60
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  CONNECTION_CHECK_MAX_COUNT=0 AIRFLOW__LOGGING__LOGGING_LEVEL=ERROR exec /entrypoint \
+                  airflow jobs check --job-type SchedulerJob --hostname $(hostname)
+          resources: {}
+          volumeMounts:
+            - name: config
+              mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
+              subPath: pod_template_file.yaml
+            - name: logs
+              mountPath: "/opt/airflow/logs"
+            - name: dags
+              mountPath: /git
+            - name: config
+              mountPath: "/opt/airflow/airflow.cfg"
+              subPath: airflow.cfg
+            - name: config
+              mountPath: "/opt/airflow/config/airflow_local_settings.py"
+              subPath: airflow_local_settings.py
+        - name: git-sync
+          image: k8s.gcr.io/git-sync/git-sync:v3.6.2
+          imagePullPolicy: Always
+          securityContext:
+            runAsUser: 65533
+          envFrom:
+            - configMapRef:
+                name: git-env
+          resources: {}
+          volumeMounts:
+            - name: dags
+              mountPath: /git
+        - name: webserver
+          image: eu.gcr.io/${PROJECT}/airflow #apache/airflow:2.5.0
+          imagePullPolicy: Always
+          args:
+            - bash
+            - -c
+            - exec airflow webserver
+          envFrom:
+            - secretRef:
+                name: airflow-secret
+          livenessProbe:
+            failureThreshold: 20
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+          ports:
+            - name: airflow-ui
+              containerPort: 8080
+          resources: {}
+      nodeSelector:
+        cloud.google.com/gke-nodepool: ${BASE_NODE_POOL}
+        iam.gke.io/gke-metadata-server-enabled: "true"
+      volumes:
+        - name: config
+          configMap:
+            name: airflow-config
+        - name: logs
+          emptyDir: {}
+        - name: dags
+          emptyDir: {}

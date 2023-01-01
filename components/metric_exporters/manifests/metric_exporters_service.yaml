@@ -1,0 +1,31 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: metric-exporters
+  labels:
+    app: metric-exporters
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9102"
+spec:
+  type: ClusterIP
+  selector:
+    app: metric-exporters
+  ports:
+    - name: statsd-ingest
+      protocol: UDP
+      port: 9125
+      targetPort: 9125
+    - name: statsd-scrape
+      protocol: TCP
+      port: 9102
+      targetPort: 9102
+    - name: kube-metrics
+      protocol: TCP
+      port: 8085
+      targetPort: 8085
+    - name: pg-exporter
+      protocol: TCP
+      port: 9187
+      targetPort: 9187
+
