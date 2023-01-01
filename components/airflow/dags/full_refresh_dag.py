@@ -62,7 +62,8 @@ with DAG(
             "--exclude-prefixes",
             "yellow_tripdata_2009,yellow_tripdata_2010",
             "--check-exists",
-            "--yellow",
+            "--",
+            "yellow",
         ],
         jinja_job_args={
             "image": "google/cloud-sdk:alpine",
