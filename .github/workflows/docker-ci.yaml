@@ -1,8 +1,9 @@
 on:
   push:
     paths:
+      - 'github/workspace/postgres/docker/**'
       # - 'airflow/docker/**'
-      - 'postgres/docker/**'
+
 
 jobs:
   create_env_file:
