@@ -65,7 +65,8 @@ with DAG(
             "--yellow",
         ],
         jinja_job_args={
-            "IMAGE": "google/cloud-sdk:alpine",
+            "image": "google/cloud-sdk:alpine",
+            "name": "aws_to_gcs",
             "gitsync": True,
             "nodeSelector": JOBS_NODE_POOL,
             "volumes": [
