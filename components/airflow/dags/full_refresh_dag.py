@@ -69,7 +69,12 @@ with DAG(
             "gitsync": True,
             "nodeSelector": JOBS_NODE_POOL,
             "volumes": [
-                {"type": "secret", "name": "aws-creds", "mountPath": "/etc/aws"}
+                {
+                    "type": "secret",
+                    "name": "aws-creds",
+                    "reference": "aws-creds",
+                    "mountPath": "/etc/aws",
+                }
             ],
         },
         in_cluster=True,
