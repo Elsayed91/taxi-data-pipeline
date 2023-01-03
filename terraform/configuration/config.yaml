@@ -84,12 +84,12 @@ GCP:
           disabled: true
 ########################################
   node_pools:
-    - name: "${BASE_NODE_POOL}"
+    - name: "${JOBS_NODE_POOL}"
       cluster: "${GKE_CLUSTER_NAME}"
       node_count: ~
       autoscaling: 
         min_node_count: 0
-        max_node_count: 5
+        max_node_count: 10
       management:
         auto_repair: true
         auto_upgrade: true
@@ -99,12 +99,12 @@ GCP:
         service_account: "${CLUSTER_SA}@${PROJECT}.iam.gserviceaccount.com"
         workload_metadata_config:
           mode: "GKE_METADATA"
-    - name: "${JOBS_NODE_POOL}"
+    - name: "${BASE_NODE_POOL}"
       cluster: "${GKE_CLUSTER_NAME}"
       node_count: ~
       autoscaling: 
         min_node_count: 0
-        max_node_count: 10
+        max_node_count: 4
       management:
         auto_repair: true
         auto_upgrade: true
