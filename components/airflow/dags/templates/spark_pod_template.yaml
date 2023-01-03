@@ -53,18 +53,18 @@ spec:
       - name: "gcsfs-creds"
         path: "/mnt/secrets"
         secretType: GCPServiceAccount
-    # {% if job.envFrom is defined  %}
-    # envFrom:
-    # {% for envFrom in job.envFrom %}
-    # - {% if envFrom.type == 'configMapRef' %}
-    #   configMapRef:
-    #       name: {{ envFrom.name }}
-    #   {% else %}
-    #   secretRef:
-    #       name: {{ envFrom.name }}
-    #   {% endif %}
-    # {% endfor %}
-    # {% endif %}
+    {% if job.envFrom is defined  %}
+    envFrom:
+    {% for envFrom in job.envFrom %}
+    - {% if envFrom.type == 'configMapRef' %}
+      configMapRef:
+          name: {{ envFrom.name }}
+      {% else %}
+      secretRef:
+          name: {{ envFrom.name }}
+      {% endif %}
+    {% endfor %}
+    {% endif %}
     {% if job.env is defined %}
     env:
     {% for key, value in job.env.items() %}
@@ -146,15 +146,15 @@ spec:
     {% if job.volumes is defined %}
     {% for volume in job.volumes %}
     - name: {{ volume.name }}
-        mountPath: {{ volume.mountPath }}
-        {% if volume.subPath is defined %}
-        subPath: {{ volume.subPath }}
-        {% endif %}
+      mountPath: {{ volume.mountPath }}
+      {% if volume.subPath is defined %}
+      subPath: {{ volume.subPath }}
+      {% endif %}
     {% endfor %}
     {% endif %}
     {% if job.gitsync is defined and job.gitsync %}
     - name: code
-        mountPath: /git
+      mountPath: /git
     {% endif %}
     {% endif %}
     {% if job.gitsync is defined and job.gitsync %}
