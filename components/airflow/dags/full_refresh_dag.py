@@ -155,4 +155,4 @@ with DAG(
     #     )
     #     tg1_1 >> tg1_2  # type: ignore
 
-    tg1  # type: ignore
+    t1  # type: ignore
