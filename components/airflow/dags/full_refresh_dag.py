@@ -51,7 +51,7 @@ def parse_spark_application(body) -> KubeResourceState:
 
     pod_phase = status.get("phase")
     if pod_phase == "Pending":
-        job_status = KubeResourceState.Pending
+        return KubeResourceState.Pending
     elif pod_phase == "Succeeded":
         return KubeResourceState.Succeeded
     elif pod_phase == "Failed":
