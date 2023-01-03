@@ -44,7 +44,7 @@ def parse_spark_application(body) -> KubeResourceState:
         return KubeResourceState.Succeeded
     if "phase" in status and status["phase"] == "Failed":
         return KubeResourceState.Failed
-    if "reason" in status and status["reason"] == "Deleting":
+    if "deleted" in status:
         return KubeResourceState.Deleted
     return KubeResourceState.Running
 
