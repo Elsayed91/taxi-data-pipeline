@@ -111,10 +111,10 @@ spec:
             mountPath: /git
     {% endif %}
   executor:
-    cores: 1
-    coreRequest: 100m
+    cores: {{ job.coreRequest  | default(1) }} 
+    coreRequest: {{ job.coreRequest  | default('100m') }} 
     instances: {{ job.instances }}
-    memory: "512m"
+    memory: {{ job.executor_memory  | default('512m') }}
       {% if job.envFrom is defined  %}
     envFrom:
     {% for envFrom in job.envFrom %}
