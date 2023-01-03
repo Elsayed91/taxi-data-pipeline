@@ -14,19 +14,18 @@ from configs import *
 from pyspark.sql import SparkSession
 
 
-URI = str(os.getenv("URI"))
-_, SRC_BUCKET, _, SRC_FOLDER = uri_parser(URI)
-CATEGORY = str(os.getenv("CATEGORY"))
-MAPPING = options[CATEGORY]["mapping"]
-FILTER_CONDITION = options[CATEGORY]["filter_conditions"]
-TRANSFORMATION_QUERY = options[CATEGORY]["transformation_query"]
-HISTORICAL_TARGET = str(os.getenv("HISTORICAL_TARGET"))
-STAGING_TARGET = str(os.getenv("STAGING_TARGET"))
-TRIAGE_TAREGET = str(os.getenv("TRIAGE_TAREGET"))
-
 if __name__ == "__main__":
     spark = SparkSession.builder.getOrCreate()
     spark.conf.set("temporaryGcsBucket", str(os.getenv("SPARK_BUCKET")))
+    URI = str(os.getenv("URI"))
+    _, SRC_BUCKET, _, SRC_FOLDER = uri_parser(URI)
+    CATEGORY = str(os.getenv("CATEGORY"))
+    MAPPING = options[CATEGORY]["mapping"]
+    FILTER_CONDITION = options[CATEGORY]["filter_conditions"]
+    TRANSFORMATION_QUERY = options[CATEGORY]["transformation_query"]
+    HISTORICAL_TARGET = str(os.getenv("HISTORICAL_TARGET"))
+    STAGING_TARGET = str(os.getenv("STAGING_TARGET"))
+    TRIAGE_TAREGET = str(os.getenv("TRIAGE_TAREGET"))
 
     blobs = get_gcs_files(SRC_BUCKET, SRC_FOLDER, SRC_FOLDER)
     blobs = list_files(blobs)
