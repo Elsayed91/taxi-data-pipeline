@@ -100,17 +100,16 @@ with DAG(
                 "nodeSelector": JOBS_NODE_POOL,
                 "env": {
                     "URI": f"gs://{STAGING_BUCKET}/yellow/*",
-                    "NAME_PREFIX": "yellow_tripdata_"
-                }
-                    
+                    "NAME_PREFIX": "yellow_tripdata_",
+                },
             },
         )
 
-    t2 = SparkKubernetesSensor(
-        task_id="spark-etl-monitor",
-        application_name="{{ task_instance.xcom_pull(task_ids='spark-job-full-refresh.spark_full_refresh') ['metadata']['name'] }}",
-        attach_log=True,
-    )
-        t1 >> t2 # type: ignore
-    
-    t1 >> tg1 # type: ignore
+        t2 = SparkKubernetesSensor(
+            task_id="spark-etl-monitor",
+            application_name="{{ task_instance.xcom_pull(task_ids='spark-job-full-refresh.spark_full_refresh') ['metadata']['name'] }}",
+            attach_log=True,
+        )
+        t1 >> t2  # type: ignore
+
+    t1 >> tg1  # type: ignore
