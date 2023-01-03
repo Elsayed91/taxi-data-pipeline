@@ -52,26 +52,28 @@ yellow_historical_transformation = """
         first_day_of_month
     """
 
-yellow_filter_conditions = (
-    (F.col("tpep_pickup_datetime") < F.col("tpep_dropoff_datetime"))
-    & (F.col("passenger_count").between(1, 8))
-    & (F.col("VendorID").between(1, 3))
-    & (F.col("RatecodeID").between(1, 7))
-    & (F.col("payment_type").between(1, 7))
-    & (F.col("fare_amount").between(2.5, 250))
-    & (F.col("DOLocationID").isNotNull())
-    & (F.col("PULocationID").isNotNull())
-    & (F.col("fare_amount").isNotNull())
-    & (F.col("trip_distance").isNotNull())
-    & (F.col("tpep_dropoff_datetime").isNotNull())
-    & (F.col("tpep_pickup_datetime").isNotNull())
-)
+
+def yellow_filter_conditions():
+    return (
+        (F.col("tpep_pickup_datetime") < F.col("tpep_dropoff_datetime"))
+        & (F.col("passenger_count").between(1, 8))
+        & (F.col("VendorID").between(1, 3))
+        & (F.col("RatecodeID").between(1, 7))
+        & (F.col("payment_type").between(1, 7))
+        & (F.col("fare_amount").between(2.5, 250))
+        & (F.col("DOLocationID").isNotNull())
+        & (F.col("PULocationID").isNotNull())
+        & (F.col("fare_amount").isNotNull())
+        & (F.col("trip_distance").isNotNull())
+        & (F.col("tpep_dropoff_datetime").isNotNull())
+        & (F.col("tpep_pickup_datetime").isNotNull())
+    )
 
 
 options = {
     "yellow": {
         "mapping": yellow_schema_mapping,
-        "filter_conditions": yellow_filter_conditions,
+        "filter_conditions": yellow_filter_conditions(),
         "transformation_query": yellow_historical_transformation,
     }
 }
