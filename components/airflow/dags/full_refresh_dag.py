@@ -37,22 +37,45 @@ from airflow_kubernetes_job_operator.kube_api import (
 
 def parse_spark_application(body) -> KubeResourceState:
 
-    status = body.get("status", {})  # type: ignore
-    conditions = status.get("conditions", [])
+    status: dict = body.get("status", {})
+    annotations: dict = body.get("metadata", {}).get("annotations", {})
+    main_container_name = annotations.get(
+        "kubernetes_job_operator.main_container", None
+    )
 
-    job_status = KubeResourceState.Pending
+    container_resource_states = KubeResourceKind._get_container_resource_states_by_name(
+        yaml=body
+    )
 
-    if "startTime" in status:
-        job_status = KubeResourceState.Running
+    for container_state in container_resource_states.values():
+        if container_state == KubeResourceState.Failed:
+            return KubeResourceState.Failed
 
-    condition: dict = None  # type: ignore
-    for condition in conditions:
-        if condition.get("type") == "Failed":
-            job_status = KubeResourceState.Failed
-        if condition.get("type") == "Complete":
-            job_status = KubeResourceState.Succeeded
+    pod_phase = status.get("phase")
+    if pod_phase == "Pending":
+        # check for image pull back-off
+        container_statuses: list[dict] = status.get("containerStatuses", [])
+        for container_status in container_statuses:
+            waiting_reason = (
+                container_status.get("state", {}).get("waiting", {}).get("reason")
+            )
+            if waiting_reason == "ImagePullBackOff":
+                return KubeResourceState.Failed
 
-    return job_status
+        return KubeResourceState.Pending
+    elif pod_phase == "Succeeded":
+        return KubeResourceState.Succeeded
+    elif pod_phase == "Failed":
+        return KubeResourceState.Failed
+    elif pod_phase == "Running":
+        if (
+            main_container_name is not None
+            and main_container_name in container_resource_states
+        ):
+            return container_resource_states[main_container_name]
+        return KubeResourceState.Running
+
+    return pod_phase
 
 
 SparkApplication = KubeApiConfiguration.register_kind(
