@@ -35,3 +35,4 @@ components/dbt/.user.yml
 nohup.out
 components/train_model/script/__pycache__
 secrets/secret.env
+components/spark/scripts/__pycache__
