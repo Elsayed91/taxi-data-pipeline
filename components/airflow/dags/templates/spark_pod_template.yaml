@@ -65,7 +65,6 @@ spec:
         {% endif %}
     {% endfor %}
     {% endif %}
-    {% if params.env is defined %}
     env:
     {% for key, value in params.env.items() %}
     - name: {{ key }}
