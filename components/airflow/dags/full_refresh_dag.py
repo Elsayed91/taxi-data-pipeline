@@ -89,9 +89,10 @@ with DAG(
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
             "mainApplicationFile": f"local://{BASE}/spark/scripts/main_init.py",
             "name": "spark-k8s-init",
-            "instances": 5,
+            "instances": 7,
             "gitsync": True,
             "nodeSelector": "base",
+            "executor_memory": "2048m"
             "env": {
                 "CATEGORY": "yellow",
                 "URI": f"gs://{STAGING_BUCKET}/yellow/*",
