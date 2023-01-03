@@ -36,9 +36,8 @@ from airflow_kubernetes_job_operator.kube_api import (
 
 
 def parse_spark_application(body) -> KubeResourceState:
-    import yaml
 
-    status = yaml.get("status", {})  # type: ignore
+    status = body.get("status", {})  # type: ignore
     conditions = status.get("conditions", [])
 
     job_status = KubeResourceState.Pending
