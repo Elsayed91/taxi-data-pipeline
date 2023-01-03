@@ -37,32 +37,21 @@ from airflow_kubernetes_job_operator.kube_api import (
 
 def parse_spark_application(body) -> KubeResourceState:
 
-    status: dict = body.get("status", {})
+    status = body.get("status", {})  # type: ignore
     annotations: dict = body.get("metadata", {}).get("annotations", {})
     main_container_name = annotations.get(
         "kubernetes_job_operator.main_container", None
     )
-
     container_resource_states = KubeResourceKind._get_container_resource_states_by_name(
         yaml=body
     )
-
     for container_state in container_resource_states.values():
         if container_state == KubeResourceState.Failed:
             return KubeResourceState.Failed
 
     pod_phase = status.get("phase")
     if pod_phase == "Pending":
-        # check for image pull back-off
-        container_statuses: list[dict] = status.get("containerStatuses", [])
-        for container_status in container_statuses:
-            waiting_reason = (
-                container_status.get("state", {}).get("waiting", {}).get("reason")
-            )
-            if waiting_reason == "ImagePullBackOff":
-                return KubeResourceState.Failed
-
-        return KubeResourceState.Pending
+        job_status = KubeResourceState.Pending
     elif pod_phase == "Succeeded":
         return KubeResourceState.Succeeded
     elif pod_phase == "Failed":
@@ -74,7 +63,6 @@ def parse_spark_application(body) -> KubeResourceState:
         ):
             return container_resource_states[main_container_name]
         return KubeResourceState.Running
-
     return pod_phase
 
 
