@@ -39,11 +39,11 @@ spec:
       emptyDir: {}
     {% endif %}
   {% endif %}
-  nodeSelector:
-    iam.gke.io/gke-metadata-server-enabled: "true"
-    {% if params.nodeSelector is defined %}
-    cloud.google.com/gke-nodepool: {{ params.nodeSelector }}
-    {% endif %}
+  # nodeSelector:
+  #   iam.gke.io/gke-metadata-server-enabled: "true"
+  #   {% if params.nodeSelector is defined %}
+  #   cloud.google.com/gke-nodepool: {{ params.nodeSelector }}
+  #   {% endif %}
   driver:
     cores: 1
     coreLimit: "1200m"
