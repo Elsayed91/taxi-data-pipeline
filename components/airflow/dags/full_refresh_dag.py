@@ -88,7 +88,7 @@ with DAG(
         tg1_1 = SparkKubernetesOperator(
             task_id="spark-etl",
             namespace="default",
-            application_file=f"templatess/spark_pod_template.yaml",
+            application_file=f"templates/spark_pod_template.yaml",
             params={
                 "project": GOOGLE_CLOUD_PROJECT,
                 "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
