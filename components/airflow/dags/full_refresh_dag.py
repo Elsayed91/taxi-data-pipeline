@@ -84,7 +84,7 @@ with DAG(
         name_prefix="",
     )
 
-    with TaskGroup(group_id="spark-job-full-refresh") as tg1:
+    with TaskGroup(group_id="spark-init-etl") as tg1:
         t1 = SparkKubernetesOperator(
             task_id="spark-etl",
             namespace="default",
@@ -92,8 +92,7 @@ with DAG(
             params={
                 "project": GOOGLE_CLOUD_PROJECT,
                 "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-                # "mainApplicationFile": "local:///git/repo/components/spark/src/full-refresh-job.py",
-                "mainApplicationFile": "local:///git/repo/components/spark/src/spark_utilities.py",
+                "mainApplicationFile": f"local://{BASE}/spark/scripts/fix_schema.py",
                 "name": "spark-k8s-init",
                 "instances": 4,
                 "gitsync": True,
@@ -107,7 +106,7 @@ with DAG(
 
         t2 = SparkKubernetesSensor(
             task_id="spark-etl-monitor",
-            application_name="{{ task_instance.xcom_pull(task_ids='spark-job-full-refresh.spark-etl') ['metadata']['name'] }}",
+            application_name="{{ task_instance.xcom_pull(task_ids='spark-init-etl.spark-etl') ['metadata']['name'] }}",
             attach_log=True,
         )
         t1 >> t2  # type: ignore
