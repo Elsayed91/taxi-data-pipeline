@@ -92,7 +92,7 @@ with DAG(
             "instances": 7,
             "gitsync": True,
             "nodeSelector": "base",
-            "executor_memory": "2048m"
+            "executor_memory": "2048m",
             "env": {
                 "CATEGORY": "yellow",
                 "URI": f"gs://{STAGING_BUCKET}/yellow/*",
