@@ -53,9 +53,9 @@ spec:
       - name: "gcsfs-creds"
         path: "/mnt/secrets"
         secretType: GCPServiceAccount
-      {% if job.envFrom is defined  %}
+      {% if params.envFrom is defined  %}
     envFrom:
-    {% for envFrom in job.envFrom %}
+    {% for envFrom in params.envFrom %}
     - {% if envFrom.type == 'configMapRef' %}
         configMapRef:
             name: {{ envFrom.name }}
@@ -76,10 +76,10 @@ spec:
       version: 3.1.2
       metrics-exposed: "true"
     serviceAccount:  {{ params.imagePullPolicy | default('default') }}
-      {% if job.volumes is defined or (job.gitsync is defined and job.gitsync) %}
+      {% if params.volumes is defined or (params.gitsync is defined and params.gitsync) %}
     volumeMounts:
-    {% if job.volumes is defined %}
-    {% for volume in job.volumes %}
+    {% if params.volumes is defined %}
+    {% for volume in params.volumes %}
     - name: {{ volume.name }}
         mountPath: {{ volume.mountPath }}
         {% if volume.subPath is defined %}
@@ -87,12 +87,12 @@ spec:
         {% endif %}
     {% endfor %}
     {% endif %}
-    {% if job.gitsync is defined and job.gitsync %}
+    {% if params.gitsync is defined and params.gitsync %}
     - name: code
         mountPath: /git
     {% endif %}
     {% endif %}
-    {% if job.gitsync is defined and job.gitsync %}
+    {% if params.gitsync is defined and params.gitsync %}
     initContainers:
       - name: git-sync
         image: k8s.gcr.io/git-sync/git-sync:v3.6.2
@@ -115,9 +115,9 @@ spec:
     coreRequest: 100m
     instances: {{ params.instances }}
     memory: "512m"
-      {% if job.envFrom is defined  %}
+      {% if params.envFrom is defined  %}
     envFrom:
-    {% for envFrom in job.envFrom %}
+    {% for envFrom in params.envFrom %}
     - {% if envFrom.type == 'configMapRef' %}
         configMapRef:
             name: {{ envFrom.name }}
@@ -141,10 +141,10 @@ spec:
     labels:
       version: 3.1.2
       metrics-exposed: "true"
-      {% if job.volumes is defined or (job.gitsync is defined and job.gitsync) %}
+      {% if params.volumes is defined or (params.gitsync is defined and params.gitsync) %}
     volumeMounts:
-    {% if job.volumes is defined %}
-    {% for volume in job.volumes %}
+    {% if params.volumes is defined %}
+    {% for volume in params.volumes %}
     - name: {{ volume.name }}
         mountPath: {{ volume.mountPath }}
         {% if volume.subPath is defined %}
@@ -152,12 +152,12 @@ spec:
         {% endif %}
     {% endfor %}
     {% endif %}
-    {% if job.gitsync is defined and job.gitsync %}
+    {% if params.gitsync is defined and params.gitsync %}
     - name: code
         mountPath: /git
     {% endif %}
     {% endif %}
-    {% if job.gitsync is defined and job.gitsync %}
+    {% if params.gitsync is defined and params.gitsync %}
     initContainers:
       - name: git-sync
         image: k8s.gcr.io/git-sync/git-sync:v3.6.2
