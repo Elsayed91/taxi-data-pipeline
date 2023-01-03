@@ -22,6 +22,9 @@ default_args = {
     "retry_delay": timedelta(minutes=60),
     "concurrency": 1,
     "max_active_runs": 1,
+    "in_cluster": True,
+    "random_name_postfix_length": 2,
+    "name_prefix": "",
 }
 
 
@@ -102,7 +105,4 @@ with DAG(
                 "TRIAGE_TAREGET": f"{os.getenv('TRIAGE_DATASET')}.{os.getenv('YELLOW_TRIAGE_TABLE')}",
             },
         },
-        in_cluster=True,
-        random_name_postfix_length=2,
-        name_prefix="",
     )
