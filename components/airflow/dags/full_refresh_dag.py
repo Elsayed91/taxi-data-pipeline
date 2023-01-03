@@ -28,31 +28,31 @@ default_args = {
     "max_active_runs": 1,
 }
 
-from airflow_kubernetes_job_operator.kube_api import KubeResourceState
+from airflow_kubernetes_job_operator.kube_api import (
+    KubeResourceState,
+    KubeApiConfiguration,
+    KubeResourceKind,
+)
 
 
 def parse_spark_application(body) -> KubeResourceState:
     if "status" not in body:
         return KubeResourceState.Pending
-
     status = body["status"]
     if "completionTime" in status:
         return KubeResourceState.Succeeded
     if "failed" in status:
         return KubeResourceState.Failed
-    if "phase" in status and status["phase"] == "Succeeded":
-        return KubeResourceState.Succeeded
-    if "phase" in status and status["phase"] == "Failed":
-        return KubeResourceState.Failed
-    if "deleted" in status:
-        return KubeResourceState.Deleted
+    if "conditions" in status:
+        conditions = status["conditions"]
+        if conditions and conditions[0]["type"] == "Completed":
+            return KubeResourceState.Succeeded
+        if conditions and conditions[0]["type"] == "Failed":
+            return KubeResourceState.Failed
+        if conditions and conditions[0]["type"] == "Deleted":
+            return KubeResourceState.Deleted
     return KubeResourceState.Running
 
-
-from airflow_kubernetes_job_operator.kube_api import (
-    KubeApiConfiguration,
-    KubeResourceKind,
-)
 
 SparkApplication = KubeApiConfiguration.register_kind(
     name="SparkApplication",
