@@ -36,7 +36,7 @@ from airflow_kubernetes_job_operator.kube_api import (
 
 
 def parse_spark_application(body) -> KubeResourceState:
-    status = body["status"]
+
     status = body.get("status", {})  # type: ignore
     annotations: dict = body.get("metadata", {}).get("annotations", {})
     main_container_name = annotations.get(
