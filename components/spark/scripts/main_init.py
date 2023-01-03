@@ -45,8 +45,8 @@ if __name__ == "__main__":
             F.col("tpep_pickup_datetime")
             > F.current_timestamp() - F.expr("INTERVAL 6 MONTH")
         )
-        df_current_clean = df.filter(FILTER_CONDITION)
-        df_current_trash = df.filter(~FILTER_CONDITION)  # type: ignore
+        df_current_clean = df.filter(get_filter_condition())
+        df_current_trash = df.filter(~get_filter_condition())  # type: ignore
         df_current_clean.write.mode("append").format("bigquery").option(
             "bigQueryJobLabel.spark", f"etl-clean-{idx}"
         ).save(STAGING_TARGET)
