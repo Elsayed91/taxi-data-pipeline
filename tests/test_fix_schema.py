@@ -10,6 +10,7 @@ import unittest.mock
 import unittest
 import pandas as pd
 import tempfile
+from pyspark.sql import SparkSession
 
 
 @pytest.mark.parametrize(
@@ -228,8 +229,10 @@ def test_uri_parser():
     assert uri_parser(uri) == expected_output
 
 
-def test_yellow_filter_conditions(spark_session):
-    df = spark_session.createDataFrame(
+def test_yellow_filter_conditions():
+
+    spark = SparkSession.builder.getOrCreate()
+    df = spark.createDataFrame(
         [
             {
                 "tpep_pickup_datetime": "2022-01-01 10:00:00",
@@ -329,8 +332,8 @@ def test_yellow_filter_conditions(spark_session):
             },
         ]
     )
-
-    df_filtered = df.filter(yellow_filter_conditions())
+    cond = yellow_filter_conditions()
+    df_filtered = df.filter(cond)
     assert df_filtered.count() == 6
-    df_filtered = df.filter(yellow_filter_conditions())
+    df_filtered = df.filter(cond)
     assert df_filtered.filter(F.col("DOLocationID").isNull()).count() == 0

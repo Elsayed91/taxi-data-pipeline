@@ -21,7 +21,6 @@ if __name__ == "__main__":
     _, SRC_BUCKET, _, SRC_FOLDER = uri_parser(URI)
     CATEGORY = str(os.getenv("CATEGORY"))
     MAPPING = options[CATEGORY]["mapping"]
-    FILTER_CONDITION = options[CATEGORY]["filter_conditions"]
     TRANSFORMATION_QUERY = options[CATEGORY]["transformation_query"]
     HISTORICAL_TARGET = str(os.getenv("HISTORICAL_TARGET"))
     STAGING_TARGET = str(os.getenv("STAGING_TARGET"))
@@ -44,6 +43,7 @@ if __name__ == "__main__":
             F.col("tpep_pickup_datetime")
             > F.current_timestamp() - F.expr("INTERVAL 6 MONTH")
         )
+        FILTER_CONDITION = options[CATEGORY]["filter_conditions"]
         df_current_clean = df.filter(FILTER_CONDITION)
         df_current_trash = df.filter(~FILTER_CONDITION)  # type: ignore
         df_current_clean.write.mode("append").format("bigquery").option(
