@@ -28,6 +28,32 @@ default_args = {
     "max_active_runs": 1,
 }
 
+from airflow_kubernetes_job_operator.kube_api import KubeResourceState
+
+
+def parse_spark_application(body) -> KubeResourceState:
+    if "status" not in body:
+        return KubeResourceState.Pending
+
+    status = body["status"]
+    if "completionTime" in status:
+        return KubeResourceState.Succeeded
+    if "failed" in status:
+        return KubeResourceState.Failed
+    return KubeResourceState.Running
+
+
+from airflow_kubernetes_job_operator.kube_api import (
+    KubeApiConfiguration,
+    KubeResourceKind,
+)
+
+SparkApplication = KubeApiConfiguration.register_kind(
+    name="SparkApplication",
+    api_version="sparkoperator.k8s.io/v1beta2",
+    parse_kind_state=parse_spark_application,
+)
+
 with DAG(
     dag_id="full-refresh",
     schedule_interval=None,
@@ -43,6 +69,24 @@ with DAG(
     POD_TEMPLATE_PATH = f"{BASE}/airflow/dags/templates/pod_template.yaml"
     SCRIPTS_PATH = f"{BASE}/airflow/dags/scripts"
     JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL", "jobs")
+
+    t1 = KubernetesJobOperator(
+        task_id="test",
+        body_filepath=f"{BASE}/airflow/dags/templates/spark_pod_template.yaml",
+        jinja_job_args={
+            "project": GOOGLE_CLOUD_PROJECT,
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
+            "mainApplicationFile": f"local://{BASE}/spark/scripts/fix_schema.py",
+            "name": "spark-k8s-init",
+            "instances": 4,
+            "gitsync": True,
+            "nodeSelector": JOBS_NODE_POOL,
+            "env": {
+                "URI": f"gs://{STAGING_BUCKET}/yellow/*",
+                "NAME_PREFIX": "yellow_tripdata_",
+            },
+        },
+    )
 
     # t1 = KubernetesJobOperator(
     #     task_id="aws_to_gcs",
@@ -84,31 +128,31 @@ with DAG(
     #     name_prefix="",
     # )
 
-    with TaskGroup(group_id="spark-init-etl") as tg1:
-        tg1_1 = SparkKubernetesOperator(
-            task_id="spark-etl",
-            namespace="default",
-            application_file=f"templates/spark_pod_template.yaml",
-            params={
-                "project": GOOGLE_CLOUD_PROJECT,
-                "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-                "mainApplicationFile": f"local://{BASE}/spark/scripts/fix_schema.py",
-                "name": "spark-k8s-init",
-                "instances": 4,
-                "gitsync": True,
-                "nodeSelector": JOBS_NODE_POOL,
-                "env": {
-                    "URI": f"gs://{STAGING_BUCKET}/yellow/*",
-                    "NAME_PREFIX": "yellow_tripdata_",
-                },
-            },
-        )
+    # with TaskGroup(group_id="spark-init-etl") as tg1:
+    #     tg1_1 = SparkKubernetesOperator(
+    #         task_id="spark-etl",
+    #         namespace="default",
+    #         application_file=f"templates/spark_pod_template.yaml",
+    # params={
+    #     "project": GOOGLE_CLOUD_PROJECT,
+    #     "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
+    #     "mainApplicationFile": f"local://{BASE}/spark/scripts/fix_schema.py",
+    #     "name": "spark-k8s-init",
+    #     "instances": 4,
+    #     "gitsync": True,
+    #     "nodeSelector": JOBS_NODE_POOL,
+    #     "env": {
+    #         "URI": f"gs://{STAGING_BUCKET}/yellow/*",
+    #         "NAME_PREFIX": "yellow_tripdata_",
+    #     },
+    #         },
+    #     )
 
-        tg1_2 = SparkKubernetesSensor(
-            task_id="spark-etl-monitor",
-            application_name="{{ task_instance.xcom_pull(task_ids='spark-init-etl.spark-etl') ['metadata']['name'] }}",
-            attach_log=True,
-        )
-        tg1_1 >> tg1_2  # type: ignore
+    #     tg1_2 = SparkKubernetesSensor(
+    #         task_id="spark-etl-monitor",
+    #         application_name="{{ task_instance.xcom_pull(task_ids='spark-init-etl.spark-etl') ['metadata']['name'] }}",
+    #         attach_log=True,
+    #     )
+    #     tg1_1 >> tg1_2  # type: ignore
 
     tg1  # type: ignore

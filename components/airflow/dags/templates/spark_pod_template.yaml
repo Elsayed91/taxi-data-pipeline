@@ -1,27 +1,27 @@
 apiVersion: "sparkoperator.k8s.io/v1beta2"
 kind: SparkApplication
 metadata:
-  name: "{{ params.name }}"
+  name: "{{ job.name }}"
 spec:
   type: Python
   mode: cluster
   pythonVersion: "3"
   sparkVersion: "3.1.2"
-  imagePullPolicy: {{ params.imagePullPolicy | default('Never') }}
-  image: "{{ params.image }}"
+  imagePullPolicy: {{ job.imagePullPolicy | default('Never') }}
+  image: "{{ job.image }}"
   restartPolicy:
-    type: {{ params.restartPolicy | default('Never') }}
-  mainApplicationFile: "{{ params.mainApplicationFile }}"
+    type: {{ job.restartPolicy | default('Never') }}
+  mainApplicationFile: "{{ job.mainApplicationFile }}"
   hadoopConf:
-  "fs.gs.project.id": "{{ params.project }}"
+  "fs.gs.project.id": "{{ job.project }}"
   "google.cloud.auth.service.account.enable": "true"
   "google.cloud.auth.service.account.json.keyfile": "/mnt/secrets/key.json"
   "fs.gs.impl": "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem"
   "fs.AbstractFileSystem.gs.impl": "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS"
-  {% if params.volumes is defined or (params.gitsync is defined and params.gitsync) %}
+  {% if job.volumes is defined or (job.gitsync is defined and job.gitsync) %}
   volumes:
-    {% if params.volumes is defined %}
-    {% for volume in params.volumes %}
+    {% if job.volumes is defined %}
+    {% for volume in job.volumes %}
     - name: {{ volume.name }}
       {% if volume.type == 'secret' %}
       secret:
@@ -34,15 +34,15 @@ spec:
       {% endif %}
     {% endfor %}
     {% endif %}
-    {% if params.gitsync is defined and params.gitsync %}
+    {% if job.gitsync is defined and job.gitsync %}
     - name: code
       emptyDir: {}
     {% endif %}
   {% endif %}
   nodeSelector:
     iam.gke.io/gke-metadata-server-enabled: "true"
-    {% if params.nodeSelector is defined %}
-    cloud.google.com/gke-nodepool: {{ params.nodeSelector }}
+    {% if job.nodeSelector is defined %}
+    cloud.google.com/gke-nodepool: {{ job.nodeSelector }}
     {% endif %}
   driver:
     cores: 1
@@ -53,9 +53,9 @@ spec:
       - name: "gcsfs-creds"
         path: "/mnt/secrets"
         secretType: GCPServiceAccount
-    # {% if params.envFrom is defined  %}
+    # {% if job.envFrom is defined  %}
     # envFrom:
-    # {% for envFrom in params.envFrom %}
+    # {% for envFrom in job.envFrom %}
     # - {% if envFrom.type == 'configMapRef' %}
     #   configMapRef:
     #       name: {{ envFrom.name }}
@@ -65,9 +65,9 @@ spec:
     #   {% endif %}
     # {% endfor %}
     # {% endif %}
-    {% if params.env is defined %}
+    {% if job.env is defined %}
     env:
-    {% for key, value in params.env.items() %}
+    {% for key, value in job.env.items() %}
     - name: {{ key }}
       value: {{ value }}
     {% endfor %}
@@ -75,11 +75,11 @@ spec:
     labels:
       version: 3.1.2
       metrics-exposed: "true"
-    serviceAccount:  {{ params.imagePullPolicy | default('default') }}
-      {% if params.volumes is defined or (params.gitsync is defined and params.gitsync) %}
+    serviceAccount:  {{ job.imagePullPolicy | default('default') }}
+      {% if job.volumes is defined or (job.gitsync is defined and job.gitsync) %}
     volumeMounts:
-    {% if params.volumes is defined %}
-    {% for volume in params.volumes %}
+    {% if job.volumes is defined %}
+    {% for volume in job.volumes %}
     - name: {{ volume.name }}
         mountPath: {{ volume.mountPath }}
         {% if volume.subPath is defined %}
@@ -87,12 +87,12 @@ spec:
         {% endif %}
     {% endfor %}
     {% endif %}
-    {% if params.gitsync is defined and params.gitsync %}
+    {% if job.gitsync is defined and job.gitsync %}
     - name: code
         mountPath: /git
     {% endif %}
     {% endif %}
-    {% if params.gitsync is defined and params.gitsync %}
+    {% if job.gitsync is defined and job.gitsync %}
     initContainers:
       - name: git-sync
         image: k8s.gcr.io/git-sync/git-sync:v3.6.2
@@ -113,11 +113,11 @@ spec:
   executor:
     cores: 1
     coreRequest: 100m
-    instances: {{ params.instances }}
+    instances: {{ job.instances }}
     memory: "512m"
-      {% if params.envFrom is defined  %}
+      {% if job.envFrom is defined  %}
     envFrom:
-    {% for envFrom in params.envFrom %}
+    {% for envFrom in job.envFrom %}
     - {% if envFrom.type == 'configMapRef' %}
         configMapRef:
             name: {{ envFrom.name }}
@@ -127,9 +127,9 @@ spec:
         {% endif %}
     {% endfor %}
     {% endif %}
-    {% if params.env is defined %}
+    {% if job.env is defined %}
     env:
-    {% for key, value in params.env.items() %}
+    {% for key, value in job.env.items() %}
     - name: {{ key }}
       value: {{ value }}
     {% endfor %}
@@ -141,10 +141,10 @@ spec:
     labels:
       version: 3.1.2
       metrics-exposed: "true"
-      {% if params.volumes is defined or (params.gitsync is defined and params.gitsync) %}
+      {% if job.volumes is defined or (job.gitsync is defined and job.gitsync) %}
     volumeMounts:
-    {% if params.volumes is defined %}
-    {% for volume in params.volumes %}
+    {% if job.volumes is defined %}
+    {% for volume in job.volumes %}
     - name: {{ volume.name }}
         mountPath: {{ volume.mountPath }}
         {% if volume.subPath is defined %}
@@ -152,12 +152,12 @@ spec:
         {% endif %}
     {% endfor %}
     {% endif %}
-    {% if params.gitsync is defined and params.gitsync %}
+    {% if job.gitsync is defined and job.gitsync %}
     - name: code
         mountPath: /git
     {% endif %}
     {% endif %}
-    {% if params.gitsync is defined and params.gitsync %}
+    {% if job.gitsync is defined and job.gitsync %}
     initContainers:
       - name: git-sync
         image: k8s.gcr.io/git-sync/git-sync:v3.6.2
