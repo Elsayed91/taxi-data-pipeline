@@ -40,6 +40,8 @@ def parse_spark_application(body) -> KubeResourceState:
         return KubeResourceState.Succeeded
     if "failed" in status:
         return KubeResourceState.Failed
+    if "deletionTimestamp" in body:
+        return KubeResourceState.Deleted
     return KubeResourceState.Running
 
 
