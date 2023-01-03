@@ -58,6 +58,7 @@ def parse_spark_application(body) -> KubeResourceState:
 SparkApplication = KubeApiConfiguration.register_kind(
     name="SparkApplication",
     api_version="sparkoperator.k8s.io/v1beta2",
+    parse_kind_state=parse_spark_application,
 )
 KubeResourceKind.register_global_kind(SparkApplication)
 
