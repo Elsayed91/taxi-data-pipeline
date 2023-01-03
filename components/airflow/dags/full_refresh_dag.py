@@ -107,7 +107,7 @@ with DAG(
 
         t2 = SparkKubernetesSensor(
             task_id="spark-etl-monitor",
-            application_name="{{ task_instance.xcom_pull(task_ids='spark-job-full-refresh.spark_full_refresh') ['metadata']['name'] }}",
+            application_name="{{ task_instance.xcom_pull(task_ids='spark-job-full-refresh.spark-etl') ['metadata']['name'] }}",
             attach_log=True,
         )
         t1 >> t2  # type: ignore
