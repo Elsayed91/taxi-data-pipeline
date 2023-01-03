@@ -122,6 +122,7 @@ if __name__ == "__main__":
     URI = os.getenv("URI")
     NAME_PREFIX = os.getenv("NAME_PREFIX")
     _, SRC_BUCKET, _, SRC_FOLDER = uri_parser(URI)  # type: ignore
+    PARTITION_COLUMN = "tpep_pickup_datetime"
     spark = SparkSession.builder.getOrCreate()
     blobs = get_gcs_files(SRC_BUCKET, SRC_FOLDER, SRC_FOLDER)  # type: ignore
     blobs = list_files(blobs)  # type: ignore
