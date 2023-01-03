@@ -85,7 +85,7 @@ with DAG(
     )
 
     with TaskGroup(group_id="spark-init-etl") as tg1:
-        t1 = SparkKubernetesOperator(
+        tg1_1 = SparkKubernetesOperator(
             task_id="spark-etl",
             namespace="default",
             application_file=f"templatess/spark_pod_template.yaml",
@@ -104,11 +104,11 @@ with DAG(
             },
         )
 
-        t2 = SparkKubernetesSensor(
+        tg1_2 = SparkKubernetesSensor(
             task_id="spark-etl-monitor",
             application_name="{{ task_instance.xcom_pull(task_ids='spark-init-etl.spark-etl') ['metadata']['name'] }}",
             attach_log=True,
         )
-        t1 >> t2  # type: ignore
+        tg1_1 >> tg1_2  # type: ignore
 
     t1 >> tg1  # type: ignore
