@@ -1,20 +1,12 @@
-import logging
-from typing import List
 import pandas as pd
 import google.cloud.storage as storage
 import pyarrow.parquet as pq
 import gcsfs
 import pyspark.sql.functions as F
-from pyspark.sql import SparkSession
-import os
-
-try:
-    from configs import yellow_schema_mapping
-except:
-    from components.spark.scripts.configs import *
+from pyspark.sql import DataFrame
 
 
-def get_gcs_files(bucket: str, folder: str, file_prefix: str) -> List[bytes]:
+def get_gcs_files(bucket: str, folder: str, file_prefix: str) -> list[bytes]:
     """
     Retrieve a list of blobs from the specified bucket with the given folder and file prefix.
 
@@ -36,7 +28,7 @@ def get_gcs_files(bucket: str, folder: str, file_prefix: str) -> List[bytes]:
     return list(blobs)
 
 
-def list_files(blobs: List[bytes]) -> List[str]:
+def list_files(blobs: list[bytes]) -> list[str]:
     """
     Extract the file names from a list of blobs and return a list of file names.
     Expects Files with format gs://bucket/folder/file
@@ -56,11 +48,18 @@ def list_files(blobs: List[bytes]) -> List[str]:
     return list_items
 
 
-def get_schema_info(links: List[str]) -> pd.DataFrame:
+def get_schema_info(links: list[str]) -> pd.DataFrame:
     """
-    reads the schema of items in a list by reading the metadata.
-    """
+    Read the schema of items in a list of GCS links by reading the metadata.
 
+    Parameters:
+    - links: A list of strings representing the GCS links of the items.
+
+    Returns:
+    A DataFrame containing the schema information for each item in `links`.
+    The DataFrame has a column `link` that contains the GCS link of each item,
+    and one column for each field in the schema of the item, where the column name is the field name and the column value is the field data type.
+    """
     df_list = []
     for link in links:
         with gcsfs.GCSFileSystem().open(link) as f:
@@ -80,14 +79,32 @@ def get_schema_info(links: List[str]) -> pd.DataFrame:
     return pd.concat(df_list, ignore_index=True)
 
 
-def schema_groups(df: pd.DataFrame):
-    """creates a list holding lists of links of files that share the same schema."""
+def schema_groups(df: pd.DataFrame) -> list[list[str]]:
+    """
+    Group GCS links in a DataFrame by shared schema.
+
+    Parameters:
+    - df: A DataFrame containing a column `link` with GCS links and columns representing the fields in the schema of each link.
+
+    Returns:
+    A list of lists, where each inner list contains the GCS links that share the same schema. The schema is determined by the column names and values in `df` (excluding the `link` column).
+    """
     columns = [value for value in list(df.columns) if value != "link"]
     df_groups = df.groupby(columns)["link"]
     return df_groups.apply(lambda x: list(x)).tolist()
 
 
-def cast_columns(df, mapping):
+def cast_columns(df: DataFrame, mapping: dict[str, str]) -> DataFrame:
+    """
+    Cast columns in a DataFrame to corresponding data types according to a mapping dict that is provided.
+
+    Parameters:
+    - df: The DataFrame whose columns should be cast.
+    - mapping: A dictionary where the keys are column names and the values are the new data types to which the columns should be cast.
+
+    Returns:
+    df with columns that are included in the mapping and with the columns cast to appropriate dtype.
+    """
     rest_cols = [F.col(cl) for cl in df.columns if cl not in mapping]
     conv_cols = [
         F.col(cl_name).cast(cl_type).alias(cl_name)
@@ -99,7 +116,7 @@ def cast_columns(df, mapping):
 
 
 def uri_parser(uri: str) -> tuple[str, str, str, str]:
-    """Parses a URI string and returns its parts.
+    """Parses a GCS URI string and returns its parts.
 
     Args:
         uri (str): The URI string to parse.
@@ -116,23 +133,3 @@ def uri_parser(uri: str) -> tuple[str, str, str, str]:
     blob_path = "/".join(uri.split("/")[3:])
     category = uri.split("/")[-2]
     return filename, bucket, blob_path, category
-
-
-if __name__ == "__main__":
-    URI = os.getenv("URI")
-    NAME_PREFIX = os.getenv("NAME_PREFIX")
-    _, SRC_BUCKET, _, SRC_FOLDER = uri_parser(URI)  # type: ignore
-    PARTITION_COLUMN = "tpep_pickup_datetime"
-    spark = SparkSession.builder.getOrCreate()
-    blobs = get_gcs_files(SRC_BUCKET, SRC_FOLDER, SRC_FOLDER)  # type: ignore
-    blobs = list_files(blobs)  # type: ignore
-    df = get_schema_info(blobs)  # type: ignore
-    lists = schema_groups(df)
-    for l in lists:
-        df = spark.read.parquet(*l)
-        df = cast_columns(df, yellow_schema_mapping)
-        year_month = F.to_date(F.col(PARTITION_COLUMN), "YYYY-MM")  # type: ignore
-        df_with_partition = df.withColumn("year_month", year_month)
-        df_with_partition.write.partitionBy("year_month").mode("append").parquet(
-            f"gs://{SRC_BUCKET}/{SRC_FOLDER}/{NAME_PREFIX}"
-        )

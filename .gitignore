@@ -36,3 +36,4 @@ nohup.out
 components/train_model/script/__pycache__
 secrets/secret.env
 components/spark/scripts/__pycache__
+components/airflow/dags/addons/__pycache__
