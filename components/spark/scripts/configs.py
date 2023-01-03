@@ -53,28 +53,23 @@ yellow_historical_transformation = """
     """
 
 
-def yellow_filter_conditions():
-    cond = (
-        (F.col("tpep_pickup_datetime") < F.col("tpep_dropoff_datetime"))
-        & (F.col("passenger_count").between(1, 8))
-        & (F.col("VendorID").between(1, 3))
-        & (F.col("RatecodeID").between(1, 7))
-        & (F.col("payment_type").between(1, 7))
-        & (F.col("fare_amount").between(2.5, 250))
-        & (F.col("DOLocationID").isNotNull())
-        & (F.col("PULocationID").isNotNull())
-        & (F.col("fare_amount").isNotNull())
-        & (F.col("trip_distance").isNotNull())
-        & (F.col("tpep_dropoff_datetime").isNotNull())
-        & (F.col("tpep_pickup_datetime").isNotNull())
-    )
-    return cond
+yellow_filter_conditions = """
+    tpep_pickup_datetime < tpep_dropoff_datetime 
+    AND passenger_count BETWEEN 1 AND 8 
+    AND VendorID BETWEEN 1 AND 3 
+    AND RatecodeID BETWEEN 1 AND 7 
+    AND payment_type BETWEEN 1 AND 7 
+    AND fare_amount >= 2.5 AND fare_amount < 250 
+    AND DOLocationID IS NOT NULL AND PULocationID IS NOT NULL 
+    AND fare_amount IS NOT NULL AND trip_distance IS NOT NULL 
+    AND tpep_dropoff_datetime IS NOT NULL AND tpep_pickup_datetime IS NOT NULL
+    """
 
 
 options = {
     "yellow": {
         "mapping": yellow_schema_mapping,
-        "filter_conditions": yellow_filter_conditions(),
+        "filter_conditions": yellow_filter_conditions,
         "transformation_query": yellow_historical_transformation,
     }
 }

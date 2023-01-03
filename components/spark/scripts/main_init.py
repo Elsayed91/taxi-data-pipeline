@@ -22,6 +22,7 @@ if __name__ == "__main__":
     CATEGORY = str(os.getenv("CATEGORY"))
     MAPPING = options[CATEGORY]["mapping"]
     TRANSFORMATION_QUERY = options[CATEGORY]["transformation_query"]
+    FILTER_CONDITIONS = options[CATEGORY]["filter_conditions"]
     HISTORICAL_TARGET = str(os.getenv("HISTORICAL_TARGET"))
     STAGING_TARGET = str(os.getenv("STAGING_TARGET"))
     TRIAGE_TAREGET = str(os.getenv("TRIAGE_TAREGET"))
@@ -43,9 +44,11 @@ if __name__ == "__main__":
             F.col("tpep_pickup_datetime")
             > F.current_timestamp() - F.expr("INTERVAL 6 MONTH")
         )
-        FILTER_CONDITION = options[CATEGORY]["filter_conditions"]
-        df_current_clean = df.filter(FILTER_CONDITION)
-        df_current_trash = df.filter(~FILTER_CONDITION)  # type: ignore
+        df_view = df_current.createOrReplaceTempView("view")
+        df_current_clean = spark.sql(f"SELECT * FROM view WHERE {FILTER_CONDITIONS}")
+        df_current_trash = spark.sql(
+            f"SELECT * FROM view WHERE NOT ({FILTER_CONDITIONS})"
+        )
         df_current_clean.write.mode("append").format("bigquery").option(
             "bigQueryJobLabel.spark", f"etl-clean-{idx}"
         ).save(STAGING_TARGET)
