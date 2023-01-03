@@ -59,6 +59,7 @@ SparkApplication = KubeApiConfiguration.register_kind(
     name="SparkApplication",
     api_version="sparkoperator.k8s.io/v1beta2",
 )
+KubeResourceKind.register_global_kind(SparkApplication)
 
 with DAG(
     dag_id="full-refresh",
