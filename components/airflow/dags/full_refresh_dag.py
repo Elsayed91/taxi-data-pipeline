@@ -36,35 +36,24 @@ from airflow_kubernetes_job_operator.kube_api import (
 
 
 def parse_spark_application(body) -> KubeResourceState:
-
-    status = body.get("status", {})  # type: ignore
-    annotations: dict = body.get("metadata", {}).get("annotations", {})
-    main_container_name = annotations.get(
-        "kubernetes_job_operator.main_container", None
-    )
-    container_resource_states = KubeResourceKind._get_container_resource_states_by_name(
-        yaml=body
-    )
-    for container_state in container_resource_states.values():
-        if container_state == KubeResourceState.Failed:
-            return KubeResourceState.Failed
-
-    pod_phase = status.get("phase")
-    logging.info(pod_phase)
-    if pod_phase == "Pending":
+    if "status" not in body:
         return KubeResourceState.Pending
-    elif pod_phase == "Succeeded":
+
+    status = body["status"]
+    if "completionTime" in status:
         return KubeResourceState.Succeeded
-    elif pod_phase == "Failed":
+    if "failed" in status:
         return KubeResourceState.Failed
-    elif pod_phase == "Running":
-        if (
-            main_container_name is not None
-            and main_container_name in container_resource_states
-        ):
-            return container_resource_states[main_container_name]
-        return KubeResourceState.Running
-    return pod_phase
+    if "phase" in status and status["phase"] == "Succeeded":
+        return KubeResourceState.Succeeded
+    if "phase" in status and status["phase"] == "Failed":
+        return KubeResourceState.Failed
+    if "reason" in status and status["reason"] == "Deleting":
+        return KubeResourceState.Deleted
+    metadata = body["metadata"]
+    if "deletionTimestamp" in metadata:
+        return KubeResourceState.Deleted
+    return KubeResourceState.Running
 
 
 SparkApplication = KubeApiConfiguration.register_kind(
