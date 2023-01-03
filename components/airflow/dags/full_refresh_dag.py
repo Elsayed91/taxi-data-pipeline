@@ -36,23 +36,18 @@ from airflow_kubernetes_job_operator.kube_api import (
 
 
 def parse_spark_application(body) -> KubeResourceState:
+    FAILURE_STATES = ("FAILED", "UNKNOWN", "DELETED")
+    SUCCESS_STATES = ("COMPLETED",)
+
     if "status" not in body:
         return KubeResourceState.Pending
+    application_state = body["status"]["applicationState"]["state"]
 
-    status = body["status"]
-    if "completionTime" in status:
-        return KubeResourceState.Succeeded
-    if "failed" in status:
+    if application_state in FAILURE_STATES:
         return KubeResourceState.Failed
-    if "phase" in status and status["phase"] == "Succeeded":
+    if application_state in SUCCESS_STATES:
         return KubeResourceState.Succeeded
-    if "phase" in status and status["phase"] == "Failed":
-        return KubeResourceState.Failed
-    if "reason" in status and status["reason"] == "Deleting":
-        return KubeResourceState.Deleted
-    metadata = body["metadata"]
-    if "deletionTimestamp" in metadata:
-        return KubeResourceState.Deleted
+
     return KubeResourceState.Running
 
 
