@@ -18,10 +18,8 @@ URI = str(os.getenv("URI"))
 _, SRC_BUCKET, _, SRC_FOLDER = uri_parser(URI)
 CATEGORY = str(os.getenv("CATEGORY"))
 MAPPING = options[CATEGORY]["mapping"]
-FILTER_CONDITION = options[CATEGORY]["filter_condition"]
+FILTER_CONDITION = options[CATEGORY]["filter_conditions"]
 TRANSFORMATION_QUERY = options[CATEGORY]["transformation_query"]
-
-LABEL_KEY = str(os.getenv("LABEL", "spark-etl"))
 HISTORICAL_TARGET = str(os.getenv("HISTORICAL_TARGET"))
 STAGING_TARGET = str(os.getenv("STAGING_TARGET"))
 TRIAGE_TAREGET = str(os.getenv("TRIAGE_TAREGET"))

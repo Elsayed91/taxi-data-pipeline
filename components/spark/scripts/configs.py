@@ -72,6 +72,6 @@ options = {
     "yellow": {
         "mapping": yellow_schema_mapping,
         "filter_conditions": yellow_filter_conditions,
-        "historical_transformation": yellow_historical_transformation,
+        "transformation_query": yellow_historical_transformation,
     }
 }
