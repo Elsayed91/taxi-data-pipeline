@@ -36,7 +36,7 @@ from airflow_kubernetes_job_operator.kube_api import (
 
 
 def parse_spark_application(body) -> KubeResourceState:
-
+    status = body["status"]
     status = body.get("status", {})  # type: ignore
     annotations: dict = body.get("metadata", {}).get("annotations", {})
     main_container_name = annotations.get(
@@ -50,6 +50,7 @@ def parse_spark_application(body) -> KubeResourceState:
             return KubeResourceState.Failed
 
     pod_phase = status.get("phase")
+    logging.info(pod_phase)
     if pod_phase == "Pending":
         return KubeResourceState.Pending
     elif pod_phase == "Succeeded":
