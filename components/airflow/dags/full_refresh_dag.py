@@ -36,22 +36,24 @@ from airflow_kubernetes_job_operator.kube_api import (
 
 
 def parse_spark_application(body) -> KubeResourceState:
-    if "status" not in body:
-        return KubeResourceState.Pending
-    status = body["status"]
-    if "completionTime" in status:
-        return KubeResourceState.Succeeded
-    if "failed" in status:
-        return KubeResourceState.Failed
-    if "conditions" in status:
-        conditions = status["conditions"]
-        if conditions and conditions[0]["type"] == "Completed":
-            return KubeResourceState.Succeeded
-        if conditions and conditions[0]["type"] == "Failed":
-            return KubeResourceState.Failed
-        if conditions and conditions[0]["type"] == "Deleted":
-            return KubeResourceState.Deleted
-    return KubeResourceState.Running
+    import yaml
+
+    status = yaml.get("status", {})  # type: ignore
+    conditions = status.get("conditions", [])
+
+    job_status = KubeResourceState.Pending
+
+    if "startTime" in status:
+        job_status = KubeResourceState.Running
+
+    condition: dict = None  # type: ignore
+    for condition in conditions:
+        if condition.get("type") == "Failed":
+            job_status = KubeResourceState.Failed
+        if condition.get("type") == "Complete":
+            job_status = KubeResourceState.Succeeded
+
+    return job_status
 
 
 SparkApplication = KubeApiConfiguration.register_kind(
