@@ -53,18 +53,19 @@ spec:
       - name: "gcsfs-creds"
         path: "/mnt/secrets"
         secretType: GCPServiceAccount
-      {% if params.envFrom is defined  %}
+    {% if params.envFrom is defined  %}
     envFrom:
     {% for envFrom in params.envFrom %}
     - {% if envFrom.type == 'configMapRef' %}
-        configMapRef:
-            name: {{ envFrom.name }}
-        {% else %}
-        secretRef:
-            name: {{ envFrom.name }}
-        {% endif %}
+      configMapRef:
+          name: {{ envFrom.name }}
+      {% else %}
+      secretRef:
+          name: {{ envFrom.name }}
+      {% endif %}
     {% endfor %}
     {% endif %}
+    {% if params.env is defined %}
     env:
     {% for key, value in params.env.items() %}
     - name: {{ key }}
