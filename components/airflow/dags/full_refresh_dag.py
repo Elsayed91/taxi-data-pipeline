@@ -13,6 +13,8 @@ from addons.extract_target_date import extract_target_date
 KubeResourceKind.register_global_kind(SparkApplication)
 
 
+today = datetime.today().strftime("%Y-%m-%d")
+
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -139,5 +141,5 @@ with DAG(
             ],
             "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
         },
-        envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app"},
+        envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app", "RUN_DATE": today},
     )
