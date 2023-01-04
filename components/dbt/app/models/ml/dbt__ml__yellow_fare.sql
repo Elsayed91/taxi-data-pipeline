@@ -31,7 +31,7 @@ left join {{ ref("seed_zones") }} z2 on bt.dolocationid = z2.LocationID
 WHERE z1.LocationID IS NOT NULL AND z2.LocationID IS NOT NULL
 
 {% if is_incremental() %}
-{% set incremental_date = env_var('RUN_DATE', DATE(dbt_date.today())) %}
+{% set incremental_date = env_var('RUN_DATE',dbt_date.today()) %}
     AND DATE(bt.tpep_pickup_datetime) >= PARSE_DATE('%Y-%m-%d', DATE("{{ incremental_date }}"))
 {% endif %}
 
