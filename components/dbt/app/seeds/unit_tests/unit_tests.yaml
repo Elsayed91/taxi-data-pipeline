@@ -1,7 +1,7 @@
 version: 2
 
 seeds:
-- name: test_dbt__ml__yellow_fare_expected
+- name: test_yellow_staging
   description: sample data to be used for unit testing dbt__ml__yellow_fare
   config:
     schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
