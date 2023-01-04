@@ -116,11 +116,11 @@ with DAG(
         command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
         arguments=[
             "--debug",
-            # "--commands",
-            # "dbt seed;dbt run --full-refresh",  # ;dbt test --exclude tag:unit-test --target test
+            "--commands",
+            "dbt seed;dbt run --full-refresh",  # ;dbt test --exclude tag:unit-test --target test
         ],
         jinja_job_args={
-            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt/app",
             "name": "dbt",
             "gitsync": True,
             "volumes": [
