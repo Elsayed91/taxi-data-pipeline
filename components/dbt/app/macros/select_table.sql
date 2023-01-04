@@ -1,6 +1,6 @@
 {% macro select_table(source_table, test_table) %}
 
-      {% if var('unit_test', false) == true %}
+      {% if target.name == 'test' %}
             
             {{ return(test_table) }}
 
