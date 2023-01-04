@@ -44,6 +44,7 @@ t4 = KubernetesJobOperator(
     in_cluster=True,
     random_name_postfix_length=2,
     name_prefix="",
+    dag=dag,
 )
 
 
