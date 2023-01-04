@@ -1,6 +1,6 @@
 {% macro ref(model_name)%}
   {% if target.name == 'test' %}
-    {% if model_name.startswith('seed') %}
+    {% if model_name.startswith('seed') or model_name.endswith('_expected') %}
       {% do return(builtins.ref(model_name).include(database=false)) %}
     {% elif model_name.startswith('dbt__') %}
       {% do return(builtins.ref('test_' ~ model_name).include(database=false)) %}
