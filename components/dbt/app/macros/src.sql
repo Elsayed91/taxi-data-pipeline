@@ -1,4 +1,22 @@
-{% macro ref(model_name)%}
+{% macro src(dataset=None, model_name=None, test_model=None) %}
+    {% if target.name == 'test' %}
+        {% if dataset %}
+            {{ ref('test_' ~ test_model) }}
+        {% elif model_name %}
+            {{ ref('test_' ~ model_name) }}
+        {% endif %}
+    {% else %}
+        {% if dataset %}
+            {{ source(dataset, model_name) }}
+        {% elif model_name %}
+            {{ ref(model_name) }}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+
+
+{# {% macro ref(model_name)%}
   {% if target.name == 'test' %}
     {% if model_name.startswith('seed') or model_name.endswith('_expected') %}
       {% do return(builtins.ref(model_name).include(database=false)) %}
@@ -17,7 +35,7 @@
   {% else %}
     {% do return(builtins.source(dataset_name, model_name).include(database=false))  %}
   {% endif %}
-{% endmacro %}
+{% endmacro %} #}
 
 {# 
 

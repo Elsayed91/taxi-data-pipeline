@@ -23,7 +23,7 @@ select
             "z1.longitude", "z1.latitude", "z2.longitude", "z2.latitude"
         )
     }},
-from {{ source("staging_data", "yellow_staging", "dbt__ml__yellow_fare") }} bt
+from {{ src("staging_data", "yellow_staging", "dbt__ml__yellow_fare") }} bt
 left join {{ ref("seed_zones") }} z1 on bt.pulocationid = z1.LocationID
 left join {{ ref("seed_zones") }} z2 on bt.dolocationid = z2.LocationID 
 WHERE z1.LocationID IS NOT NULL AND z2.LocationID IS NOT NULL
