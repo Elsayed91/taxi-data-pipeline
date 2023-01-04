@@ -58,9 +58,9 @@ if [[ -n $generate_docs ]]; then
     echo "generating elementary report."
     edr monitor send-report --profiles-dir ${DBT_PROFILES_DIR} \
         --google-service-account-path $KEYFILE \
-        --gcs-bucket-name $DOCS_BUCKET \
-        --update-bucket-website true \
-        --bucket-file-path elementary/
+        --gcs-bucket-name gs://$DOCS_BUCKET/elementary
+    # --update-bucket-website true \
+    # --bucket-file-path elementary/
 fi
 
 if [[ -n $debug ]]; then
