@@ -33,7 +33,7 @@
   {% if target.name == 'test' %}
     {{ builtins.ref('test_'|string + this.name).include(database=false) }}
   {% else %}
-    {{ builtins.source(dataset_name, model_name) }}
+    {{ builtins.source(dataset_name, model_name).include(database=false) }}
   {% endif %}
 {% endmacro %}
 
