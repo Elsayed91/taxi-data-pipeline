@@ -120,7 +120,7 @@ with DAG(
             "dbt seed;dbt run --full-refresh",  # ;dbt test --exclude tag:unit-test --target test
         ],
         jinja_job_args={
-            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt/app",
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
             "name": "dbt",
             "gitsync": True,
             "volumes": [
@@ -137,7 +137,7 @@ with DAG(
             "GCP_REGION": os.getenv("GCP_REGION"),
             "STAGING_DATASET": os.getenv("STAGING_DATASET"),
             "YELLOW_STAGING_TABLE": os.getenv("YELLOW_STAGING_TABLE"),
-            "DBT_PROFILES_DIR": f"{BASE}/dbt",
+            "DBT_PROFILES_DIR": f"{BASE}/dbt/app",
             "HISTORICAL_DATASET": os.getenv("HISTORICAL_DATASET"),
         },
     )
