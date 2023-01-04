@@ -24,8 +24,7 @@ models:
     +schema: "elementary"
     +enabled: true 
 
-seeds:
-  +schema: "{{ 'models_unittest' if target.name == 'test' else 'models_common' }}"
+
 vars:
   'dbt_date:time_zone': 'UTC'
 tests:
