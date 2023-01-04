@@ -2,6 +2,7 @@ version: 2
 
 models:
   - name: dbt__ml__yellow_fare
+    schema: "{{ env_var('ML_DATASET') }}"
     description: >
       This table contains data on taxi rides in New York City, including various features such as
       the pickup and dropoff zones, trip distance, and fare amount. It also includes date and time
