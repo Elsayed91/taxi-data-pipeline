@@ -38,6 +38,14 @@ while [[ $# -gt 0 ]]; do
         test=true
         shift
         ;;
+    --seed)
+        seed=true
+        shift
+        ;;
+    *)
+        echo "Error: Unrecognized flag $key" >&2
+        exit 1
+        ;;
     esac
 done
 
