@@ -21,7 +21,7 @@ from google.cloud import storage
 
 if __name__ == "__main__":
     TARGET_BUCKET = os.getenv("DOCS_BUCKET")
-    PROFILES_DIR = os.getenv("DBT_PROFILES_DIR", "/git/repo/components/dbt")
+    PROFILES_DIR = os.getenv("DBT_PROFILES_DIR")
 
     search_str = 'o=[i("manifest","manifest.json"+t),i("catalog","catalog.json"+t)]'
     with open(f"{PROFILES_DIR}/target/index.html", "r") as f:

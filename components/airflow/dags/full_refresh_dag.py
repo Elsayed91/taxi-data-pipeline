@@ -141,5 +141,6 @@ with DAG(
             "DBT_PROFILES_DIR": f"{BASE}/dbt/app",
             "HISTORICAL_DATASET": os.getenv("HISTORICAL_DATASET"),
             "YELLOW_SUMMARY_TABLE": os.getenv("YELLOW_SUMMARY_TABLE"),
+            "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
         },
     )
