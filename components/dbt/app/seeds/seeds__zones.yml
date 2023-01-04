@@ -1,6 +1,6 @@
 version: 2
 seeds:
-- name: zones
+- name: seeds_zones
 
   config:
     column_types: {
@@ -9,7 +9,7 @@ seeds:
       longitude: float,
       latitude: float    
       }
-    schema: models_common
+    schema: models_seeds
       
   description: > 
     the name of the zone/borough corressponding to the LocationID provided in pickup and dropoff locations,
