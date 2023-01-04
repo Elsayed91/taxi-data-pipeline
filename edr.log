@@ -1,3 +1,4 @@
 2023-01-04 04:59:58 — DEBUG — Running dbt --log-format json run-operation get_adapter_type_and_unique_id --project-dir /home/lestrang/.local/lib/python3.10/site-packages/elementary/monitor/dbt_project --profiles-dir /home/lestrang/.dbt
 2023-01-04 05:00:02 — DEBUG — Running dbt --log-format json run-operation get_adapter_type_and_unique_id --project-dir /home/lestrang/.local/lib/python3.10/site-packages/elementary/monitor/dbt_project --profiles-dir /home/lestrang/.dbt
 2023-01-04 05:00:07 — DEBUG — Running dbt --log-format json run-operation get_adapter_type_and_unique_id --project-dir /home/lestrang/.local/lib/python3.10/site-packages/elementary/monitor/dbt_project --profiles-dir /home/lestrang/.dbt
+2023-01-04 05:05:43 — INFO — Running with edr=0.6.1

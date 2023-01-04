@@ -51,16 +51,16 @@ if [[ -n $commands ]]; then
 fi
 if [[ -n $generate_docs ]]; then
     echo "generating dbt docs."
-    dbt docs generate
-    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-    echo "uploading dbt docs static HTML to GCS"
-    python ${SCRIPT_DIR}/upload_dbt_results.py
+    # dbt docs generate
+    # SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+    # echo "uploading dbt docs static HTML to GCS"
+    # python ${SCRIPT_DIR}/upload_dbt_results.py
     echo "generating elementary report."
     edr monitor send-report --profiles-dir ${DBT_PROFILES_DIR} \
         --google-service-account-path $KEYFILE \
-        --gcs-bucket-name gs://$DOCS_BUCKET/elementary
-    # --update-bucket-website true \
-    # --bucket-file-path elementary/
+        --gcs-bucket-name $DOCS_BUCKET \
+        --update-bucket-website true \
+        --bucket-file-path elementary/elementary.html
 fi
 
 if [[ -n $debug ]]; then
