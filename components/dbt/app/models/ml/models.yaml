@@ -9,7 +9,7 @@ models:
       Additionally, it includes the distance between the pickup and dropoff locations, the distances
       from each location to JFK, EWR, and LGA airports.
     tests:
-      - dbt_utils.equality:
+      - default.equality:
           compare_model: ref('dbt__ml__yellow_fare_expected')
           tags: ["unit-test"]
     columns:
