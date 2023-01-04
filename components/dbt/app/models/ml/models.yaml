@@ -20,7 +20,7 @@ models:
         description: The distance of the taxi trip, in miles.
         type: float
       - name: trip_duration
-        description: trip_duration.
+        description: the duration of the trip. calculated by subtracting dropoff and pickup times.
         type: float
       - name: fare_amount
         description: The fare amount, in dollars.
@@ -43,25 +43,25 @@ models:
       - name: hour_of_day
         description: The hour of the day at which the taxi trip occurred.
         type: integer
-      - name: distance
-        description: The distance between the pickup and dropoff locations, in miles.
+      - name: geo_distance
+        description: The geographical distance between the pickup and dropoff locations.
         type: float
       - name: pickup_jfk_distance
-        description: The distance between the pickup location and JFK airport, in miles.
+        description: The geographical distance between the pickup location and JFK airport.
         type: float
       - name: dropoff_jfk_distance
-        description: The distance between the dropoff location and JFK airport, in miles.
+        description: The geographical distance between the dropoff location and JFK airport.
         type: float
       - name: pickup_ewr_distance
-        description: The distance between the pickup location and EWR airport, in miles.
+        description: The geographical distance between the pickup location and EWR airport.
         type: float
       - name: dropoff_ewr_distance
-        description: The distance between the dropoff location and EWR airport, in miles.
+        description: The geographical distance between the dropoff location and EWR airport.
         type: float
       - name: pickup_lga_distance
-        description: The distance between the pickup location and LGA airport, in miles.
+        description: The geographical distance between the pickup location and LGA airport.
         type: float
       - name: dropoff_lga_distance
-        description: The distance between the dropoff location and LGA airport, in miles.
+        description: The geographical distance between the dropoff location and LGA airport.
         type: float
 
