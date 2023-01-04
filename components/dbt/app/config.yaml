@@ -1,0 +1,8 @@
+google:
+  service_account_path: /mnt/secrets/key.json 
+  gcs_bucket_name: "{{ env_var('DOCS_BUCKET') }}"
+  bucket_file_path: elementary/elementary.index
+
+update_bucket_website: true
+exclude_elementary_models: true
+
