@@ -6,7 +6,9 @@
     {% if model_name.startswith('seed') %}
       {{ ref(model_name) }}
     {% else %}
-      {{ source(test_dataset, 'test_' ~ model_name) }}
+    {% set rel = builtins.ref('test_' ~ model_name) %}
+    {% set newrel = rel.replace_path(database=test_dataset) %}
+    {% do return(newrel) %}
     {% endif %}
   {% else %}
     {{ ref(model_name) }}
@@ -16,7 +18,9 @@
 
 {% macro src(dataset_name, model_name) %}
   {% if target.name == 'test' %}
-    {{ source(test_dataset, 'test_'|string + this.name) }}
+    {% set rel = builtins.ref('test_'|string + this.name) %}
+    {% set newrel = rel.replace_path(database=test_dataset) %}
+    {% do return(newrel) %}
   {% else %}
     {{ source(dataset_name, model_name) }}
   {% endif %}
