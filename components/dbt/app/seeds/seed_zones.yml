@@ -1,6 +1,6 @@
 version: 2
 seeds:
-- name: seeds_zones
+- name: seed_zones
 
   config:
     column_types: {
