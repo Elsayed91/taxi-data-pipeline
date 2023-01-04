@@ -59,12 +59,14 @@ gitpush() {
     git commit -m "$(openssl rand -hex 5)"
     git push -u origin main
 }
-
+kubectl get pods | grep Error
 kill_failed() {
     local namespace=${1:-default}
-    kubectl get pods -n $namespace | grep Error | cut -d' ' -f 1 | xargs kubectl delete pod
-    kubectl get pods -n $namespace | grep CrashLoopBackOff | cut -d' ' -f 1 | xargs kubectl delete pod
-    kubectl get pods -n $namespace | grep ImagePullBackOff | cut -d' ' -f 1 | xargs kubectl delete pod
+    local pods=$(kubectl get pods -n $namespace | grep -E "Error|CrashLoopBackOff|ImagePullBackOff" | cut -d' ' -f 1)
+    if [ -n "$pods" ]; then
+        kubectl delete pod $pods
+    fi
+    # kubectl get pods -n $namespace | grep ImagePullBackOff | cut -d' ' -f 1 | xargs kubectl delete pod
 }
 
 # wait_for_all_pods() {
