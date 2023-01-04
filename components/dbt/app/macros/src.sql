@@ -1,4 +1,4 @@
-{% macro ref(model_name)%}
+{% macro refv2(model_name)%}
   {% if target.name == 'test' %}
     {% if model_name.startswith('seed') %}
       {% do return(builtins.ref(model_name).include(database=false)) %}
@@ -11,7 +11,7 @@
 {% endmacro %}
 
 
-{% macro source(dataset_name, model_name, test_table=None) %}
+{% macro src(dataset_name, model_name, test_table=None) %}
   {% if target.name == 'test' %}
     {% do return(builtins.ref('test_' ~ test_table).include(database=false)) %}
   {% else %}
