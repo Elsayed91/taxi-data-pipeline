@@ -2,7 +2,7 @@
   {% if target.name == 'test' %}
     {% if model_name.startswith('seed') %}
       {% do return(builtins.ref(model_name).include(database=false)) %}
-    {% elif model_name.startwith('dbt__') %}
+    {% elif model_name.startswith('dbt__') %}
       {% do return(builtins.ref('test_' ~ model_name).include(database=false)) %}
     {% endif %}
   {% else %}
