@@ -12,7 +12,7 @@
 # --deps: When this option is present, the script will run the dbt deps command with the specified profiles directory to install dependencies.
 
 cd ${DBT_PROFILES_DIR}
-echo ${PWD}
+echo ${ML_DATASET}
 set -e
 while [[ $# -gt 0 ]]; do
     key="$1"
