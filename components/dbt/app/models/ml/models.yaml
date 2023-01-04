@@ -9,8 +9,15 @@ models:
       Additionally, it includes the distance between the pickup and dropoff locations, the distances
       from each location to JFK, EWR, and LGA airports.
     tests:
-      - dbt_utils.equality:
-          compare_model: ref('dbt__ml__yellow_fare_expected')
+      - dbt_datamocktool.unit_test:
+          name: "YS"
+          description: "This test is a unit test"
+          input_mapping:
+            source('staging_data', 'yellow_staging'): ref('test_dbt__ml__yellow_fare')
+          expected_output: ref('dbt__ml__yellow_fare_expected')
+          compare_columns:
+            - fare_amount
+            - passenger_count
           tags: ["unit-test"]
     columns:
       - name: passenger_count

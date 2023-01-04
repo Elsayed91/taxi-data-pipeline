@@ -1,4 +1,4 @@
-{% macro ref_for_env(model_name) %}
+{# {% macro ref_for_env(model_name) %}
 
 {%- set normal_ref_relation = ref(model_name) -%}
 
@@ -42,4 +42,4 @@
 
 {% endif %}
 
-{% endmacro %}
+{% endmacro %} #}
