@@ -11,7 +11,6 @@ secrets/aws_creds.json
 .terraform
 terraform/.cloudignore
 .git
-components/dbt/dbt_packages
 /terraform/.terraform.tfstate.lock.info
 *.tfvars
 terraform/modules/files/lambda
@@ -37,3 +36,5 @@ components/train_model/script/__pycache__
 secrets/secret.env
 components/spark/scripts/__pycache__
 components/airflow/dags/addons/__pycache__
+components/dbt/app/logs
+components/dbt/app/target

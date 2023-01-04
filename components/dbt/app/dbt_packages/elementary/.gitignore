@@ -1,0 +1,10 @@
+target/
+dbt_packages/
+logs/
+scripts/
+
+.idea
+
+edr.log
+integration_tests/data
+

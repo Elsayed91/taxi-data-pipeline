@@ -1,0 +1,45 @@
+version: 2
+seeds:
+- name: zones
+
+  config:
+    column_types: {
+      LocationID: integer,
+      borough:	string,
+      longitude: float,
+      latitude: float    
+      }
+    schema: models_common
+      
+  description: > 
+    the name of the zone/borough corressponding to the LocationID provided in pickup and dropoff locations,
+    in addition to the longitude and latitude.
+  columns:
+  - name: LocationID
+    description: The Zone's LocationID.
+    tests:
+      - unique
+      - not_null
+  - name: borough
+    description: The name of the Zone/Borough.
+    tests:
+      - unique
+      - not_null
+  - name: longitude
+    description: Longitude of the zone.
+    tests:
+      - unique
+      - not_null
+      - dbt_expectations.expect_column_values_to_be_between:
+          min_value: -74.28
+          max_value: -73.65
+          strictly: false
+  - name: latitude
+    description: Latitude of the zone.
+    tests:
+      - unique
+      - not_null
+      - dbt_expectations.expect_column_values_to_be_between:
+          min_value: 40.48
+          max_value: 40.93
+          strictly: false

@@ -1,0 +1,22 @@
+# version: 2
+
+# seeds:
+#   - name: base_y_ml_expected
+
+#     config:
+#       column_types:
+#         passenger_count: INTEGER
+#         pulocationid: INTEGER
+#         dolocationid: INTEGER
+#         trip_distance: FLOAT64
+#         fare_amount: FLOAT
+#         day_of_month: INTEGER
+#         MONTH: INTEGER
+#         YEAR: INTEGER
+#         day_of_week: INTEGER
+#         hour_of_day: INTEGER
+#         trip_duration: INTEGER
+#       schema: models_unittest
+#   - name: test_base_y_ml
+#     config:
+#       schema: models_unittest

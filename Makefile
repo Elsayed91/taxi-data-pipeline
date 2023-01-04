@@ -24,3 +24,6 @@ gitex:
 
 k:
 	@bash x.sh
+
+schema:
+	@bq show --schema --format=prettyjson $$PROJECT:$$STAGING_DATASET.$$YELLOW_STAGING_TABLE > myschema.json

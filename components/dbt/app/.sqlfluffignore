@@ -1,0 +1,4 @@
+target/
+logs/
+macros/
+dbt_packages/

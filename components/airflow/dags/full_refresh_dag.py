@@ -8,8 +8,11 @@ from airflow_kubernetes_job_operator.kubernetes_job_operator import (
 )
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
 from addons.parse_state import SparkApplication
+from addons.extract_target_date import extract_target_date
 
 KubeResourceKind.register_global_kind(SparkApplication)
+
+
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -84,25 +87,56 @@ with DAG(
     #     name_prefix="",
     # )
 
-    t2 = KubernetesJobOperator(
-        task_id="test",
-        body_filepath=f"{TEMPLATES_PATH}/spark_pod_template.yaml",
+    # t2 = KubernetesJobOperator(
+    #     task_id="test",
+    #     body_filepath=f"{TEMPLATES_PATH}/spark_pod_template.yaml",
+    #     jinja_job_args={
+    #         "project": GOOGLE_CLOUD_PROJECT,
+    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
+    #         "mainApplicationFile": f"local://{BASE}/spark/scripts/main_init.py",
+    #         "name": "spark-k8s-init",
+    #         "instances": 7,
+    #         "gitsync": True,
+    #         "nodeSelector": "base",
+    #         "executor_memory": "2048m",
+    #         "env": {
+    #             "CATEGORY": "yellow",
+    #             "URI": f"gs://{STAGING_BUCKET}/yellow/*",
+    #             "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
+    #             "HISTORICAL_TARGET": f"{os.getenv('HISTORICAL_DATASET')}.{os.getenv('HISTORICAL_TABLE')}",
+    #             "STAGING_TARGET": f"{os.getenv('STAGING_DATASET')}.{os.getenv('YELLOW_STAGING_TABLE')}",
+    #             "TRIAGE_TAREGET": f"{os.getenv('TRIAGE_DATASET')}.{os.getenv('YELLOW_TRIAGE_TABLE')}",
+    #         },
+    #     },
+    # )
+
+    t1 = KubernetesJobOperator(
+        task_id="aws_to_gcs",
+        body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
+        command=["/bin/bash", "/usr/app/scripts/run.sh"],
+        arguments=[
+            "-c",
+            "dbt test --exclude tag:unit-test --target test",  # dbt seed;dbt run --full-refresh;
+            "-g",
+        ],
         jinja_job_args={
-            "project": GOOGLE_CLOUD_PROJECT,
-            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-            "mainApplicationFile": f"local://{BASE}/spark/scripts/main_init.py",
-            "name": "spark-k8s-init",
-            "instances": 7,
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
             "gitsync": True,
-            "nodeSelector": "base",
-            "executor_memory": "2048m",
+            "volumes": [
+                {
+                    "name": "gcsfs-creds",
+                    "type": "secret",
+                    "reference": "gcsfs-creds",
+                    "mountPath": "/mnt/secrets/key.json",
+                }
+            ],
             "env": {
-                "CATEGORY": "yellow",
-                "URI": f"gs://{STAGING_BUCKET}/yellow/*",
-                "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
-                "HISTORICAL_TARGET": f"{os.getenv('HISTORICAL_DATASET')}.{os.getenv('HISTORICAL_TABLE')}",
-                "STAGING_TARGET": f"{os.getenv('STAGING_DATASET')}.{os.getenv('YELLOW_STAGING_TABLE')}",
-                "TRIAGE_TAREGET": f"{os.getenv('TRIAGE_DATASET')}.{os.getenv('YELLOW_TRIAGE_TABLE')}",
+                "PROJECT": GOOGLE_CLOUD_PROJECT,
+                "GCP_REGION": os.getenv("GCP_REGION"),
+                "STAGING_DATASET": os.getenv("STAGING_DATASET"),
+                "YELLOW_STAGING_TABLE": os.getenv("YELLOW_STAGING_TABLE"),
+                "DBT_PROFILES_DIR": f"{BASE}/dbt"
+                # "RUN_DATE": RUN_DATE,
             },
         },
     )

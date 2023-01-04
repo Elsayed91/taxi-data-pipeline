@@ -1,0 +1,72 @@
+version: 2
+
+models:
+  - name: dbt__ml_yellow_fare
+    description: >
+      This table contains data on taxi rides in New York City, including various features such as
+      the pickup and dropoff zones, trip distance, and fare amount. It also includes date and time
+      information such as the day of the month, month, year, day of the week, and hour of the day.
+      Additionally, it includes the distance between the pickup and dropoff locations, the distances
+      from each location to JFK, EWR, and LGA airports, and various fees.
+    # tests:
+    #   - dbt_utils.equality:
+    #       compare_model: ref('base_y_ml_expected')
+    #       tags: ["unit-test"]
+    columns:
+      - name: passenger_count
+        description: The number of passengers in the taxi.
+        type: integer
+      - name: pickup_zone_id
+        description: The ID of the zone in which the taxi pickup occurred.
+        type: integer
+      - name: dropoff_zone_id
+        description: The ID of the zone in which the taxi dropoff occurred.
+        type: integer
+      - name: trip_distance
+        description: The distance of the taxi trip, in miles.
+        type: float
+      - name: fare_amount
+        description: The fare amount, in dollars.
+        type: float
+      - name: data_timestamp
+        description: The date and time at which the taxi trip occurred.
+        type: timestamp
+      - name: day_of_month
+        description: The day of the month on which the taxi trip occurred.
+        type: integer
+      - name: month
+        description: The month in which the taxi trip occurred.
+        type: integer
+      - name: year
+        description: The year in which the taxi trip occurred.
+        type: integer
+      - name: day_of_week
+        description: The day of the week on which the taxi trip occurred.
+        type: integer
+      - name: hour_of_day
+        description: The hour of the day at which the taxi trip occurred.
+        type: integer
+      - name: distance
+        description: The distance between the pickup and dropoff locations, in miles.
+        type: float
+      - name: pickup_jfk_distance
+        description: The distance between the pickup location and JFK airport, in miles.
+        type: float
+      - name: dropoff_jfk_distance
+        description: The distance between the dropoff location and JFK airport, in miles.
+        type: float
+      - name: pickup_ewr_distance
+        description: The distance between the pickup location and EWR airport, in miles.
+        type: float
+      - name: dropoff_ewr_distance
+        description: The distance between the dropoff location and EWR airport, in miles.
+        type: float
+      - name: pickup_lga_distance
+        description: The distance between the pickup location and LGA airport, in miles.
+        type: float
+      - name: dropoff_lga_distance
+        description: The distance between the dropoff location and LGA airport, in miles.
+        type: float
+      - name: total_amount
+        description: The total amount charged for the taxi trip, in dollars.
+        type: float

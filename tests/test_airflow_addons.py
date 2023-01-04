@@ -1,5 +1,5 @@
 from components.airflow.dags.addons.parse_state import parse_spark_application
-
+from components.airflow.dags.addons.extract_target_date import extract_target_date
 
 import pytest
 
@@ -28,3 +28,15 @@ def test_parse_spark_application():
     # Test a succeeded state
     body = {"status": {"applicationState": {"state": "COMPLETED"}}}
     assert parse_spark_application(body) == KubeResourceState.Succeeded
+
+
+def test_get_run_date():
+    # Test with default filename
+    assert extract_target_date() == "2022-08-01"
+
+    # Test with different filename
+    assert extract_target_date("green_tripdata_2022-09.parquet") == "2022-09-01"
+
+    # Test with different filename format
+    assert extract_target_date("tripdata_2022-10.csv") == "2022-10-01"
+    assert extract_target_date("tripdata_2022-10-10.csv") == "2022-10-01"

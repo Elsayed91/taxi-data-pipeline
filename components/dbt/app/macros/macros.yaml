@@ -1,0 +1,96 @@
+version: 2
+
+macros:
+  - name: distance
+    description: >
+      Calculates the distance between two points using the longitude and latitude coordinates of the points.
+    arguments:
+      - name: lon1
+        type: float
+        description: Longitude coordinate of the first point.
+      - name: lat1
+        type: float
+        description: Latitude coordinate of the first point.
+      - name: lon2
+        type: float
+        description: Longitude coordinate of the second point.
+      - name: lat2
+        type: float
+        description: Latitude coordinate of the second point.
+  - name: generate_schema_name
+    description: >
+      Generates a schema name based on a provided custom schema name or a default schema.
+      overrides the default generate_schema_name.
+    arguments:
+      - name: custom_schema_name
+        type: string
+        description: Custom schema name to use. If not provided, the default schema will be used.
+      - name: node
+        type: string
+        description: Name of the node to which the schema name will be applied.
+  - name: src
+    description: >
+      Generates a reference to a source or model depending on the target and provided arguments.
+    arguments:
+      - name: func
+        type: string
+        description: Function to use. Can be either 'ref' or 'source'.
+      - name: model_name
+        type: string
+        description: Name of the model.
+      - name: dataset_name
+        type: string
+        description: Name of the dataset. Optional if using 'ref' function.
+  - name: distances_from_airports
+    description: >
+      Generates four columns containing the distance between two points and three major airports in New York City (JFK, EWR, and LGA) using the longitude and latitude coordinates of the points.
+    arguments:
+      - name: lon1
+        type: float
+        description: Longitude coordinate of the first point.
+      - name: lat1
+        type: float
+        description: Latitude coordinate of the first point.
+      - name: lon2
+        type: float
+        description: Longitude coordinate of the second point.
+      - name: lat2
+        type: float
+        description: Latitude coordinate of the second point.
+  - name: extract_datetime_parts
+    description: Extracts various date and time parts (day of month, month, year, day of week, hour of day) from a given timestamp column.
+    arguments:
+    - name: timestamp_column
+      type: string
+      description: >
+        The name of the timestamp column to extract date and time parts from.
+        outputs:
+        - name: day_of_month
+          type: integer
+          description: The day of the month (1-31) from the given timestamp column.
+        - name: month
+          type: integer
+          description: The month (1-12) from the given timestamp column.
+        - name: year
+          type: integer
+          description: The year from the given timestamp column.
+        - name: day_of_week
+          type: integer
+          description: The day of the week (0-6) from the given timestamp column, where 0 is Sunday and 6 is Saturday.
+        - name: hour_of_day
+          type: integer
+          description: The hour of the day (0-23) from the given timestamp column.
+  - name: payment_form
+    description: >
+      returns the form of payment for payment_type.
+    arguments:
+      - name: payment_type
+        type: int
+        description: > 
+          payment_type value. If none of the below, will return null.
+          1= Credit card
+          2= Cash
+          3= No charge
+          4= Dispute
+          5= Unknown
+          6= Voided trip

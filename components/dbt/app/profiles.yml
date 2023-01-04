@@ -1,0 +1,40 @@
+default:
+  target: dev
+  outputs:
+    dev:
+      dataset: models
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      keyfile: "/mnt/secrets/key.json"
+      location: "{{ env_var('GCP_REGION') }}"
+      method: service-account
+      priority: interactive
+      project: "{{ env_var('PROJECT') }}"
+      threads: 4
+      type: bigquery
+      # maximum_bytes_billed: 1000000000
+#dbt service key BigQuery Data Editor BigQuery User
+    test:
+      dataset: models
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      keyfile: "/mnt/secrets/key.json"
+      location: "{{ env_var('GCP_REGION') }}"
+      method: service-account
+      priority: interactive
+      project: "{{ env_var('PROJECT') }}"
+      threads: 4
+      type: bigquery
+
+
+elementary:
+  outputs:
+    default:
+      type: bigquery
+      keyfile: "/mnt/secrets/key.json"
+      location: "{{ env_var('GCP_REGION') }}"
+      method: service-account
+      project: "{{ env_var('PROJECT') }}"
+      dataset: elementary
+      threads: 4
+
