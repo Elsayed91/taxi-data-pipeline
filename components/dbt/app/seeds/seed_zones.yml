@@ -1,16 +1,14 @@
 version: 2
 seeds:
 - name: seed_zones
-
   config:
+    schema: "{{ env_var('SEEDS_DATASET') }}"
     column_types: {
       LocationID: integer,
       borough:	string,
       longitude: float,
       latitude: float    
       }
-    schema: models_seeds
-      
   description: > 
     the name of the zone/borough corressponding to the LocationID provided in pickup and dropoff locations,
     in addition to the longitude and latitude.

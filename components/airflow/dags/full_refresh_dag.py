@@ -115,10 +115,9 @@ with DAG(
         body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
         command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
         arguments=[
-            "--deps",
-            "--commands",
-            "dbt seed;",
-            "--generate-docs",  # dbt run --full-refresh;dbt test --exclude tag:unit-test --target test
+            "--seed",
+            "--test",
+            # dbt run --full-refresh;dbt test --exclude tag:unit-test --target test --generate-docs
         ],
         jinja_job_args={
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
@@ -132,15 +131,7 @@ with DAG(
                     "mountPath": "/mnt/secrets",
                 }
             ],
+            "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
         },
-        envs={
-            "PROJECT": GOOGLE_CLOUD_PROJECT,
-            "GCP_REGION": os.getenv("GCP_REGION"),
-            "STAGING_DATASET": os.getenv("STAGING_DATASET"),
-            "YELLOW_STAGING_TABLE": os.getenv("YELLOW_STAGING_TABLE"),
-            "DBT_PROFILES_DIR": f"{BASE}/dbt/app",
-            "HISTORICAL_DATASET": os.getenv("HISTORICAL_DATASET"),
-            "YELLOW_SUMMARY_TABLE": os.getenv("YELLOW_SUMMARY_TABLE"),
-            "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
-        },
+        envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app"},
     )

@@ -18,7 +18,7 @@ default:
       dataset: models
       job_execution_timeout_seconds: 300
       job_retries: 1
-      keyfile: /mnt/secrets/key.json
+      keyfile: /mnt/secrets/key.json 
       location: "{{ env_var('GCP_REGION') }}"
       method: service-account
       priority: interactive

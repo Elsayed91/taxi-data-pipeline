@@ -1,7 +1,7 @@
 
 {{ config(
         materialized = 'incremental',
-        dataset = 'models_ml',
+        dataset = "{{ env_var('ML_DATASET') }}",
         partition_expiration_days = 180,
         partition_by = {'field': 'date', 'data_type': 'date',  "granularity": "month"},
 ) }}
@@ -23,9 +23,9 @@ select
             "z1.longitude", "z1.latitude", "z2.longitude", "z2.latitude"
         )
     }},
-from {{ source("staging_data", "yellow_staging") }} bt
-left join {{ ref("seed_zones") }} z1 on bt.pulocationid = z1.LocationID
-left join {{ ref("seed_zones") }} z2 on bt.dolocationid = z2.LocationID 
+from {{ src("source", dataset_name= "staging_data", "yellow_staging") }} bt
+left join {{ src("ref", "seed_zones") }} z1 on bt.pulocationid = z1.LocationID
+left join {{ src("ref", "seed_zones") }} z2 on bt.dolocationid = z2.LocationID 
 WHERE z1.LocationID IS NOT NULL AND z2.LocationID IS NOT NULL
 
 {% if is_incremental() %}

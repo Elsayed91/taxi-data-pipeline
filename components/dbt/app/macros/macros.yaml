@@ -30,17 +30,22 @@ macros:
         description: Name of the node to which the schema name will be applied.
   - name: src
     description: >
-      Generates a reference to a source or model depending on the target and provided arguments.
+      - Generates a reference to a source or model depending on the target and provided arguments.
+      - If the target is 'test', the function will generate a reference to the test version of the
+      model or source.
+      - If the target is 'test' and the model starts with 'seed_', the model will reference the 
+      seed as usual despite the target.
+      - If the target is not 'test', the function will use the standard builtin ref/source.
     arguments:
       - name: func
         type: string
         description: Function to use. Can be either 'ref' or 'source'.
       - name: model_name
         type: string
-        description: Name of the model.
+        description: Name of the model. If model name starts with 'seed_', the `ref` function is used.
       - name: dataset_name
         type: string
-        description: Name of the dataset. Optional if using 'ref' function.
+        description: Name of the dataset. Optional if using 'ref' function or if `model_name` starts with 'seed_'. 
   - name: distances_from_airports
     description: >
       Generates four columns containing the distance between two points and three major airports in New York City (JFK, EWR, and LGA) using the longitude and latitude coordinates of the points.

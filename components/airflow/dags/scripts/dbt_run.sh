@@ -34,6 +34,10 @@ while [[ $# -gt 0 ]]; do
         deps=true
         shift
         ;;
+    --test)
+        test=true
+        shift
+        ;;
     esac
 done
 
@@ -51,10 +55,10 @@ if [[ -n $commands ]]; then
 fi
 if [[ -n $generate_docs ]]; then
     echo "generating dbt docs."
-    # dbt docs generate
-    # SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-    # echo "uploading dbt docs static HTML to GCS"
-    # python ${SCRIPT_DIR}/upload_dbt_results.py
+    dbt docs generate
+    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+    echo "uploading dbt docs static HTML to GCS"
+    python ${SCRIPT_DIR}/upload_dbt_results.py
     echo "generating elementary report."
     edr monitor send-report --profiles-dir ${DBT_PROFILES_DIR} --gcs-bucket-name=$DOCS_BUCKET \
         --google-service-account-path=$KEYFILE \
@@ -65,6 +69,18 @@ fi
 if [[ -n $debug ]]; then
     echo "running dbt debug."
     dbt debug
+fi
+
+if [[ -n $test ]]; then
+    echo "running dbt data quality tests."
+    dbt test --exclude tag:unit-test
+    echo "running dbt unit tests."
+    dbt test --target test --select tag:unit-test
+fi
+
+if [[ -n $seed ]]; then
+    echo "running dbt seed"
+    dbt seed
 fi
 
 exit_code=$?

@@ -7,61 +7,180 @@ models:
       the pickup and dropoff zones, trip distance, and fare amount. It also includes date and time
       information such as the day of the month, month, year, day of the week, and hour of the day.
       Additionally, it includes the distance between the pickup and dropoff locations, the distances
-      from each location to JFK, EWR, and LGA airports, and various fees.
-    # tests:
-    #   - dbt_utils.equality:
-    #       compare_model: ref('base_y_ml_expected')
-    #       tags: ["unit-test"]
+      from each location to JFK, EWR, and LGA airports.
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('dbt__ml__yellow_fare_expected')
+          tags: ["unit-test"]
     columns:
       - name: passenger_count
         description: The number of passengers in the taxi.
         type: integer
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: integer
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 7
+              strictly: false
       - name: trip_distance
         description: The distance of the taxi trip, in miles.
         type: float
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: float
+          - dbt_expectations.expect_column_values_to_be_within_n_stdevs:
+              sigma_threshold: 4 # (Optional. Default is 3)
+          - dbt_expectations.expect_column_proportion_of_unique_values_to_be_between:
+              min_value: 0.3  # (Optional)
+              max_value: 1 # (Optional)
       - name: trip_duration
         description: the duration of the trip. calculated by subtracting dropoff and pickup times.
         type: float
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: float
       - name: fare_amount
         description: The fare amount, in dollars.
         type: float
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: float
+          - dbt_expectations.expect_column_values_to_be_within_n_stdevs:
+              sigma_threshold: 4 
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 2.5
+              max_value: 250
+              strictly: false
       - name: date
         description: The date and time at which the taxi trip occurred.
         type: date
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: date	
       - name: day_of_month
         description: The day of the month on which the taxi trip occurred.
         type: integer
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: integer	
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 31
+              strictly: false
       - name: month
         description: The month in which the taxi trip occurred.
         type: integer
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: integer	
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 12
+              strictly: false
       - name: year
         description: The year in which the taxi trip occurred.
         type: integer
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: integer	
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 2010
+              max_value: 2023
+              strictly: false
       - name: day_of_week
         description: The day of the week on which the taxi trip occurred.
         type: integer
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: integer	
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 7
+              strictly: false
       - name: hour_of_day
         description: The hour of the day at which the taxi trip occurred.
         type: integer
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: integer	
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 23.999
+              strictly: false
       - name: geo_distance
         description: The geographical distance between the pickup and dropoff locations.
         type: float
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: float
       - name: pickup_jfk_distance
         description: The geographical distance between the pickup location and JFK airport.
         type: float
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: float
       - name: dropoff_jfk_distance
         description: The geographical distance between the dropoff location and JFK airport.
         type: float
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: float
       - name: pickup_ewr_distance
         description: The geographical distance between the pickup location and EWR airport.
         type: float
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: float
       - name: dropoff_ewr_distance
         description: The geographical distance between the dropoff location and EWR airport.
         type: float
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: float
       - name: pickup_lga_distance
         description: The geographical distance between the pickup location and LGA airport.
         type: float
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: float
       - name: dropoff_lga_distance
         description: The geographical distance between the dropoff location and LGA airport.
         type: float
-
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_to_exist
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: float
