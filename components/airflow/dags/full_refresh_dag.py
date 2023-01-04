@@ -111,7 +111,7 @@ with DAG(
     # )
 
     t1 = KubernetesJobOperator(
-        task_id="aws_to_gcs",
+        task_id="dbt",
         body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
         command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
         arguments=[
@@ -120,6 +120,7 @@ with DAG(
         ],
         jinja_job_args={
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
+            "name": "dbt"
             "gitsync": True,
             "volumes": [
                 {
