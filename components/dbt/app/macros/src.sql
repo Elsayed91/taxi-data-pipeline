@@ -11,7 +11,7 @@
 {% endmacro %}
 
 
-{% macro src(dataset_name, model_name, test_table=None) %}
+{% macro source(dataset_name, model_name, test_table=None) %}
   {% if target.name == 'test' and test_table is not none and test_table.startswith('dbt__') %}
     {% do return(builtins.ref('test_' ~ test_table).include(database=false)) %}
   {% else %}
