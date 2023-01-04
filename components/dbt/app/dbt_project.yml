@@ -27,6 +27,7 @@ models:
 
 vars:
   'dbt_date:time_zone': 'UTC'
+  'disable_dbt_artifacts_autoupload': 'true'
 tests:
   # +severity: warn
   +error_if: ">10000"

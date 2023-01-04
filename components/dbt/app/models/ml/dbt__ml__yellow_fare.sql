@@ -12,7 +12,7 @@ select
     bt.fare_amount,
     DATE(bt.tpep_pickup_datetime) as date,
     TIMESTAMP_DIFF(bt.tpep_dropoff_datetime, bt.tpep_pickup_datetime, MINUTE) AS trip_duration,
-    {{ date_parts("bt.tpep_pickup_datetime") }},
+    {{ extract_datetime_parts("bt.tpep_pickup_datetime") }},
     {{ distance("z1.longitude", "z1.latitude", "z2.longitude", "z2.latitude") }}
     as geo_distance,
     {{
