@@ -120,7 +120,7 @@ with DAG(
         ],
         jinja_job_args={
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
-            "name": "dbt"
+            "name": "dbt",
             "gitsync": True,
             "volumes": [
                 {
