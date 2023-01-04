@@ -117,7 +117,7 @@ with DAG(
         arguments=[
             "--deps",
             "--commands",
-            "dbt seed;dbt run --full-refresh",  # ;dbt test --exclude tag:unit-test --target test
+            "cat /mnt/secrets/key.json;",  # dbt seed;dbt run --full-refresh;dbt test --exclude tag:unit-test --target test
         ],
         jinja_job_args={
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",

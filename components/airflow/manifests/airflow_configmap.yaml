@@ -48,7 +48,7 @@ data:
     remote_logging = False
 
     [metrics]
-    statsd_host = internal-svc.default.svc.cluster.local
+    statsd_host = metric-exporters.default.svc.cluster.local
     statsd_on = True
     statsd_port = 9125
     statsd_prefix = airflow
@@ -56,7 +56,7 @@ data:
     [scheduler]
     run_duration = 41460
     standalone_dag_processor = False
-    statsd_host = internal-svc.default.svc.cluster.local
+    statsd_host = metric-exporters.default.svc.cluster.local
     statsd_on = True
     statsd_port = 9125
     statsd_prefix = airflow

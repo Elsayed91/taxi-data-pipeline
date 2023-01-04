@@ -1,8 +1,19 @@
-[![CircleCI](https://circleci.com/gh/calogica/dbt-expectations/tree/main.svg?style=svg)](https://circleci.com/gh/calogica/dbt-expectations/tree/main)
+<h1 align="center">dbt-expectations</h1>
+<p align="center">
+<img alt="logo" width="10%" src="https://raw.githubusercontent.com/calogica/dbt-expectations/main/static/dbt-expectations-logo.svg" />
+</p>
 
-# dbt-expectations
+<hr/>
 
-<img src="expectations.gif"/>
+<p align="center">
+<a href="https://circleci.com/gh/calogica/dbt-expectations/tree/main">
+<img alt="CircleCI" src="https://img.shields.io/circleci/build/github/calogica/dbt-expectations/main?style=plastic"/>
+</a>
+<img alt="License" src="https://img.shields.io/badge/license-Apache--2.0-ff69b4?style=plastic"/>
+
+</p>
+
+## About
 
 `dbt-expectations` is an extension package for [**dbt**](https://github.com/dbt-labs/dbt), inspired by the [Great Expectations package for Python](https://greatexpectations.io/). The intent is to allow dbt users to deploy GE-like tests in their data warehouse directly from dbt, vs having to add another integration with their data warehouse.
 
@@ -14,6 +25,10 @@ Development of `dbt-expectations` (and `dbt-date`) is funded by our amazing [spo
 
 <a href="https://www.aggua.io/" target="_blank"><img width="80%" src="https://uploads-ssl.webflow.com/628f445aa439cdd1dfb160c0/62b4295accb569ec87d751a5_aggua-logo.svg"/></a>
 
+### Elementary (<a href="https://www.elementary-data.com/" target="_blank">www.elementary-data.com</a>)
+
+<a href="https://www.elementary-data.com/" target="_blank"><img width="80%" src="https://raw.githubusercontent.com/elementary-data/elementary/master/static/header_git.png"/></a>
+
 ### re_data (<a href="https://www.getre.io/" target="_blank">www.getre.io</a>)
 
 <a href="https://www.getre.io/" target="_blank"><img width="30%" src="https://uploads-ssl.webflow.com/60bdbc7b0c4f5aa1568dc8cc/60df3224a3b3637230f335d6_REDATA%20LOGO%2011.svg"/></a>
@@ -22,14 +37,14 @@ Development of `dbt-expectations` (and `dbt-date`) is funded by our amazing [spo
 
 `dbt-expectations` currently supports `dbt 1.2.x` or higher.
 
-Check [dbt Hub](https://hub.getdbt.com/calogica/dbt_expectations/latest/) for the latest installation instructions, or [read the docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
+Check [dbt package hub](https://hub.getdbt.com/calogica/dbt_expectations/latest/) for the latest installation instructions, or [read the docs](https://docs.getdbt.com/docs/package-management) for more information on installing packages.
 
 Include in `packages.yml`
 
 ```yaml
 packages:
   - package: calogica/dbt_expectations
-    version: [">=0.7.0", "<0.8.0"]
+    version: [">=0.8.0", "<0.9.0"]
     # <see https://github.com/calogica/dbt-expectations/releases/latest> for the latest version tag
 ```
 
@@ -58,6 +73,7 @@ For example, use `America/New_York` for East Coast Time.
 - [expect_column_to_exist](#expect_column_to_exist)
 - [expect_row_values_to_have_recent_data](#expect_row_values_to_have_recent_data)
 - [expect_grouped_row_values_to_have_recent_data](#expect_grouped_row_values_to_have_recent_data)
+- [expect_table_aggregation_to_equal_other_table](#expect_table_aggregation_to_equal_other_table)
 - [expect_table_column_count_to_be_between](#expect_table_column_count_to_be_between)
 - [expect_table_column_count_to_equal_other_table](#expect_table_column_count_to_equal_other_table)
 - [expect_table_column_count_to_equal](#expect_table_column_count_to_equal)
@@ -145,7 +161,7 @@ Expect the specified column to exist.
 
 ```yaml
 tests:
-- dbt_expectations.expect_column_to_exist
+  - dbt_expectations.expect_column_to_exist
 ```
 
 ### [expect_row_values_to_have_recent_data](macros/schema_tests/table_shape/expect_row_values_to_have_recent_data.sql)
@@ -157,9 +173,9 @@ Expect the model to have rows that are at least as recent as the defined interva
 ```yaml
 tests:
   - dbt_expectations.expect_row_values_to_have_recent_data:
-        datepart: day
-        interval: 1
-        row_condition: 'id is not null' #optional
+      datepart: day
+      interval: 1
+      row_condition: 'id is not null' #optional
 ```
 
 ### [expect_grouped_row_values_to_have_recent_data](macros/schema_tests/table_shape/expect_grouped_row_values_to_have_recent_data.sql)
@@ -173,20 +189,64 @@ Use this to test whether there is recent data for each grouped row defined by `g
 models: # or seeds:
   - name : my_model
     tests :
-        - dbt_expectations.expect_grouped_row_values_to_have_recent_data:
-            group_by: [group_id]
-            timestamp_column: date_day
-            datepart: day
-            interval: 1
-            row_condition: "id is not null" #optional
-        # or also:
-        - dbt_expectations.expect_grouped_row_values_to_have_recent_data:
-            group_by: [group_id, other_group_id]
-            timestamp_column: date_day
-            datepart: day
-            interval: 1
-            row_condition: "id is not null" #optional
+      - dbt_expectations.expect_grouped_row_values_to_have_recent_data:
+          group_by: [group_id]
+          timestamp_column: date_day
+          datepart: day
+          interval: 1
+          row_condition: "id is not null" #optional
+      # or also:
+      - dbt_expectations.expect_grouped_row_values_to_have_recent_data:
+          group_by: [group_id, other_group_id]
+          timestamp_column: date_day
+          datepart: day
+          interval: 1
+          row_condition: "id is not null" #optional
 ```
+
+### [expect_table_aggregation_to_equal_other_table](macros/schema_tests/table_shape/expect_table_aggregation_to_equal_other_table.sql)
+
+Except an (optionally grouped) expression to match the same (or optionally other) expression in a different table.
+
+*Applies to:* Model, Seed, Source
+
+Simple:
+
+```yaml
+tests:
+  - dbt_expectations.expect_table_aggregation_to_equal_other_table:
+      expression: sum(col_numeric_a)
+      compare_model: ref("other_model")
+      group_by: [idx]
+```
+
+More complex:
+
+```yaml
+tests:
+  - dbt_expectations.expect_table_aggregation_to_equal_other_table:
+      expression: count(*)
+      compare_model: ref("other_model")
+      compare_expression: count(distinct id)
+      group_by: [date_column]
+      compare_group_by: [some_other_date_column]
+```
+
+or:
+
+```yaml
+tests:
+  - dbt_expectations.expect_table_aggregation_to_equal_other_table:
+      expression: max(column_a)
+      compare_model: ref("other_model")
+      compare_expression: max(column_b)
+      group_by: [date_column]
+      compare_group_by: [some_other_date_column]
+      row_condition: some_flag=true
+      compare_row_condition: some_flag=false
+```
+
+**Note**: You can also express a **tolerance** factor, either as an absolute tolerable difference, `tolerance`, or as a tolerable % difference `tolerance_percent`.
 
 ### [expect_table_column_count_to_be_between](macros/schema_tests/table_shape/expect_table_column_count_to_be_between.sql)
 
@@ -211,8 +271,8 @@ Expect the number of columns in a model to match another model.
 models: # or seeds:
   - name: my_model
     tests:
-    - dbt_expectations.expect_table_column_count_to_equal_other_table:
-        compare_model: ref("other_model")
+      - dbt_expectations.expect_table_column_count_to_equal_other_table:
+          compare_model: ref("other_model")
 ```
 
 ### [expect_table_columns_to_not_contain_set](macros/schema_tests/table_shape/expect_table_columns_to_not_contain_set.sql)
@@ -225,9 +285,9 @@ Expect the columns in a model not to contain a given list.
 models: # or seeds:
   - name: my_model
     tests:
-    - dbt_expectations.expect_table_columns_to_not_contain_set:
-        column_list: ["col_a", "col_b"]
-        transform: uppper # (Optional)
+      - dbt_expectations.expect_table_columns_to_not_contain_set:
+          column_list: ["col_a", "col_b"]
+          transform: upper # (Optional)
 ```
 
 ### [expect_table_columns_to_contain_set](macros/schema_tests/table_shape/expect_table_columns_to_contain_set.sql)
@@ -240,9 +300,9 @@ Expect the columns in a model to contain a given list.
 models: # or seeds:
   - name: my_model
     tests:
-    - dbt_expectations.expect_table_columns_to_contain_set:
-        column_list: ["col_a", "col_b"]
-        transform: uppper # (Optional)
+      - dbt_expectations.expect_table_columns_to_contain_set:
+          column_list: ["col_a", "col_b"]
+          transform: upper # (Optional)
 ```
 
 ### [expect_table_column_count_to_equal](macros/schema_tests/table_shape/expect_table_column_count_to_equal.sql)
@@ -255,8 +315,8 @@ Expect the number of columns in a model to be equal to `expected_number_of_colum
 models: # or seeds:
   - name: my_model
     tests:
-    - dbt_expectations.expect_table_column_count_to_equal:
-        value: 7
+      - dbt_expectations.expect_table_column_count_to_equal:
+          value: 7
 ```
 
 ### [expect_table_columns_to_match_ordered_list](macros/schema_tests/table_shape/expect_table_columns_to_match_ordered_list.sql)
@@ -269,9 +329,9 @@ Expect the columns to exactly match a specified list.
 models: # or seeds:
   - name: my_model
     tests:
-    - dbt_expectations.expect_table_columns_to_match_ordered_list:
-        column_list: ["col_a", "col_b"]
-        transform: uppper # (Optional)
+      - dbt_expectations.expect_table_columns_to_match_ordered_list:
+          column_list: ["col_a", "col_b"]
+          transform: upper # (Optional)
 ```
 
 ### [expect_table_columns_to_match_set](macros/schema_tests/table_shape/expect_table_columns_to_match_set.sql)
@@ -284,9 +344,9 @@ Expect the columns in a model to match a given list.
 models: # or seeds:
   - name: my_model
     tests:
-    - dbt_expectations.expect_table_columns_to_match_set:
-        column_list: ["col_a", "col_b"]
-        transform: uppper # (Optional)
+      - dbt_expectations.expect_table_columns_to_match_set:
+          column_list: ["col_a", "col_b"]
+          transform: upper # (Optional)
 ```
 
 ### [expect_table_row_count_to_be_between](macros/schema_tests/table_shape/expect_table_row_count_to_be_between.sql)
@@ -298,12 +358,12 @@ Expect the number of rows in a model to be between two values.
 models: # or seeds:
   - name: my_model
     tests:
-    - dbt_expectations.expect_table_row_count_to_be_between:
-        min_value: 1 # (Optional)
-        max_value: 4 # (Optional)
-        group_by: [group_id, other_group_id, ...] # (Optional)
-        row_condition: "id is not null" # (Optional)
-        strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 1 # (Optional)
+          max_value: 4 # (Optional)
+          group_by: [group_id, other_group_id, ...] # (Optional)
+          row_condition: "id is not null" # (Optional)
+          strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
 ```
 
 ### [expect_table_row_count_to_equal_other_table](macros/schema_tests/table_shape/expect_table_row_count_to_equal_other_table.sql)
@@ -316,11 +376,13 @@ Expect the number of rows in a model match another model.
 models: # or seeds:
   - name: my_model
     tests:
-    - dbt_expectations.expect_table_row_count_to_equal_other_table:
-        compare_model: ref("other_model")
-        factor: 1 # (Optional)
-        row_condition: "id is not null" # (Optional)
-        compare_row_condition: "id is not null" # (Optional)
+      - dbt_expectations.expect_table_row_count_to_equal_other_table:
+          compare_model: ref("other_model")
+          group_by: [col1, col2] # (Optional)
+          compare_group_by: [col1, col2] # (Optional)
+          factor: 1 # (Optional)
+          row_condition: "id is not null" # (Optional)
+          compare_row_condition: "id is not null" # (Optional)
 ```
 
 ### [expect_table_row_count_to_equal_other_table_times_factor](macros/schema_tests/table_shape/expect_table_row_count_to_equal_other_table_times_factor.sql)
@@ -333,11 +395,13 @@ Expect the number of rows in a model to match another model times a preconfigure
 models: # or seeds:
   - name: my_model
     tests:
-    - dbt_expectations.expect_table_row_count_to_equal_other_table_times_factor:
-        compare_model: ref("other_model")
-        factor: 13
-        row_condition: "id is not null" # (Optional)
-        compare_row_condition: "id is not null" # (Optional)
+      - dbt_expectations.expect_table_row_count_to_equal_other_table_times_factor:
+          compare_model: ref("other_model")
+          factor: 13
+          group_by: [col1, col2] # (Optional)
+          compare_group_by: [col1, col2] # (Optional)
+          row_condition: "id is not null" # (Optional)
+          compare_row_condition: "id is not null" # (Optional)
 ```
 
 ### [expect_table_row_count_to_equal](macros/schema_tests/table_shape/expect_table_row_count_to_equal.sql)
@@ -350,10 +414,10 @@ Expect the number of rows in a model to be equal to `expected_number_of_rows`.
 models: # or seeds:
   - name: my_model
     tests:
-    - dbt_expectations.expect_table_row_count_to_equal:
-        value: 4
-        group_by: [group_id, other_group_id, ...] # (Optional)
-        row_condition: "id is not null" # (Optional)
+      - dbt_expectations.expect_table_row_count_to_equal:
+          value: 4
+          group_by: [group_id, other_group_id, ...] # (Optional)
+          row_condition: "id is not null" # (Optional)
 ```
 
 ### [expect_column_values_to_be_unique](macros/schema_tests/column_values_basic/expect_column_values_to_be_unique.sql)
@@ -438,7 +502,7 @@ Expect each column value to be in a given set.
 tests:
   - dbt_expectations.expect_column_values_to_be_in_set:
       value_set: ['a','b','c']
-      quote_values: true # (Optional)
+      quote_values: true # (Optional. Default is 'true'.)
       row_condition: "id is not null" # (Optional)
 ```
 
@@ -467,7 +531,7 @@ Expect each column value not to be in a given set.
 tests:
   - dbt_expectations.expect_column_values_to_not_be_in_set:
       value_set: ['e','f','g']
-      quote_values: true # (Optional)
+      quote_values: true # (Optional. Default is 'true'.)
       row_condition: "id is not null" # (Optional)
 ```
 
@@ -475,7 +539,7 @@ tests:
 
 Expect column values to be increasing.
 
-If `strictly: True`, then this expectation is only satisfied if each consecutive value is strictly increasing–equal values are treated as failures.
+If `strictly: True`, then this expectation is only satisfied if each consecutive value is strictly increasing – equal values are treated as failures.
 
 *Applies to:* Column
 
@@ -492,7 +556,7 @@ tests:
 
 Expect column values to be decreasing.
 
-If `strictly=True`, then this expectation is only satisfied if each consecutive value is strictly increasing–equal values are treated as failures.
+If `strictly=True`, then this expectation is only satisfied if each consecutive value is strictly decreasing – equal values are treated as failures.
 
 *Applies to:* Column
 
@@ -659,7 +723,7 @@ Expect the number of distinct column values to be equal to a given value.
 tests:
   - dbt_expectations.expect_column_distinct_count_to_equal:
       value: 10
-      quote_values: false # (Optional. Default is 'false'.)
+      quote_values: true # (Optional. Default is 'true'.)
       group_by: [group_id, other_group_id, ...] # (Optional)
       row_condition: "id is not null" # (Optional)
 ```
@@ -674,7 +738,7 @@ Expect the number of distinct column values to be greater than a given value.
 tests:
   - dbt_expectations.expect_column_distinct_count_to_be_greater_than:
       value: 10
-      quote_values: false # (Optional. Default is 'false'.)
+      quote_values: true # (Optional. Default is 'true'.)
       group_by: [group_id, other_group_id, ...] # (Optional)
       row_condition: "id is not null" # (Optional)
 ```
@@ -689,7 +753,7 @@ Expect the number of distinct column values to be less than a given value.
 tests:
   - dbt_expectations.expect_column_distinct_count_to_be_less_than:
       value: 10
-      quote_values: false # (Optional. Default is 'false'.)
+      quote_values: true # (Optional. Default is 'true'.)
       group_by: [group_id, other_group_id, ...] # (Optional)
       row_condition: "id is not null" # (Optional)
 ```
@@ -704,7 +768,7 @@ Expect the set of distinct column values to be contained by a given set.
 tests:
   - dbt_expectations.expect_column_distinct_values_to_be_in_set:
       value_set: ['a','b','c','d']
-      quote_values: false # (Optional. Default is 'false'.)
+      quote_values: true # (Optional. Default is 'true'.)
       row_condition: "id is not null" # (Optional)
 ```
 
@@ -720,7 +784,7 @@ In contrast to `expect_column_values_to_be_in_set` this ensures not that all col
 tests:
   - dbt_expectations.expect_column_distinct_values_to_contain_set:
       value_set: ['a','b']
-      quote_values: false # (Optional. Default is 'false'.)
+      quote_values: true # (Optional. Default is 'true'.)
       row_condition: "id is not null" # (Optional)
 ```
 
@@ -887,7 +951,7 @@ tests:
   - dbt_expectations.expect_column_most_common_value_to_be_in_set:
       value_set: [0.5]
       top_n: 1
-      quote_values: false # (Optional)
+      quote_values: true # (Optional. Default is 'true'.)
       data_type: "decimal" # (Optional. Default is 'decimal')
       strictly: false # (Optional. Default is 'false'. Adds an 'or equal to' to the comparison operator for min/max)
 ```
@@ -1137,3 +1201,5 @@ To run the tests:
 
 1. You will need a profile called `integration_tests` in `~/.dbt/profiles.yml` pointing to a writable database. We only support postgres, BigQuery and Snowflake.
 2. Then, from within the `integration_tests` folder, run `dbt build` to run the test models in `integration_tests/models/schema_tests/` and run the tests specified in `integration_tests/models/schema_tests/schema.yml`
+
+<img src="https://raw.githubusercontent.com/calogica/dbt-expectations/main/expectations.gif"/>

@@ -38,3 +38,4 @@ components/spark/scripts/__pycache__
 components/airflow/dags/addons/__pycache__
 components/dbt/app/logs
 components/dbt/app/target
+components/dbt/app/.user.yml

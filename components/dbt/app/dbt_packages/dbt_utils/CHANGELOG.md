@@ -8,6 +8,44 @@
 ## Contributors:
 --->
 
+# dbt utils v1.0
+
+## Migration Guide 
+The full migration guide is at https://docs.getdbt.com/guides/migration/versions/upgrading-to-dbt-utils-v1.0 
+
+## New features
+- New macro `get_single_value` ([#696](https://github.com/dbt-labs/dbt-utils/pull/696))
+- New macro safe_divide() — Returns null when the denominator is 0, instead of throwing a divide-by-zero error.
+- Add `not_empty_string` generic test that asserts column values are not an empty string. ([#632](https://github.com/dbt-labs/dbt-utils/issues/632), [#634](https://github.com/dbt-labs/dbt-utils/pull/634))
+
+## Enhancements
+- Implemented an optional `group_by_columns` argument across many of the generic testing macros to test for properties that only pertain to group-level or are can be more rigorously conducted at the group level. Property available in `recency`, `at_least_one`, `equal_row_count`, `fewer_rows_than`, `not_constant`, `not_null_proportion`, and `sequential` tests [#633](https://github.com/dbt-labs/dbt-utils/pull/633)
+- With the addition of an on-by-default quote_identifiers flag in the star() macro, you can now disable quoting if necessary. ([#706](https://github.com/dbt-labs/dbt-utils/pull/706))
+
+## Fixes
+- `union()` now includes/excludes columns case-insensitively
+- The `expression_is_true test` doesn’t output * unless storing failures, a cost improvement for BigQuery ([#683](https://github.com/dbt-labs/dbt-utils/issues/683), [#686](https://github.com/dbt-labs/dbt-utils/pull/686))
+- Updated the `slugify` macro to prepend "_" to column names beginning with a number since most databases do not allow names to begin with numbers. 
+
+## Under the hood
+- Remove deprecated table argument from `unpivot` ([#671](https://github.com/dbt-labs/dbt-utils/pull/671))
+- Delete the deprecated identifier macro ([#672](https://github.com/dbt-labs/dbt-utils/pull/672))
+- Handle deprecations in deduplicate macro ([#673](https://github.com/dbt-labs/dbt-utils/pull/673))
+- Fully remove varargs usage in `surrogate_key` and `safe_add` ([#674](https://github.com/dbt-labs/dbt-utils/pull/674))
+- Remove obsolete condition argument from `expression_is_true` ([#699](https://github.com/dbt-labs/dbt-utils/pull/699))
+- Explicitly stating the namespace for cross-db macros so that the dispatch logic works correctly by restoring the dbt. prefix for all migrated cross-db macros ([#701](https://github.com/dbt-labs/dbt-utils/pull/701))
+
+## Contributors:
+- [@CR-Lough] (https://github.com/CR-Lough) (#706) (#696)
+- [@fivetran-catfritz](https://github.com/fivetran-catfritz)
+- [@crowemi](https://github.com/crowemi)
+- [@SimonQuvang](https://github.com/SimonQuvang) (#701)
+- [@christineberger](https://github.com/christineberger) (#624)
+- [@epapineau](https://github.com/epapineau) (#634)
+- [@courentin](https://github.com/courentin) (#651)
+- [@zachoj10](https://github.com/zachoj10) (#692)
+- [@miles170](https://github.com/miles170)
+- [@emilyriederer](https://github.com/emilyriederer)
 # 0.9.5
 ## Fixes
 - Stop showing cross-db deprecation warnings for macros who have already been migrated ([#725](https://github.com/dbt-labs/dbt-utils/pull/725))
@@ -55,7 +93,6 @@ Rolled back due to accidental incompatibilities
 * @christineberger made their first contribution in https://github.com/dbt-labs/dbt-utils/pull/624
 * @alla-bongard made their first contribution in https://github.com/dbt-labs/dbt-utils/pull/636
 * @david-beallor made their first contribution in https://github.com/dbt-labs/dbt-utils/pull/646
-
 # dbt-utils v0.8.6
 
 ## New features
@@ -110,6 +147,7 @@ After:
 ## Fixes
 - Fix `union_relations` `source_column_name` none option.
 - Enable a negative part_number for `split_part()` ([#557](https://github.com/dbt-labs/dbt-utils/issues/557), [#559](https://github.com/dbt-labs/dbt-utils/pull/559))
+- Make `exclude` case insensitive for `union_relations()` ([#578](https://github.com/dbt-labs/dbt-utils/issues/557), [#587](https://github.com/dbt-labs/dbt-utils/issues/587))
 
 ## Quality of life
 - Documentation about listagg macro ([#544](https://github.com/dbt-labs/dbt-utils/issues/544), [#560](https://github.com/dbt-labs/dbt-utils/pull/560))
@@ -132,6 +170,7 @@ After:
 - [@LewisDavies](https://github.com/LewisDavies) (#554)
 - [@epapineau](https://github.com/epapineau) (#583)
 - [@b-per](https://github.com/b-per) (#559)
+- [@dbeatty10](https://github.com/dbeatty10), [@jeremyyeo](https://github.com/jeremyyeo) (#587)
 
 # dbt-utils v0.8.4
 ## Fixes
