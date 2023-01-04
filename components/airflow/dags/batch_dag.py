@@ -19,7 +19,7 @@ with DAG(
     schedule_interval=None,
     default_args=default_args,
     catchup=False,
-    tags=["full-refresh"],
+    tags=["batch-dag"],
     template_searchpath=["/git/repo/components/airflow/dags"],
 ) as dag:
     GKE_CLUSTER_NAME = os.getenv("GKE_CLUSTER_NAME")
