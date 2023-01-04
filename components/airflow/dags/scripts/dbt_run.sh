@@ -11,6 +11,8 @@
 # --debug: When this option is present, the script will run the dbt debug command with the specified profiles directory.
 # --deps: When this option is present, the script will run the dbt deps command with the specified profiles directory to install dependencies.
 
+cd ${DBT_PROFILES_DIR}
+echo ${PWD}
 set -e
 while [[ $# -gt 0 ]]; do
     key="$1"
@@ -37,7 +39,7 @@ done
 
 if [[ -n $deps ]]; then
     echo "installing dependencies."
-    dbt deps --profiles-dir=${DBT_PROFILES_DIR}
+    dbt deps
 fi
 
 if [[ -n $commands ]]; then
@@ -63,7 +65,7 @@ fi
 
 if [[ -n $debug ]]; then
     echo "running dbt debug."
-    dbt debug --profiles-dir=${DBT_PROFILES_DIR}
+    dbt debug
 fi
 
 exit_code=$?
