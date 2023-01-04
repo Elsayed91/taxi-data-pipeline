@@ -21,8 +21,8 @@ select
         )
     }},
 from {{ source("staging_data", "yellow_staging") }} bt
-left join {{ ref("seed_zones") }} z1 on bt.pulocationid = z1.location_id
-left join {{ ref("seed_zones") }} z2 on bt.dolocationid = z2.location_id
+left join {{ ref("seed_zones") }} z1 on bt.pulocationid = z1.LocationID
+left join {{ ref("seed_zones") }} z2 on bt.dolocationid = z2.LocationID
 
 {% if is_incremental() %}
 {% set incremental_date = env_var('RUN_DATE') %}
