@@ -117,7 +117,7 @@ with DAG(
         arguments=[
             "--deps",
             "--commands",
-            "cat /mnt/secrets/key.json;",  # dbt seed;dbt run --full-refresh;dbt test --exclude tag:unit-test --target test
+            "dbt seed;dbt run --full-refresh;",  # ;dbt test --exclude tag:unit-test --target test
         ],
         jinja_job_args={
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
@@ -128,7 +128,7 @@ with DAG(
                     "name": "gcsfs-creds",
                     "type": "secret",
                     "reference": "gcsfs-creds",
-                    "mountPath": "/mnt/secrets/key.json",
+                    "mountPath": "/mnt/secrets",
                 }
             ],
         },
