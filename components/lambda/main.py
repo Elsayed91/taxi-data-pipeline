@@ -36,10 +36,10 @@ def lambda_handler(event: dict, context) -> None:
     )
     object_uri = f"s3://{bucket_name}/{key}"
     cluster_data = f'projects/{os.getenv("PROJECT")}/locations/{os.getenv("GCP_ZONE")}/clusters/{os.getenv("GKE_CLUSTER_NAME")}'
-    logger.info(f"cluster_data = {cluster_data}")
     DAG_NAME = os.getenv("DAG_NAME")
     NAMESPACE = os.getenv("TARGET_NAMESPACE")
     COMMAND_STRING = f"""airflow dags unpause {DAG_NAME} && airflow dags trigger {DAG_NAME} --conf '{{"URI":"{object_uri}"}}'"""
+    logger.info(f"object uri = {object_uri}")
     #######################################################################
     # setup gke connection
     #######################################################################
@@ -78,21 +78,6 @@ def lambda_handler(event: dict, context) -> None:
             airflow_pod = pod.metadata.name
             break
     if airflow_pod:
-        # exec_cmd = stream(
-        #     api.connect_post_namespaced_pod_exec(
-        #         name=airflow_pod,
-        #         namespace=NAMESPACE,
-        #         command=COMMAND_STRING,
-        #         container="scheduler",
-        #         stderr=True,
-        #         stdin=False,
-        #         stdout=True,
-        #         tty=False,
-        #     )
-        # )
-
-        # print(exec_cmd)
-
         exec_command = ["/bin/sh", "-c", COMMAND_STRING]
         resp = stream(
             api.connect_get_namespaced_pod_exec,
@@ -106,3 +91,4 @@ def lambda_handler(event: dict, context) -> None:
             tty=False,
         )
         print("Response: " + resp)
+        logger.info(f"resp => {resp}")
