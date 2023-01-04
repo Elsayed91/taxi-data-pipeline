@@ -4,6 +4,7 @@ from airflow.utils.dates import days_ago
 from airflow_kubernetes_job_operator.kubernetes_job_operator import (
     KubernetesJobOperator,
 )
+
 # default_args are the default arguments for the DAG
 default_args = {
     "owner": "me",
@@ -18,8 +19,9 @@ dag = DAG(
     description="A dummy DAG to demonstrate command line configuration",
     template_searchpath=["/git/repo/components/airflow/dags"],
 )
-    
+
 import os
+
 GKE_CLUSTER_NAME = os.getenv("GKE_CLUSTER_NAME")
 GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
 STAGING_BUCKET = os.getenv("STAGING_BUCKET")
@@ -42,7 +44,7 @@ t4 = KubernetesJobOperator(
     in_cluster=True,
     random_name_postfix_length=2,
     name_prefix="",
-
+)
 # Define a function that prints the command line configuration
 # def print_conf(**kwargs):
 #     conf = kwargs["dag_run"].conf
