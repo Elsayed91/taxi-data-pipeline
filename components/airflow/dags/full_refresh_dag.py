@@ -115,6 +115,8 @@ with DAG(
         body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
         command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
         arguments=[
+            "--commands",
+            "dbt run",
             "--unit-test"
             # "--deps",
             # "--seed",
