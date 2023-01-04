@@ -1,3 +1,0 @@
-VendorID,tpep_pickup_datetime,tpep_dropoff_datetime,store_and_fwd_flag,RateCodeID,PULocationID,DOLocationID,passenger_count,trip_distance,fare_amount,extra,mta_tax,tip_amount,tolls_amount,improvement_surcharge,total_amount,payment_type,congestion_surcharge,airport_fee
-2,2022-07-04 08:29:44 UTC,2022-07-04 08:29:53 UTC,N,1,231,231,3,5.5,2.5,0,0.5,0,0,0.30000001192092896,7.75,2,2.5,0
-2,2022-07-04 15:22:05 UTC,2022-07-04 15:22:16 UTC,N,1,211,125,1,5.5,2.5,0,0.5,0,0,0.30000001192092896,7.75,2,2.5,0

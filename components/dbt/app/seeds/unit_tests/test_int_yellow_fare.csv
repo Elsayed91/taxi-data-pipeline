@@ -1,3 +1,0 @@
-passenger_count,PUlocationID,DOlocationID,trip_distance,fare_amount,data_timestamp,day_of_month,month,year,day_of_week,hour_of_day,trip_duration
-6,114,79,0.56000000238418579,4.5,2022-09-01 00:02:57.000000 UTC,31,8,2022,4,23,3
-1,233,163,1.2899999618530273,7.5,2022-08-31 23:57:15.000000 UTC,31,8,2022,4,23,8
