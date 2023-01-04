@@ -115,8 +115,13 @@ with DAG(
         body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
         command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
         arguments=[
-            "--unit-test",
-            # dbt run --full-refresh;dbt test --exclude tag:unit-test --target test --generate-docs
+            "--unit-test"
+            # "--deps",
+            # "--seed",
+            # "--test",
+            # "--commands",
+            # "dbt run --full-refresh",
+            # "--generate-docs",
         ],
         jinja_job_args={
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",

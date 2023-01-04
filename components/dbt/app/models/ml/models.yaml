@@ -9,9 +9,9 @@ models:
       Additionally, it includes the distance between the pickup and dropoff locations, the distances
       from each location to JFK, EWR, and LGA airports.
     tests:
-      - nytaxi.equality:
+      - dbt_utils.equality:
           compare_model: ref('dbt__ml__yellow_fare_expected')
-          tags: ["unit-test"]
+          tags: ["unit_test"]
     columns:
       - name: passenger_count
         description: The number of passengers in the taxi.

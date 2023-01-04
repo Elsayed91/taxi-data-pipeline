@@ -28,24 +28,6 @@ macros:
       - name: node
         type: string
         description: Name of the node to which the schema name will be applied.
-  - name: src
-    description: >
-      - Generates a reference to a source or model depending on the target and provided arguments.
-      - If the target is 'test', the function will generate a reference to the test version of the
-      model or source.
-      - If the target is 'test' and the model starts with 'seed_', the model will reference the 
-      seed as usual despite the target.
-      - If the target is not 'test', the function will use the standard builtin ref/source.
-    arguments:
-      - name: func
-        type: string
-        description: Function to use. Can be either 'ref' or 'source'.
-      - name: model_name
-        type: string
-        description: Name of the model. If model name starts with 'seed_', the `ref` function is used.
-      - name: dataset_name
-        type: string
-        description: Name of the dataset. Optional if using 'ref' function or if `model_name` starts with 'seed_'. 
   - name: distances_from_airports
     description: >
       Generates four columns containing the distance between two points and three major airports in New York City (JFK, EWR, and LGA) using the longitude and latitude coordinates of the points.
@@ -100,18 +82,3 @@ macros:
           5= Unknown
           6= Voided trip
 
-  - name: refv2
-    description: >
-      Generates a reference to a model, depending on the context.
-    arguments:  
-    - name: model_name
-      type: string
-      description: >
-        The name of the model.
-        It provides seamless unit-testing capabilities by simply prefixing the model name with 'test_' 
-        to reference the unit-test data sample if the target variable is 'test'. If the target variable
-        is 'test' and the model is a seed, then nothing will happen, this is due to a naming convention
-        where seeds always start with 'seed_'.
-        if the target is not test, then it will provide the same functionality as builtin.ref.
-        builtins.ref(model_name) should be a better choice however it returns an error 
-        'str' object has no attribute 'database' with and without .include(database=false).

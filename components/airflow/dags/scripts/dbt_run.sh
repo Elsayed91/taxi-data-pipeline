@@ -94,7 +94,7 @@ fi
 
 if [[ -n $unit_test ]]; then
     echo "running dbt unit tests."
-    dbt test --target test --select tag:unit-test
+    dbt test --vars 'unit_test: true' -s +tag:unit_test
 fi
 
 exit_code=$?
