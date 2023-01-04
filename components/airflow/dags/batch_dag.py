@@ -45,23 +45,26 @@ t4 = KubernetesJobOperator(
     random_name_postfix_length=2,
     name_prefix="",
 )
-# Define a function that prints the command line configuration
-# def print_conf(**kwargs):
-#     conf = kwargs["dag_run"].conf
-#     if conf:
-#         print(f"Configuration received: {conf}")
-#     else:
-#         print("No configuration received")
 
 
-# # Create a PythonOperator that calls the print_conf function
-# print_conf_task = PythonOperator(
-#     task_id="print_conf",
-#     python_callable=print_conf,
-#     provide_context=True,
-#     dag=dag,
-# )
+def print_conf(**kwargs):
+    conf = kwargs["dag_run"].conf
+    if conf:
+        print(f"Configuration received: {conf}")
+    else:
+        print("No configuration received")
 
+
+# Create a PythonOperator that calls the print_conf function
+print_conf_task = PythonOperator(
+    task_id="print_conf",
+    python_callable=print_conf,
+    provide_context=True,
+    dag=dag,
+)
+
+
+t4 >> print_conf_task
 # Set the order of the tasks using set_upstream and set_downstream
 # print_conf_task
 
