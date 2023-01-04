@@ -1,11 +1,45 @@
 import os
 from tempfile import NamedTemporaryFile
-
+import base64, pprint
+import kubernetes.client
 import functions_framework
 import googleapiclient.discovery
 import kubernetes
 import kubernetes.client
 from kubernetes.stream import stream
+import googleapiclient.discovery
+from tempfile import NamedTemporaryFile
+import kubernetes
+import base64
+
+credentials = googleapiclient._auth.default_credentials()
+scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+scoped = googleapiclient._auth.with_scopes(credentials, scopes)
+googleapiclient._auth.refresh_credentials(scoped)
+api_auth_token = scoped.token
+
+gke = googleapiclient.discovery.build("container", "v1", credentials=credentials)
+name = "projects/your_project/locations/your_zone/clusters/your_gke_cluster"
+gke_clusters = gke.projects().locations().clusters()
+gke_cluster = gke_clusters.get(name=name).execute()
+config = kubernetes.client.Configuration()
+config.host = f'https://{gke_cluster["endpoint"]}'
+config.api_key_prefix["authorization"] = "Bearer"
+config.api_key["authorization"] = api_auth_token
+config.debug = False
+with NamedTemporaryFile(delete=False) as cert:
+    cert.write(
+        base64.decodebytes(gke_cluster["masterAuth"]["clusterCaCertificate"].encode())
+    )
+    config.ssl_ca_cert = cert.name
+
+client = kubernetes.client.ApiClient(configuration=config)
+api = kubernetes.client.CoreV1Api(client)
+exec_cmd = stream(
+    api.connect_post_namespaced_pod_exec(name, namespace, command=command)
+)
+
+print(exec_cmd)
 
 
 def token():

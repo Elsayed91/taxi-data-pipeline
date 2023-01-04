@@ -27,3 +27,7 @@ k:
 
 schema:
 	@bq show --schema --format=prettyjson $$PROJECT:$$STAGING_DATASET.$$YELLOW_STAGING_TABLE > myschema.json
+
+
+lambda_test:
+	@aws s3 cp yellow_tripdata_2019-08.parquet s3://stella-9af1e2ce16

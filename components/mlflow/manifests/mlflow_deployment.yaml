@@ -45,5 +45,6 @@ spec:
         - name: mlflow
           containerPort: 5000
           protocol: TCP
-
-          
+      nodeSelector:
+        cloud.google.com/gke-nodepool: ${BASE_NODE_POOL}
+        iam.gke.io/gke-metadata-server-enabled: "true"

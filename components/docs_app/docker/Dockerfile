@@ -8,3 +8,4 @@ COPY --chmod=0755 . .
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt && rm -rf requirements.txt && rm -r /root/.cache && rm -rf /var/cache/apt/*
 
 CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+

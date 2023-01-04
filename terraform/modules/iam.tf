@@ -14,7 +14,7 @@ locals {
 }
 
 resource "google_project_iam_custom_role" "custom-roles" {
-  for_each    = { for idx, sa in var.custom_roles : idx => sa if var.custom_roles != null }
+  for_each    = { for idx, sa in var.custom_roles : idx => sa if var.custom_roles != {} }
   role_id     = each.value.role_id
   project     = try(each.value.project, var.project)
   title       = each.value.title

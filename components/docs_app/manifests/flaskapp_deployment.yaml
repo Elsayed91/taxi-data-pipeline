@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flaskapp
+spec:
+  selector:
+    matchLabels:
+      app: flaskapp
+  template:
+    metadata:
+      labels:
+        app: flaskapp
+    spec:
+      containers:
+        - name: flask-k8s
+          image:  eu.gcr.io/${PROJECT}/flask
+          imagePullPolicy: Always
+          ports:
+            - name: flask-port
+              containerPort: 5000
+          env:
+            - name: DOCS_BUCKET
+              value: $DOCS_BUCKET
+      nodeSelector:
+        cloud.google.com/gke-nodepool: ${BASE_NODE_POOL}
+        iam.gke.io/gke-metadata-server-enabled: "true"

@@ -19,6 +19,7 @@ GCP:
           ]
       service_account_id: "projects/${PROJECT}/serviceAccounts/${CLUSTER_SA}@${PROJECT}.iam.gserviceaccount.com"
     - service_account_name: "lambda-svc"
+      iam_roles: [ "roles/container.developer"]
       iam_binding:
         iam_binding_role: "projects/${PROJECT}/roles/lambdaRole"
         iam_binding_members:
@@ -26,19 +27,19 @@ GCP:
       generate_key: true
       key_name: "files/lambda_key.json" #and path
       service_account_id: "projects/${PROJECT}/serviceAccounts/lambda-svc@${PROJECT}.iam.gserviceaccount.com"
-    - service_account_name: "${CLOUD_FN_SA}"
-      iam_roles:
-        [
-          "roles/run.invoker",
-          "roles/eventarc.eventReceiver",
-          "roles/container.clusterAdmin",
-        ]
-      service_account_id: "projects/${PROJECT}/serviceAccounts/cfn-sa@${PROJECT}.iam.gserviceaccount.com"
+    # - service_account_name: "${CLOUD_FN_SA}"
+    #   iam_roles:
+    #     [
+    #       "roles/run.invoker",
+    #       "roles/eventarc.eventReceiver",
+    #       "roles/container.clusterAdmin",
+    #     ]
+    #   service_account_id: "projects/${PROJECT}/serviceAccounts/cfn-sa@${PROJECT}.iam.gserviceaccount.com"
 ########################################
-  custom_roles:
-    - role_id: "lambdaRole"
-      title: "LambdaRole"
-      permissions: ["container.clusters.update", "container.operations.get"]
+  custom_roles: []
+  #   - role_id: "lambdaRole"
+  #     title: "LambdaRole"
+  #     permissions: ["container.clusters.update", "container.operations.get"]
 ########################################
   datasets: ~
     # - dataset_id: "${STAGING_DATASET}"
@@ -115,52 +116,19 @@ GCP:
         workload_metadata_config:
           mode: "GKE_METADATA"
 ########################################
-  # cloud-functions:
-  #   - name: "die-funktion"
-  #     code_path: "../../components/airflow_trigger_cloud_fn"
-  #     description: "super-duper-cfn"
-  #     build_config:
-  #       runtime: "python310"
-  #       entry_point: "main" # Set the entry point in the code
-  #       build_env_vars: ~ # build_envs
-  #       source:
-  #         storage_source:
-  #           bucket: ${CODE_BUCKET}
-  #           object: "cfn_dependencies.zip"
-  #     service_config:
-  #       max_instance_count: 1
-  #       min_instance_count: 1
-  #       available_memory: "256Mi"
-  #       timeout_seconds: 60
-  #       environment_variables:
-  #         GCP_ZONE: "${GCP_ZONE}"
-  #         CLUSTER_NAME: "${GKE_CLUSTER_NAME}"
-  #       ingress_settings: "ALLOW_INTERNAL_ONLY"
-  #       all_traffic_on_latest_revision: true
-  #       service_account_email: "${CLOUD_FN_SA}@${PROJECT}.iam.gserviceaccount.com"
-  #     event_trigger:
-  #       event_type: "google.cloud.storage.object.v1.finalized"
-  #       retry_policy: "RETRY_POLICY_DO_NOT_RETRY"
-  #       service_account_email: "${CLOUD_FN_SA}@${PROJECT}.iam.gserviceaccount.com"
-  #       event_filters:
-  #         attribute: "bucket"
-  #         value: "${STAGING_BUCKET}"
-
 ########################################
-########################################
-# AWS:
-#   buckets:
-#     - name: ${AWS_DUMMY_BUCKET}
+AWS:
+  buckets:
+    - name: ${AWS_DUMMY_BUCKET}
 # ########################################
-#   lambdas:
-#     - name: "die-lambda"
-#       dependencies_path: "files/lambda/dependencies.zip"
-#       vars:
-#         STAGING_BUCKET: "${STAGING_BUCKET}"
-#         GCP_PROJECT: "${PROJECT}"
-#         GCP_ZONE: "${GCP_ZONE}"
-#         CLUSTER_NAME: "${GKE_CLUSTER_NAME}"
-#         NODE_POOL_NAME: "${JOBS_NODE_POOL}"
-#         NODE_POOL_SIZE: JOBS_NODE_POOL_SIZE
-#       trigger_bucket: "${AWS_DUMMY_BUCKET}"
-#       code_path: "../../components/lambda"
+  lambdas:
+    - name: "die-lambda"
+      dependencies_path: "files/lambda/dependencies.zip"
+      vars:
+        PROJECT: "${PROJECT}"
+        GCP_ZONE: "${GCP_ZONE}"
+        GKE_CLUSTER_NAME: "${GKE_CLUSTER_NAME}"
+        DAG_NAME: "batch-dag"
+        TARGET_NAMESPACE: "default"
+      trigger_bucket: "${AWS_DUMMY_BUCKET}"
+      code_path: "./../../components/lambda"

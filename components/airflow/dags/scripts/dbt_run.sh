@@ -45,6 +45,10 @@ while [[ $# -gt 0 ]]; do
         seed=true
         shift
         ;;
+    --tests)
+        tests=true
+        shift
+        ;;
     *)
         echo "Error: Unrecognized flag $key" >&2
         exit 1
@@ -74,7 +78,7 @@ if [[ -n $generate_docs ]]; then
     edr monitor send-report --profiles-dir ${DBT_PROFILES_DIR} --gcs-bucket-name=$DOCS_BUCKET \
         --google-service-account-path=$KEYFILE \
         --update-bucket-website=true \
-        --bucket-file-path=elementary/elementary.html
+        --bucket-file-path=elementary/index.html
 fi
 
 if [[ -n $debug ]]; then
@@ -94,6 +98,13 @@ if [[ -n $seed ]]; then
 fi
 
 if [[ -n $unit_test ]]; then
+    echo "running dbt unit tests."
+    dbt test --select tag:unit-test
+fi
+
+if [[ -n $tests ]]; then
+    echo "running dbt data quality tests."
+    dbt test --exclude tag:unit-test
     echo "running dbt unit tests."
     dbt test --select tag:unit-test
 fi
