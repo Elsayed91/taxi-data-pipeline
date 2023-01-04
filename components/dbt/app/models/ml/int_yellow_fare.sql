@@ -1,4 +1,4 @@
-{{ config(materialized = 'view', dataset = 'staging') }}
+{# {{ config(materialized = 'view', dataset = 'staging') }}
 
 WITH 
     base AS (
@@ -104,4 +104,4 @@ SELECT passenger_count,
        DATE_DIFF(tpep_dropoff_datetime, tpep_pickup_datetime, MINUTE) AS trip_duration
 FROM {{ src('source', 'staging_data', 'stg_yellow') }}
 
-
+ #}

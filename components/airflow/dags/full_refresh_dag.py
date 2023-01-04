@@ -113,11 +113,10 @@ with DAG(
     t1 = KubernetesJobOperator(
         task_id="aws_to_gcs",
         body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
-        command=["/bin/bash", "/usr/app/scripts/run.sh"],
+        command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
         arguments=[
-            "-c",
-            "dbt test --exclude tag:unit-test --target test",  # dbt seed;dbt run --full-refresh;
-            "-g",
+            "--deps" "--commands",
+            "dbt seed;dbt run --full-refresh",  # ;dbt test --exclude tag:unit-test --target test
         ],
         jinja_job_args={
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
@@ -135,8 +134,8 @@ with DAG(
                 "GCP_REGION": os.getenv("GCP_REGION"),
                 "STAGING_DATASET": os.getenv("STAGING_DATASET"),
                 "YELLOW_STAGING_TABLE": os.getenv("YELLOW_STAGING_TABLE"),
-                "DBT_PROFILES_DIR": f"{BASE}/dbt"
-                # "RUN_DATE": RUN_DATE,
+                "DBT_PROFILES_DIR": f"{BASE}/dbt",
+                "HISTORICAL_DATASET": os.getenv("HISTORICAL_DATASET"),
             },
         },
     )
