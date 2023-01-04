@@ -100,39 +100,39 @@ macros:
           5= Unknown
           6= Voided trip
 
-  # - name: refv2
-  #   description: >
-  #     Generates a reference to a model, depending on the context.
-  #   arguments:  
-  #   - name: model_name
-  #     type: string
-  #     description: >
-  #       The name of the model.
-  #       It provides seamless unit-testing capabilities by simply prefixing the model name with 'test_' 
-  #       to reference the unit-test data sample if the target variable is 'test'. If the target variable
-  #       is 'test' and the model is a seed, then nothing will happen, this is due to a naming convention
-  #       where seeds always start with 'seed_'.
-  #       if the target is not test, then it will provide the same functionality as builtin.ref.
-  #       builtin.ref should be a better choice however it returns an error 
-  #       'str' object has no attribute 'database'
+  - name: refv2
+    description: >
+      Generates a reference to a model, depending on the context.
+    arguments:  
+    - name: model_name
+      type: string
+      description: >
+        The name of the model.
+        It provides seamless unit-testing capabilities by simply prefixing the model name with 'test_' 
+        to reference the unit-test data sample if the target variable is 'test'. If the target variable
+        is 'test' and the model is a seed, then nothing will happen, this is due to a naming convention
+        where seeds always start with 'seed_'.
+        if the target is not test, then it will provide the same functionality as builtin.ref.
+        builtin.ref should be a better choice however it returns an error 
+        'str' object has no attribute 'database' with and without .include(database=false)
 
-  #       {% macro ref(model_name)%}
-  #         {% if target.name == 'test' %}
-  #           {% if model_name.startswith('seed') %}
-  #             {{ builtins.ref(model_name) }}
-  #           {% else %}
-  #             {{ builtins.ref('test_' ~ model_name) }}
-  #           {% endif %}
-  #         {% else %}
-  #           {{ builtins.ref(model_name) }}
-  #         {% endif %}
-  #       {% endmacro %}
+        {% macro ref(model_name)%}
+          {% if target.name == 'test' %}
+            {% if model_name.startswith('seed') %}
+              {{ builtins.ref(model_name).include(database=false) }}
+            {% else %}
+              {{ builtins.ref('test_' ~ model_name).include(database=false) }}
+            {% endif %}
+          {% else %}
+            {{ builtins.ref(model_name).include(database=false) }}
+          {% endif %}
+        {% endmacro %}
 
 
-  #       {% macro source(dataset_name, model_name) %}
-  #         {% if target.name == 'test' %}
-  #           {{ builtins.ref('test_'|string + this.name) }}
-  #         {% else %}
-  #           {{ builtins.source(dataset_name, model_name) }}
-  #         {% endif %}
-  #       {% endmacro %}
+        {% macro source(dataset_name, model_name) %}
+          {% if target.name == 'test' %}
+            {{ builtins.ref('test_'|string + this.name).include(database=false) }}
+          {% else %}
+            {{ builtins.source(dataset_name, model_name).include(database=false) }}
+          {% endif %}
+        {% endmacro %}
