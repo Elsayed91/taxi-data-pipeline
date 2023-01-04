@@ -3,7 +3,7 @@
     {% if model_name.startswith('seed') %}
       {% do return(builtins.ref(model_name).include(database=false)) %}
     {% else %}
-  {% do return(builtins.ref('test_' ~ model_name).include(database=false)) %}
+      {% do return(builtins.ref('test_' ~ model_name).include(database=false)) %}
     {% endif %}
   {% else %}
     {% do return(builtins.ref(model_name).include(database=false)) %}
@@ -13,9 +13,9 @@
 
 {% macro source(dataset_name, model_name, test_table=None) %}
   {% if target.name == 'test' %}
-  {% do return(builtins.ref('test_' ~ test_table).include(database=false)) %}
+    {% do return(builtins.ref('test_' ~ test_table).include(database=false)) %}
   {% else %}
-    {{ do return(builtins.source(dataset_name, model_name).include(database=false)) }}
+    {% do return(builtins.source(dataset_name, model_name).include(database=false))  %}
   {% endif %}
 {% endmacro %}
 
