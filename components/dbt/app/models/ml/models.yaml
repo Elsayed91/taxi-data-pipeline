@@ -15,6 +15,8 @@ models:
           input_mapping:
             source('staging_data', 'yellow_staging'): ref('test_dbt__ml__yellow_fare')
           expected_output: ref('dbt__ml__yellow_fare_expected')
+          depends_on:
+            - ref('seed_zones')
           compare_columns:
             - fare_amount
             - passenger_count
