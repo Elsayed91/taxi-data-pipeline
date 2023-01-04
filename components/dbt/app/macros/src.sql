@@ -54,7 +54,7 @@
 
             {%- set test_ref = adapter.get_relation(
                   database = test_ref_relation.database,
-                  schema = 'test_dataset',
+                  schema = test_dataset,
                   identifier = 'test_' ~ test_ref_relation.identifier) 
             -%}
             
@@ -78,7 +78,7 @@
 
             {%- set test_source_relation = adapter.get_relation(
                   database = test_ref_relation.database,
-                  schema = 'test_dataset',
+                  schema = test_dataset,
                   identifier = 'test_' ~ test_ref_relation.identifier) 
             -%}
             
