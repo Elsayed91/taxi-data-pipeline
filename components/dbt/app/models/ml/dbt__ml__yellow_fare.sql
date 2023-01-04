@@ -1,7 +1,7 @@
-{% set ML_DATASET = env_var('ML_DATASET') %}
+
 {{ config(
         materialized = 'incremental',
-        dataset = "{{ ML_DATASET }}",
+        dataset = env_var('ML_DATASET'),
         partition_expiration_days = 180,
         partition_by = {'field': 'date', 'data_type': 'date',  "granularity": "month"},
 ) }}
