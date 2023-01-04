@@ -18,7 +18,8 @@ dag = DAG(
 
 t = "{{ dag_run.conf.URI }}"
 # Define a function that prints the command line configuration
-def print_conf(t):
+def print_conf():
+    print(f"the value of uri is {t}")
     return t
 
 
