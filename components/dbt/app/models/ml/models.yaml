@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: dbt__ml_yellow_fare
+  - name: dbt__ml__yellow_fare
     description: >
       This table contains data on taxi rides in New York City, including various features such as
       the pickup and dropoff zones, trip distance, and fare amount. It also includes date and time
@@ -16,21 +16,18 @@ models:
       - name: passenger_count
         description: The number of passengers in the taxi.
         type: integer
-      - name: pickup_zone_id
-        description: The ID of the zone in which the taxi pickup occurred.
-        type: integer
-      - name: dropoff_zone_id
-        description: The ID of the zone in which the taxi dropoff occurred.
-        type: integer
       - name: trip_distance
         description: The distance of the taxi trip, in miles.
+        type: float
+      - name: trip_duration
+        description: trip_duration.
         type: float
       - name: fare_amount
         description: The fare amount, in dollars.
         type: float
-      - name: data_timestamp
+      - name: date
         description: The date and time at which the taxi trip occurred.
-        type: timestamp
+        type: date
       - name: day_of_month
         description: The day of the month on which the taxi trip occurred.
         type: integer
@@ -67,6 +64,4 @@ models:
       - name: dropoff_lga_distance
         description: The distance between the dropoff location and LGA airport, in miles.
         type: float
-      - name: total_amount
-        description: The total amount charged for the taxi trip, in dollars.
-        type: float
+
