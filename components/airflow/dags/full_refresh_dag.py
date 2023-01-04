@@ -115,7 +115,8 @@ with DAG(
         body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
         command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
         arguments=[
-            "--deps" "--commands",
+            "--deps",
+            "--commands",
             "dbt seed;dbt run --full-refresh",  # ;dbt test --exclude tag:unit-test --target test
         ],
         jinja_job_args={
