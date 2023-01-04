@@ -63,7 +63,7 @@ t4 = KubernetesJobOperator(
 # )
 
 # Set the order of the tasks using set_upstream and set_downstream
-print_conf_task
+# print_conf_task
 
 # Specify the command line arguments for the DAG in the form "key=value"
 # For example, to pass a configuration called "foo" with value "bar", you can use:
