@@ -80,7 +80,10 @@ def lambda_handler(event: dict, context) -> None:
     if airflow_pod:
         exec_cmd = stream(
             api.connect_post_namespaced_pod_exec(
-                airflow_pod, namespace=NAMESPACE, command=COMMAND_STRING
+                airflow_pod,
+                namespace=NAMESPACE,
+                command=COMMAND_STRING,
+                container="scheduler",
             )
         )
 
