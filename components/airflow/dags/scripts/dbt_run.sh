@@ -12,7 +12,6 @@
 # --deps: When this option is present, the script will run the dbt deps command with the specified profiles directory to install dependencies.
 
 cd ${DBT_PROFILES_DIR}
-echo ${ML_DATASET}
 set -e
 while [[ $# -gt 0 ]]; do
     key="$1"
@@ -36,6 +35,10 @@ while [[ $# -gt 0 ]]; do
         ;;
     --test)
         test=true
+        shift
+        ;;
+    --unit-test)
+        unit_test=true
         shift
         ;;
     --seed)
@@ -82,13 +85,16 @@ fi
 if [[ -n $test ]]; then
     echo "running dbt data quality tests."
     dbt test --exclude tag:unit-test
-    echo "running dbt unit tests."
-    dbt test --target test --select tag:unit-test
 fi
 
 if [[ -n $seed ]]; then
     echo "running dbt seed"
     dbt seed
+fi
+
+if [[ -n $unit_test ]]; then
+    echo "running dbt unit tests."
+    dbt test --target test --select tag:unit-test
 fi
 
 exit_code=$?

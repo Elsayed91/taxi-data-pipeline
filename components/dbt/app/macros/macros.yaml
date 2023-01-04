@@ -113,26 +113,5 @@ macros:
         is 'test' and the model is a seed, then nothing will happen, this is due to a naming convention
         where seeds always start with 'seed_'.
         if the target is not test, then it will provide the same functionality as builtin.ref.
-        builtin.ref should be a better choice however it returns an error 
-        'str' object has no attribute 'database' with and without .include(database=false)
-
-        {% macro ref(model_name)%}
-          {% if target.name == 'test' %}
-            {% if model_name.startswith('seed') %}
-              {{ builtins.ref(model_name).include(database=false) }}
-            {% else %}
-              {{ builtins.ref('test_' ~ model_name).include(database=false) }}
-            {% endif %}
-          {% else %}
-            {{ builtins.ref(model_name).include(database=false) }}
-          {% endif %}
-        {% endmacro %}
-
-
-        {% macro source(dataset_name, model_name) %}
-          {% if target.name == 'test' %}
-            {{ builtins.ref('test_'|string + this.name).include(database=false) }}
-          {% else %}
-            {{ builtins.source(dataset_name, model_name).include(database=false) }}
-          {% endif %}
-        {% endmacro %}
+        builtins.ref(model_name) should be a better choice however it returns an error 
+        'str' object has no attribute 'database' with and without .include(database=false).

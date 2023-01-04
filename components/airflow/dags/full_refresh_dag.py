@@ -116,7 +116,7 @@ with DAG(
         command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
         arguments=[
             "--seed",
-            "--test",
+            "--unit-test",
             # dbt run --full-refresh;dbt test --exclude tag:unit-test --target test --generate-docs
         ],
         jinja_job_args={
