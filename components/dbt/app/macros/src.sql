@@ -1,6 +1,6 @@
-{% set test_dataset = env_var('UNIT_TESTS_DATASET') %}
+{% set test_dataset = env_var('UNIT_TESTS_DATASET') | string() %}
 
-{#
+
 {% macro refv2(model_name)%}
   {% if target.name == 'test' %}
     {% if model_name.startswith('seed') %}
@@ -14,26 +14,6 @@
 {% endmacro %} 
 
 
-{% macro refv2(model_name) %}
-  {% if target.name == 'test' %}
-    {% if model_name.startswith('seed') %}
-      {{ ref(model_name) }}
-    {% else %}
-      {%- set rel = this -%}
-      {%- set test_ref = adapter.get_relation(
-            database = rel.database,
-            schema = test_dataset,
-            identifier = 'test_' ~ model_name) 
-      -%}
-      {{ return(test_ref) }}
-  {% else %}
-    {{ ref(model_name) }}
-  {% endif %}
-{% endmacro %}
-
-
-
-
 {% macro src(dataset_name, model_name) %}
   {% if target.name == 'test' %}
     {{ source(test_dataset, 'test_'|string + this.name) }}
@@ -42,9 +22,9 @@
   {% endif %}
 {% endmacro %}
 
- #}
 
 
+{# 
 {% macro ref_for_test(model_name) %}
  
       {%- set normal_ref_relation = ref(model_name) -%}
@@ -90,4 +70,4 @@
 
       {% endif %}
 
-{% endmacro %}
+{% endmacro %} #}
