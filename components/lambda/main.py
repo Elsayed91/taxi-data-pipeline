@@ -78,13 +78,31 @@ def lambda_handler(event: dict, context) -> None:
             airflow_pod = pod.metadata.name
             break
     if airflow_pod:
-        exec_cmd = stream(
-            api.connect_post_namespaced_pod_exec(
-                airflow_pod,
-                namespace=NAMESPACE,
-                command=COMMAND_STRING,
-                container="scheduler",
-            )
-        )
+        # exec_cmd = stream(
+        #     api.connect_post_namespaced_pod_exec(
+        #         name=airflow_pod,
+        #         namespace=NAMESPACE,
+        #         command=COMMAND_STRING,
+        #         container="scheduler",
+        #         stderr=True,
+        #         stdin=False,
+        #         stdout=True,
+        #         tty=False,
+        #     )
+        # )
 
-        print(exec_cmd)
+        # print(exec_cmd)
+
+        exec_command = ["/bin/sh", "-c", COMMAND_STRING]
+        resp = stream(
+            api.connect_get_namespaced_pod_exec,
+            name=airflow_pod,
+            namespace=NAMESPACE,
+            container="scheduler",
+            command=exec_command,
+            stderr=True,
+            stdin=False,
+            stdout=True,
+            tty=False,
+        )
+        print("Response: " + resp)

@@ -16,13 +16,10 @@ dag = DAG(
     description="A dummy DAG to demonstrate command line configuration",
 )
 
+t = "{{ dag_run.conf.URI }}"
 # Define a function that prints the command line configuration
-def print_conf(**kwargs):
-    conf = kwargs["dag_run"].conf
-    if conf:
-        print(f"Configuration received: {conf}")
-    else:
-        print("No configuration received")
+def print_conf(t):
+    return t
 
 
 # Create a PythonOperator that calls the print_conf function
