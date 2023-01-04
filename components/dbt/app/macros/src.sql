@@ -16,9 +16,9 @@
 {% endmacro %} 
 
 
-{% macro src(dataset_name, model_name) %}
+{% macro src(dataset_name, model_name, test_model) %}
   {% if target.name == 'test' %}
-    {% set rel = builtins.ref(test_dataset, 'test_'|string + this.name) %}
+    {% set rel = builtins.ref(test_dataset, test_model) %}
     {% set newrel = rel.replace_path(database=None) %}  
     {% do return(newrel) %}
   {% else %}
