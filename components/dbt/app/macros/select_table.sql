@@ -1,4 +1,4 @@
-{% macro select_table(source_table, test_table) %}
+{# {% macro select_table(source_table, test_table) %}
 
       {% if target.name == 'test' %}
             
@@ -10,4 +10,6 @@
 
       {% endif %}
 
-{% endmacro %}
+{% endmacro %} #}
+
+{# {% set src = select_table(source("staging_data", "yellow_staging"), ref('test_dbt__ml__yellow_fare')) %} #}
