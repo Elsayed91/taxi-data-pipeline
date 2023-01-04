@@ -30,7 +30,7 @@ WHERE z1.LocationID IS NOT NULL AND z2.LocationID IS NOT NULL
 
 {% if is_incremental() %}
 {% set incremental_date = env_var('RUN_DATE') %}
-    AND DATE(bt.tpep_pickup_datetime) >= PARSE_DATE('%Y-%m-%d', DATE("{{ incremental_date }}"))
+    AND DATE(bt.tpep_pickup_datetime) >=  "{{ incremental_date }}"
 {% endif %}
 
 
