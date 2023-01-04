@@ -131,13 +131,13 @@ with DAG(
                     "mountPath": "/mnt/secrets/key.json",
                 }
             ],
-            "env": {
-                "PROJECT": GOOGLE_CLOUD_PROJECT,
-                "GCP_REGION": os.getenv("GCP_REGION"),
-                "STAGING_DATASET": os.getenv("STAGING_DATASET"),
-                "YELLOW_STAGING_TABLE": os.getenv("YELLOW_STAGING_TABLE"),
-                "DBT_PROFILES_DIR": f"{BASE}/dbt",
-                "HISTORICAL_DATASET": os.getenv("HISTORICAL_DATASET"),
-            },
+        },
+        envs={
+            "PROJECT": GOOGLE_CLOUD_PROJECT,
+            "GCP_REGION": os.getenv("GCP_REGION"),
+            "STAGING_DATASET": os.getenv("STAGING_DATASET"),
+            "YELLOW_STAGING_TABLE": os.getenv("YELLOW_STAGING_TABLE"),
+            "DBT_PROFILES_DIR": f"{BASE}/dbt",
+            "HISTORICAL_DATASET": os.getenv("HISTORICAL_DATASET"),
         },
     )
