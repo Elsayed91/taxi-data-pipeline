@@ -115,7 +115,7 @@ with DAG(
         body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
         command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
         arguments=[
-            "--debug",
+            "--deps",
             "--commands",
             "dbt seed;dbt run --full-refresh",  # ;dbt test --exclude tag:unit-test --target test
         ],
@@ -139,5 +139,6 @@ with DAG(
             "YELLOW_STAGING_TABLE": os.getenv("YELLOW_STAGING_TABLE"),
             "DBT_PROFILES_DIR": f"{BASE}/dbt/app",
             "HISTORICAL_DATASET": os.getenv("HISTORICAL_DATASET"),
+            "YELLOW_SUMMARY_TABLE": os.getenv("YELLOW_SUMMARY_TABLE"),
         },
     )
