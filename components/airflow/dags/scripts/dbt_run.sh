@@ -85,6 +85,7 @@ fi
 if [[ -n $test ]]; then
     echo "running dbt data quality tests."
     dbt test --exclude tag:unit-test
+
 fi
 
 if [[ -n $seed ]]; then
@@ -94,7 +95,7 @@ fi
 
 if [[ -n $unit_test ]]; then
     echo "running dbt unit tests."
-    dbt test --target test -s +tag:unit_test
+    dbt test --target test --select tag:unit-test
 fi
 
 exit_code=$?
