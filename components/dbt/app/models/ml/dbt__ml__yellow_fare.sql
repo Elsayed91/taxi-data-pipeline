@@ -1,4 +1,4 @@
-{% set ML_DATASET = {{ env_var('ML_DATASET') }} %}
+{% set ML_DATASET = env_var('ML_DATASET') %}
 {{ config(
         materialized = 'incremental',
         dataset = {{ ML_DATASET }},
