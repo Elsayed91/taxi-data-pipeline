@@ -1,8 +1,8 @@
-{% macro refv2(model_name)%}
+{% macro ref(model_name)%}
   {% if target.name == 'test' %}
     {% if model_name.startswith('seed') %}
       {% do return(builtins.ref(model_name).include(database=false)) %}
-    {% else %}
+    {% elif mode_name.startwith('dbt__') %}
       {% do return(builtins.ref('test_' ~ model_name).include(database=false)) %}
     {% endif %}
   {% else %}
@@ -12,7 +12,7 @@
 
 
 {% macro src(dataset_name, model_name, test_table=None) %}
-  {% if target.name == 'test' %}
+  {% if target.name == 'test' and if test_table is not none and test_table.startswith('dbt__') %}
     {% do return(builtins.ref('test_' ~ test_table).include(database=false)) %}
   {% else %}
     {% do return(builtins.source(dataset_name, model_name).include(database=false))  %}
