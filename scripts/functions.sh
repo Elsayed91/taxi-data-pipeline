@@ -59,7 +59,7 @@ gitpush() {
     git commit -m "$(openssl rand -hex 5)"
     git push -u origin main
 }
-kubectl get pods | grep Error
+
 kill_failed() {
     local namespace=${1:-default}
     local pods=$(kubectl get pods -n $namespace | grep -E "Error|CrashLoopBackOff|ImagePullBackOff" | cut -d' ' -f 1)
