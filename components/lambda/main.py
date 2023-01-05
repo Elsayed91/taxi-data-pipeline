@@ -61,7 +61,7 @@ def get_credentials(secret_id: str = "gcp_key"):
     )
     secret_value = get_secret_value_response["SecretString"]
 
-    key = decodebytes(secret_value["privateKeyData"]).encode()  # type: ignore
+    key = decodebytes(secret_value["privateKeyData"])  # type: ignore
     key = json.loads(key)  # type: ignore
 
     logger.info(key)
