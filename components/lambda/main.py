@@ -41,6 +41,7 @@ from aws_lambda_typing.context import Context as LambdaContext
 import boto3
 from botocore.exceptions import ClientError
 import json
+from typing import Optional, Any
 
 
 def get_credentials(secret_id: str = "gcp_key") -> Credentials:
@@ -51,16 +52,28 @@ def get_credentials(secret_id: str = "gcp_key") -> Credentials:
     will be connected to the standard AWS AWS secretsmanager service.
 
     Args:
-        secret_id (str): The ID of the secret in Secrets Manager. Defaults to "gcp_key".
-        secret_manager_client (boto3.client): the secretsmanager client object
+        secret_id (str): The ID of the secret in Secrets Manager.
+            Defaults to "gcp_key".
+        secret_manager_client (boto3.client): the secretsmanager client
+            object
 
     Returns:
         Credentials: The service account credentials object.
     """
-    secrets_manager_client = boto3.client("secretsmanager")
-    integration_test = os.getenv("INTEGRATION_TEST") == "true"
-    if integration_test:
-        secrets_manager_client.meta.endpoint_url = "http://localhost:4566"
+    # integration_test = os.getenv("INTEGRATION_TEST") == "true"
+    # if integration_test:
+    #     secrets_manager_client = boto3.client(
+    #         "secretsmanager", entpoint_url="http://localhost:4566"
+    #     )
+
+    # else:
+    #     secrets_manager_client = boto3.client("secretsmanager")
+    secrets_manager_client = boto3.client(
+        "secretsmanager",
+        endpoint_url=None
+        if os.getenv("INTEGRATION_TEST") == "true"
+        else "http://localhost:4566",
+    )
     try:
         get_secret_value_response = secrets_manager_client.get_secret_value(
             SecretId=secret_id
@@ -77,7 +90,8 @@ def token(credentials: Credentials, *scopes: str) -> str:
     Returns the access token for the given credentials and scopes.
 
     Args:
-        credentials: The credentials object to use for generating the token.
+        credentials: The credentials object to use for generating
+            the token.
         scopes: A list of scopes to include in the token.
 
     Returns:
@@ -89,15 +103,53 @@ def token(credentials: Credentials, *scopes: str) -> str:
     return scoped.token
 
 
-def get_cluster_info(project, zone, cluster_name, credentials):
-    cluster_attributes = f"projects/{project}/locations/{zone}/clusters/{cluster_name}"
-    gke = googleapiclient.discovery.build("container", "v1", credentials=credentials)
-    gke_clusters = gke.projects().locations().clusters()
-    gke_cluster = gke_clusters.get(name=cluster_attributes).execute()
-    return gke_cluster
+def get_cluster_info(
+    project: str, zone: str, cluster_name: str, credentials: Credentials
+) -> dict[str, Any]:
+    """
+    Returns the cluster info for the given project, zone, and
+    cluster name.
+
+    Args:
+        project: The project name.
+        zone: The zone where the cluster is located.
+        cluster_name: The name of the cluster.
+        credentials: The credentials to use for accessing the cluster.
+
+    Returns:
+        A dictionary containing the cluster info.
+
+    Raises:
+        HttpError: If there is a connection error or the request returns an HTTP error.
+    """
+    try:
+        cluster_attributes = (
+            f"projects/{project}/locations/{zone}/clusters/{cluster_name}"
+        )
+        gke = googleapiclient.discovery.build(
+            "container", "v1", credentials=credentials
+        )
+        gke_clusters = gke.projects().locations().clusters()
+        gke_cluster = gke_clusters.get(name=cluster_attributes).execute()
+        return gke_cluster
+    except HttpError as error:
+        print(f"An error occurred while getting cluster info: {error}")
+        raise error
 
 
-def kubernetes_api(cluster, api_auth_token):
+def kubernetes_api(
+    cluster: dict[str, Any], api_auth_token: str
+) -> kubernetes.client.CoreV1Api:
+    """
+    Returns a Kubernetes API client for the given cluster and API auth token.
+
+    Args:
+        cluster: A dictionary containing information about the cluster.
+        api_auth_token: The API auth token to use for accessing the cluster.
+
+    Returns:
+        A CoreV1Api object for interacting with the Kubernetes API.
+    """
     config = kubernetes.client.Configuration()
     config.host = f'https://{cluster["endpoint"]}'
     config.api_key_prefix["authorization"] = "Bearer"
@@ -117,9 +169,27 @@ def kubernetes_api(cluster, api_auth_token):
 
 
 def get_target_pod(
-    api, target_namespace, target_pod_substring, cluster, api_auth_token
-):
-    api = kubernetes_api(cluster, api_auth_token)
+    api: kubernetes.client.CoreV1Api,
+    target_namespace: str,
+    target_pod_substring: str,
+    cluster: dict[str, Any],
+    api_auth_token: str,
+) -> str:
+    """
+    Returns the name of the first pod in the given namespace that has
+    the target pod substring in its name and is ready.
+
+    Args:
+        api: A CoreV1Api object for interacting with the Kubernetes API.
+        target_namespace: The namespace to search for the target pod.
+        target_pod_substring: The substring to search for in the pod names.
+        cluster: A dictionary containing information about the cluster.
+        api_auth_token: The API auth token to use for accessing the cluster.
+
+    Returns:
+        The name of the target pod, or the target pod substring if no matching
+        pod is found.
+    """
     pods = api.list_namespaced_pod(namespace=str(target_namespace))
     target_pod_name = None
     for pod in pods.items:
@@ -130,22 +200,48 @@ def get_target_pod(
         ):
             target_pod_name = pod.metadata.name
             break
-    return target_pod_name
+    if target_pod_name is None:
+        return target_pod_substring
+    else:
+        return target_pod_name
 
 
-def pod_exec(api, target_namespace, target_pod, container, command_string):
-    resp = stream(
-        api.connect_get_namespaced_pod_exec,
-        name=target_pod,
-        namespace=target_namespace,
-        container=container,
-        command=["/bin/sh", "-c", command_string],
-        stderr=True,
-        stdin=False,
-        stdout=True,
-        tty=False,
-    )
-    print("Response: " + resp)
+def pod_exec(
+    api: kubernetes.client.CoreV1Api,
+    target_namespace: str,
+    target_pod: str,
+    container: str,
+    command_string: str,
+) -> None:
+    """
+    Executes the given command string in the specified pod and container
+    in the given namespace.
+
+    Args:
+        api: A CoreV1Api object for interacting with the Kubernetes API.
+        target_namespace: The namespace where the target pod is located.
+        target_pod: The name of the target pod.
+        container: The name of the container in the target pod.
+        command_string: The command to execute in the pod.
+    Raises:
+        KubernetesError: If there is an error executing the command in the pod.
+    """
+    try:
+        resp = stream(
+            api.connect_get_namespaced_pod_exec,
+            name=target_pod,
+            namespace=target_namespace,
+            container=container,
+            command=["/bin/sh", "-c", command_string],
+            stderr=True,
+            stdin=False,
+            stdout=True,
+            tty=False,
+        )
+        print("Response: " + resp)
+    except kubernetes.client.rest.ApiException as error:
+        print(f"An error occurred while executing the command in the pod: {error}")
+        raise kubernetes.client.KubernetesError(error)
 
 
 def lambda_handler(event: dict, context: LambdaContext) -> None:

@@ -10,19 +10,25 @@ cd $SCRIPT_DIR
 # cp ${SCRIPT_DIR}/../../../components/lambda/* ${SCRIPT_DIR}/files/
 # python -m pip install --target ${SCRIPT_DIR}/files -r ${SCRIPT_DIR}/files/requirements.txt
 
-# SERVICES=lambda,iam,secretsmanager,s3,logs nohup localstack start &
+terraform destroy -auto-approve
+localstack stop
+echo "sleeping"
+sleep 20
 
-# terraform init && terraform apply --auto-approve --destroy
+SERVICES=lambda,iam,secretsmanager,s3,logs nohup localstack start &
 
-# aws --endpoint-url=http://localhost:4566 secretsmanager create-secret --name gcp_key \
-#     --secret-string file:///home/lestrang/grandiose/terraform/modules/files/lambda_key.json \
-#     --region eu-west-1
-# # # touch yellow_tripdata_2019-08.parquet
-# aws --endpoint-url=http://localhost:4566 \
-#     s3api put-object --bucket test-bucket \
-#     --key yellow_tripdata_2019-08.parquet \
-#     --body=yellow_tripdata_2019-08.parquet \
-#     --region eu-west-1
+terraform init && terraform apply --auto-approve
+
+aws --endpoint-url=http://localhost:4566 secretsmanager create-secret --name gcp_key \
+    --secret-string file:///home/lestrang/grandiose/terraform/modules/files/lambda_key.json \
+    --region eu-west-1
+touch yellow_tripdata_2019-08.parquet
+aws --endpoint-url=http://localhost:4566 \
+    s3api put-object --bucket test-bucket \
+    --key yellow_tripdata_2019-08.parquet \
+    --body=yellow_tripdata_2019-08.parquet \
+    --region eu-west-1
+rm yellow_tripdata_2019-08.parquet
 
 # test_run_info=$(kubectl exec -t $(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow) -c scheduler -- airflow dags list-runs -d lambda_integration_test -o yaml | head -6)
 # if [[ -n "$test_run_info" ]]; then
