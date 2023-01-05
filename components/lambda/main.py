@@ -42,15 +42,6 @@ from aws_lambda_typing.context import Context as LambdaContext
 import boto3
 from botocore.exceptions import ClientError
 import json
-import logging
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-ch.setFormatter(formatter)
-logger.addHandler(ch)
 
 
 def get_credentials(secret_id: str = "gcp_key") -> Credentials:
@@ -162,5 +153,4 @@ def lambda_handler(event: dict, context: LambdaContext) -> None:
     target_pod_name = get_target_pod(
         api, "default", "airflow", gke_cluster, api_auth_token
     )
-    logger.info(f"targetpod is {target_pod_name}")
     pod_exec(api, target_namespace, target_pod_name, "scheduler", dag_trigger_command)

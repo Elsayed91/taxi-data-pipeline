@@ -1,6 +1,15 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 default_args = {
     "owner": "me",
@@ -39,6 +48,7 @@ with DAG(
         try:
             file_uri = conf["URI"]
             filename = conf["filename"]
+            logger.info(f"uri is {file_uri}, and file is {filename}")
             assert file_uri == assertion_result_1
             assert filename == assertion_result_2
         except AssertionError:
