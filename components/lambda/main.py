@@ -54,23 +54,23 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-def get_credentials(secret_id: str = "gcp_key"):
-    secrets_manager_client = boto3.client("secretsmanager")
-    get_secret_value_response = secrets_manager_client.get_secret_value(
-        SecretId=secret_id
-    )
-    key_file = get_secret_value_response["SecretString"]
-    with NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
-        json.dump(key_file, f)
-        f.flush()
+# def get_credentials(secret_id: str = "gcp_key"):
+#     secrets_manager_client = boto3.client("secretsmanager")
+#     get_secret_value_response = secrets_manager_client.get_secret_value(
+#         SecretId=secret_id
+#     )
+#     key_file = get_secret_value_response["SecretString"]["private-data"]
+#     with NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+#         json.dump(key_file, f)
+#         f.flush()
 
-    # Load the credentials from the temporary file
-    credentials = Credentials.from_service_account_file(f.name)
+#     # Load the credentials from the temporary file
+#     credentials = Credentials.from_service_account_file(f.name)
 
-    # Delete the temporary file
-    os.unlink(f.name)
+#     # Delete the temporary file
+#     os.unlink(f.name)
 
-    return credentials
+#     return credentials
 
 
 def lambda_handler(event: dict, context: LambdaContext) -> None:
@@ -90,16 +90,22 @@ def lambda_handler(event: dict, context: LambdaContext) -> None:
     # setup gke connection
     #######################################################################
 
-    print(get_credentials())
+    # print(get_credentials())
 
     secrets_manager_client = boto3.client("secretsmanager")
     get_secret_value_response = secrets_manager_client.get_secret_value(
         SecretId="gcp-key"
     )
     key_file = get_secret_value_response["SecretString"]
-    service_account_info = json.loads(key_file)
-    credentials = Credentials.from_service_account_info(service_account_info)
-    print(credentials)
+    try:
+        service_account_info = json.loads(key_file)
+        credentials = Credentials.from_service_account_info(service_account_info)
+        print(f"try ok {credentials}")
+    except:
+        key_file = get_secret_value_response["SecretString"]["private-key"]
+        service_account_info = json.loads(key_file)
+        credentials = Credentials.from_service_account_info(service_account_info)
+        print(f"except ok {credentials}")
     # credentials = service_account.Credentials.from_service_account_file(
     #     "lambda_key.json"
     # )
