@@ -37,7 +37,7 @@ import googleapiclient.discovery
 import kubernetes
 from kubernetes.stream import stream
 import urllib.parse
-from google.oauth2 import service_account
+from google.oauth2.service_account import Credentials
 from aws_lambda_typing.context import Context as LambdaContext
 import boto3
 from base64 import decodebytes, encode
@@ -60,22 +60,14 @@ def get_credentials(secret_id: str = "gcp_key"):
         SecretId=secret_id
     )
     secret_value = get_secret_value_response["SecretString"]
+    key_file = json.loads(secret_value)
 
-    key = decodebytes(secret_value["privateKeyData"])  # type: ignore
-    key = json.loads(key)  # type: ignore
-
-    logger.info(key)
-    # key_file = json.loads(secret_value)
-    # logger.info(f"jsonkey {key_file}")
-
-    # with NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
-    #     json.dump(key_file, f)
-    #     f.flush()
-    # credentials = service_account.Credentials.from_service_account_file(
-    #     f.name
-    # )  # Load the credentials from the temporary file
-    # os.unlink(f.name)  # Delete the temporary file
-    return service_account.Credentials.from_service_account_info(key)
+    with NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+        json.dump(key_file, f)
+        f.flush()
+    credentials = Credentials.from_service_account_file(f.name)
+    os.unlink(f.name)  # Delete the temporary file
+    return Credentials.from_service_account_info(credentials)
 
 
 def lambda_handler(event: dict, context: LambdaContext) -> None:
