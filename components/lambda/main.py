@@ -1,3 +1,22 @@
+"""
+Functionality:
+-   The function is triggered when an object is added to an S3 bucket. It retrieves the bucket name and
+    object key from the event data, constructs an object URI in the format "s3://bucket_name/key".
+-   retrieves variables data (cluster data, DAG name, and namespace) from environment variables.
+-   authenticates with Google Cloud Platform (GCP) using a service account key, and uses the Google 
+    Kubernetes Engine (GKE) API to retrieve information about a specific cluster and create a 
+    Kubernetes client configuration and subsequently a Kubernetes API client.
+-   retrieves a list of pods in the specified namespace, and searches for a pod with a name containing 
+    "airflow". This is done as the airflow pod unlike the deployment, is usually suffixed randomly.
+    If found, it uses the Kubernetes API to execute the command string on the pod to trigger a dag.
+    
+Best Practices:
+-   Using environment variables for sensitive information such as API keys, project names, and bucket names.
+-   Using a temporary file to store the GKE cluster certificate instead of storing it in a variable, 
+    preventing it from being exposed in memory.
+-   Using the NamedTemporaryFile context manager to create a temporary file, which automatically deletes the
+    file after it is closed.
+"""
 import os
 from tempfile import NamedTemporaryFile
 import kubernetes.client
@@ -5,27 +24,16 @@ import base64
 import googleapiclient.discovery
 import kubernetes
 from kubernetes.stream import stream
-import googleapiclient.discovery
-import os
 import urllib.parse
-import logging
-
 from google.oauth2 import service_account
+from aws_lambda_typing.context import Context as LambdaContext
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-ch.setFormatter(formatter)
-logger.addHandler(ch)
-
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = (
-    os.environ["LAMBDA_TASK_ROOT"] + "/lambda_key.json"
-)
+# os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = (
+#     os.environ["LAMBDA_TASK_ROOT"] + "/lambda_key.json"
+# )
 
 
-def lambda_handler(event: dict, context) -> None:
+def lambda_handler(event: dict, context: LambdaContext) -> None:
 
     #######################################################################
     # setup variables
@@ -38,8 +46,7 @@ def lambda_handler(event: dict, context) -> None:
     cluster_data = f'projects/{os.getenv("PROJECT")}/locations/{os.getenv("GCP_ZONE")}/clusters/{os.getenv("GKE_CLUSTER_NAME")}'
     DAG_NAME = os.getenv("DAG_NAME")
     NAMESPACE = os.getenv("TARGET_NAMESPACE")
-    COMMAND_STRING = f"""airflow dags unpause {DAG_NAME} && airflow dags trigger {DAG_NAME} --conf '{{"URI":"{object_uri}"}}'"""
-    logger.info(f"object uri = {object_uri}")
+    COMMAND_STRING = f"""airflow dags unpause {DAG_NAME} && airflow dags trigger {DAG_NAME} --conf '{{"URI":"{object_uri}", "filename":"{key}"}}'"""
     #######################################################################
     # setup gke connection
     #######################################################################
@@ -91,4 +98,3 @@ def lambda_handler(event: dict, context) -> None:
             tty=False,
         )
         print("Response: " + resp)
-        logger.info(f"resp => {resp}")

@@ -47,7 +47,7 @@ with DAG(
     BASE = "/git/repo/components"
     TEMPLATES_PATH = f"{BASE}/airflow/dags/templates"
     SCRIPTS_PATH = f"{BASE}/airflow/dags/scripts"
-    JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOLZ")  # remove z after terraform re
+    JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")  # remove z after terraform re
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
     t1 = KubernetesJobOperator(
         task_id="aws_to_gcs",

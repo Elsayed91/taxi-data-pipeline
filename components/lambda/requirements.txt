@@ -1,3 +1,4 @@
-google-cloud-container
+# google-cloud-container
 kubernetes==25.3.0
 google-api-python-client==2.70.0
+aws-lambda-typing==2.16.3 #much lighter than aws-lambda-powertools 2.5.0
