@@ -66,8 +66,8 @@ with DAG(
 
     task = BashOperator(
         task_id="bash_operator_task",
-        bash_command='echo "Bucket: {{ task_instance.xcom_pull(task_ids="print_conf", key="bucket") }}, \
-        File Path: {{ task_instance.xcom_pull(task_ids="print_conf", key="file_path") }}',
+        bash_command='echo "Bucket: {{ task_instance.xcom_pull(task_ids="print_conf_task", key="bucket") }}, \
+        File Path: {{ task_instance.xcom_pull(task_ids="print_conf_task", key="file_path") }}',
     )
     # Pass in the variables using the `provide_context` parameter
     # provide_context=True
