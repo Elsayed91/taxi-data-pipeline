@@ -23,6 +23,10 @@ while [[ $# -gt 0 ]]; do
         creds_file="$2"
         shift 2
         ;;
+    --filename)
+        filename="$2"
+        shift 2
+        ;;
     --exclude-prefixes)
         exclude_prefixes="$2"
         shift 2
@@ -48,9 +52,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 for folder in "${@}"; do
-    file_path="${target_bucket}/${folder}/*.parquet"
     if [[ "${check_exists}" == true ]]; then
-        file_path="gs://${target_bucket}/${folder}/*.parquet"
+        file_path="gs://${target_bucket}/${folder}/${filename:=*.parquet}"
         result=$(gsutil -q stat $file_path || echo 1)
         if [[ $result == 1 ]]; then
             echo "$file_path already exists"
