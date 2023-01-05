@@ -20,8 +20,6 @@ with DAG(
     template_searchpath=["/git/repo/components/airflow/dags"],
 ) as dag:
 
-    filename = "{{ dag_run.conf['URI'] }}".split("/")[-1]
-    print(f"t={filename}")
     import os
 
     GKE_CLUSTER_NAME = os.getenv("GKE_CLUSTER_NAME")
@@ -50,6 +48,7 @@ with DAG(
     )
 
     def print_conf(**kwargs):
+        filename = "{{ dag_run.conf['URI'] }}".split("/")[-1]
         print(f"filename is {filename}")
         return filename
 
