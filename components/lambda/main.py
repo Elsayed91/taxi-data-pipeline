@@ -40,7 +40,7 @@ import urllib.parse
 from google.oauth2 import service_account
 from aws_lambda_typing.context import Context as LambdaContext
 import boto3
-from base64 import decodestring, decodebytes
+from base64 import decodebytes
 
 import json
 import logging
@@ -54,17 +54,17 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-def get_credentials():
+def get_credentials(secret_id: str = "gcp_key"):
     secrets_manager_client = boto3.client("secretsmanager")
     get_secret_value_response = secrets_manager_client.get_secret_value(
-        SecretId="gcp_key"
+        SecretId=secret_id
     )
     secret_value = get_secret_value_response["SecretString"]
 
-    key = decodestring(secret_value["privateKeyData"])
-    key = json.loads(key)
+    key = decodebytes(secret_value["privateKeyData"])
+    key = json.loads(key)  # type: ignore
 
-    logger.info(secret_value)
+    logger.info(key)
     # key_file = json.loads(secret_value)
     # logger.info(f"jsonkey {key_file}")
 
@@ -113,7 +113,7 @@ def lambda_handler(event: dict, context: LambdaContext) -> None:
     # config.debug = False
     # with NamedTemporaryFile(delete=False) as cert:
     #     cert.write(
-    #         base64.decodebytes(
+    #         decodebytes(
     #             gke_cluster["masterAuth"]["clusterCaCertificate"].encode()
     #         )
     #     )
