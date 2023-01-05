@@ -7,7 +7,7 @@ from airflow_kubernetes_job_operator.kubernetes_job_operator import (
     KubernetesJobOperator,
 )
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
-from addons.parse_state import SparkApplication
+from parse_state import SparkApplication
 
 # envs={"dag_uri": "{{ dag_run.conf.URI }}"},
 KubeResourceKind.register_global_kind(SparkApplication)
