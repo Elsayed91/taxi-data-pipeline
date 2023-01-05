@@ -36,7 +36,6 @@ with DAG(
     schedule_interval=None,
     catchup=False,
     description="batch data pipeline",
-    template_searchpath=["/git/repo/components/airflow/dags"],
 ) as dag:
 
     GKE_CLUSTER_NAME = os.getenv("GKE_CLUSTER_NAME")
