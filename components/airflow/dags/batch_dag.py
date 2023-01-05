@@ -20,8 +20,8 @@ with DAG(
     template_searchpath=["/git/repo/components/airflow/dags"],
 ) as dag:
 
-    t = "{{ dag_run.conf.URI }}"
-    print(f"t={t}")
+    filename = "{{ dag_run.conf['URI'] }}".split("/")[-1]
+    print(f"t={filename}")
     import os
 
     GKE_CLUSTER_NAME = os.getenv("GKE_CLUSTER_NAME")
@@ -50,18 +50,14 @@ with DAG(
     )
 
     def print_conf(**kwargs):
-        conf = kwargs["dag_run"].conf
-        if conf:
-            print(f"Configuration received: {conf}")
-        else:
-            print("No configuration received")
+        print(f"filename is {filename}")
+        return filename
 
     # Create a PythonOperator that calls the print_conf function
     print_conf_task = PythonOperator(
         task_id="print_conf",
         python_callable=print_conf,
         provide_context=True,
-        dag=dag,
     )
 
     t4 >> print_conf_task
