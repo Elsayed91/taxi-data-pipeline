@@ -128,7 +128,7 @@ AWS:
         PROJECT: "${PROJECT}"
         GCP_ZONE: "${GCP_ZONE}"
         GKE_CLUSTER_NAME: "${GKE_CLUSTER_NAME}"
-        DAG_NAME: "batch-dag"
+        DAG_NAME: "lambda_integration_test"
         TARGET_NAMESPACE: "default"
       trigger_bucket: "${AWS_DUMMY_BUCKET}"
       code_path: "./../../components/lambda"
