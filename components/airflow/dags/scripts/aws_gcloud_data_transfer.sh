@@ -12,7 +12,7 @@ while [[ $# -gt 0 ]]; do
         shift 2
         ;;
     --destination)
-        target_bucket="$2"
+        destination="$2"
         shift 2
         ;;
     --project)
@@ -52,14 +52,18 @@ if [[ -z "$file_part" ]]; then
     filename="*"
 else
     filename=$file_part
-    echo $filename
 fi
 
 if [[ "${check_exists}" == true ]]; then
     file_path="${destination}/${filename}"
     result=$(gsutil -q stat $file_path || echo 1)
-    if [[ $result == 1 ]]; then
-        echo "$file_path already exists"
+    # If the result is 1, then the file does not exist
+    if [ "$result" -eq 1 ]; then
+        # File does not exist, so continue with script
+        echo "File does not exist. Continuing with script."
+    else
+        # File exists, so exit script without error
+        echo "File already exists. Exiting script."
         exit 0
     fi
 fi
