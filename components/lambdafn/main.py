@@ -252,14 +252,14 @@ def lambda_handler(event: dict, context: LambdaContext) -> None:
     #### variables
     bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
     key = event["Records"][0]["s3"]["object"]["key"]
-    print(f"key value is {key}")
+    category = key.split("_")[0]
     object_uri = f"s3://{bucket_name}/{key}"
     run_date = extract_target_date(key)
     target_namespace = os.getenv("TARGET_NAMESPACE")
     dag = os.getenv("DAG_NAME")
     dag_trigger_command = f"""airflow dags unpause {dag} && airflow  \
         dags trigger {dag} --conf '{{"uri":"{object_uri}", \
-        "filename":"{key}", "run_date": "{run_date}"}}'"""
+        "filename":"{key}", "run_date": "{run_date}", "category": "{category}"}}'"""
     gcp_project = os.getenv("PROJECT")
     gcp_zone = os.getenv("GCP_ZONE")
     gke_name = os.getenv("GKE_CLUSTER_NAME")

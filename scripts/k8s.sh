@@ -20,4 +20,4 @@ source ${SCRIPT_DIR}/functions.sh
 
 airflow_pod=$(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow)
 # kubectl exec -t $airflow_pod -c scheduler -- airflow dags unpause batch-dag
-kubectl exec -t $airflow_pod -c scheduler -- airflow dags trigger batch-dag --conf '{"URI":"s3://nyc-tlc/trip data/yellow_tripdata_2022-10", "filename":"yellow_tripdata_2022-10", "run_date": "2022-10-01"}'
+kubectl exec -t $airflow_pod -c scheduler -- airflow dags trigger batch-dag --conf '{"uri":"s3://nyc-tlc/trip data/yellow_tripdata_2022-10.parquet", "filename":"yellow_tripdata_2022-10.parquet", "run_date": "2022-10-01", "category": "yellow"}'

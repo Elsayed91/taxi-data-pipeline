@@ -7,11 +7,11 @@
 while [[ $# -gt 0 ]]; do
     key="$1"
     case $key in
-    --source-bucket)
-        source_bucket="$2"
+    --source)
+        source="$2"
         shift 2
         ;;
-    --target-bucket)
+    --destination)
         target_bucket="$2"
         shift 2
         ;;
@@ -23,15 +23,10 @@ while [[ $# -gt 0 ]]; do
         creds_file="$2"
         shift 2
         ;;
-    --filename)
-        filename="$2"
-        shift 2
-        ;;
     --exclude-prefixes)
         exclude_prefixes="$2"
         shift 2
         ;;
-
     --include-prefixes)
         include_prefixes="$2"
         shift 2
@@ -51,9 +46,21 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+if [[ -z "$project" ]]; then
+    project=$(gcloud config get-value project)
+fi
+
+file_part=${source##*/}
+
+if [[ -z "$file_part" ]]; then
+    filename="*"
+else
+    filename=$file_part
+fi
+
 for folder in "${@}"; do
     if [[ "${check_exists}" == true ]]; then
-        file_path="gs://${target_bucket}/${folder}/${filename:=*.parquet}"
+        file_path="${destination}/${filename}"
         result=$(gsutil -q stat $file_path || echo 1)
         if [[ $result == 1 ]]; then
             echo "$file_path already exists"
@@ -61,7 +68,7 @@ for folder in "${@}"; do
         fi
     fi
     job=$(gcloud transfer jobs create \
-        "${source_bucket}" "${target_bucket}/${folder}/" \
+        "${source}" "${target_bucket}/${folder}/" \
         --source-creds-file="${creds_file}" \
         --project "${project}" \
         ${include_prefixes:+"--include-prefixes=${include_prefixes[@]}"} \
@@ -81,5 +88,5 @@ for folder in "${@}"; do
 done
 
 gcloud transfer jobs create \
-    "s3://nyc-tlc/trip data/*/" "gs://raw-8d74c9728b/yellow/" \
+    "s3://nyc-tlc/trip data/ " "gs://raw-8d74c9728b/yellow/" \
     --source-creds-file="secrets/aws_creds.json"

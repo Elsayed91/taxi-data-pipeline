@@ -24,7 +24,13 @@ with DAG(
     description="A dag that is part of a lambda integration test",
 ) as dag:
 
-    def get_conf(assertion_result_1, assertion_result_2, assertion_result_3, **kwargs):
+    def get_conf(
+        assertion_result_1,
+        assertion_result_2,
+        assertion_result_3,
+        assertion_result_4,
+        **kwargs,
+    ):
         """
         Checks that the values of the URI and filename, run_date keys in
         the DAG run configuration are equal to expected values.
@@ -46,6 +52,7 @@ with DAG(
             file_uri = conf["uri"]
             filename = conf["filename"]
             run_date = conf["run_date"]
+            run_date = conf["category"]
             logger.info(
                 f"uri is {file_uri}, and file is {filename} \
                 and run_date is {run_date}"
@@ -53,6 +60,7 @@ with DAG(
             assert file_uri == assertion_result_1
             assert filename == assertion_result_2
             assert run_date == assertion_result_3
+            assert category == assertion_result_4
         except AssertionError:
             raise AssertionError(
                 "dag triggered but have not received correct data, test unsuccessful."
@@ -68,6 +76,7 @@ with DAG(
             "assertion_result_1": f"s3://test-bucket/yellow_tripdata_2019-08.parquet",
             "assertion_result_2": "yellow_tripdata_2019-08.parquet",
             "assertion_result_3": "2019-08-01",
+            "assertion_result_4": "yellow",
         },
     )
 
