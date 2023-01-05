@@ -40,7 +40,6 @@ import urllib.parse
 from google.oauth2.service_account import Credentials
 from aws_lambda_typing.context import Context as LambdaContext
 import boto3
-from base64 import decodebytes, encode
 from botocore.exceptions import ClientError
 import json
 import logging
@@ -95,36 +94,18 @@ def kubernetes_api(cluster, api_auth_token):
     config.host = f'https://{cluster["endpoint"]}'
     config.api_key_prefix["authorization"] = "Bearer"
     config.api_key["authorization"] = api_auth_token
-    config.debug = False
+    config.debug = True
 
     with NamedTemporaryFile(delete=False) as cert:
-        cert.write(decodebytes(cluster["masterAuth"]["clusterCaCertificate"].encode()))
+        cert.write(
+            base64.decodebytes(cluster["masterAuth"]["clusterCaCertificate"].encode())
+        )
         config.ssl_ca_cert = cert.name  # type: ignore
+
     client = kubernetes.client.ApiClient(configuration=config)
     api = kubernetes.client.CoreV1Api(client)
+
     return api
-
-
-def pod_exec(api, namespace, target_pod_substring, container, command_string):
-    pods = api.list_namespaced_pod(namespace=namespace)
-    target_pod_name = None
-    for pod in pods.items:
-        if pod.metadata.name.find(target_pod_substring) != -1:
-            target_pod_name = pod.metadata.name
-            break
-    if target_pod_name:
-        resp = stream(
-            api.connect_get_namespaced_pod_exec,
-            name=target_pod_name,
-            namespace=namespace,
-            container=container,
-            command=["/bin/sh", "-c", command_string],
-            stderr=True,
-            stdin=False,
-            stdout=True,
-            tty=False,
-        )
-        print("Response: " + resp)
 
 
 def lambda_handler(event: dict, context: LambdaContext) -> None:
@@ -133,17 +114,85 @@ def lambda_handler(event: dict, context: LambdaContext) -> None:
     bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
     key = event["Records"][0]["s3"]["object"]["key"]
     object_uri = f"s3://{bucket_name}/{key}"
+    target_pod_substring = os.getenv("TARGET_POD", "airflow")
+    target_container = os.getenv("TARGET_CONTAINER", "scheduler")
     # key = urllib.parse.unquote_plus(
     #     event["Records"][0]["s3"]["object"]["key"], encoding="utf-8"
     # )
-    namespace = os.getenv("TARGET_NAMESPACE")
+    target_namespace = os.getenv("TARGET_NAMESPACE")
     dag_trigger_command = f"""airflow dags unpause {os.getenv("DAG_NAME")} && airflow dags trigger {os.getenv("DAG_NAME")} --conf '{{"URI":"{object_uri}", "filename":"{key}"}}'"""
     gcp_project = os.getenv("PROJECT")
     gcp_zone = os.getenv("GCP_ZONE")
     gke_name = os.getenv("GKE_CLUSTER_NAME")
-
     credentials = get_credentials()
     api_auth_token = token(credentials, "cloud-platform")
-    gke_cluster = get_cluster_info(gcp_project, gcp_zone, gke_name, credentials)
-    k8_api = kubernetes_api(gke_cluster, api_auth_token)
-    pod_exec(k8_api, namespace, "airflow", "scheduler", dag_trigger_command)
+    # gke_cluster = get_cluster_info(gcp_project, gcp_zone, gke_name, credentials)
+
+    # api = kubernetes_api(gke_cluster, api_auth_token)
+    # print(api.list_pod_for_all_namespaces())
+    # pods = api.list_namespaced_pod(namespace=str(target_namespace))
+    # target_pod = None
+    # for pod in pods.items:
+    #     if pod.metadata.name.find(target_pod_substring) != -1:
+    #         target_pod = pod.metadata.name
+    #         break
+    # if target_pod:
+    #     exec_command = ["/bin/sh", "-c", dag_trigger_command]
+    #     resp = stream(
+    #         api.connect_get_namespaced_pod_exec,
+    #         name=target_pod,
+    #         namespace=target_namespace,
+    #         container=target_container,
+    #         command=exec_command,
+    #         stderr=True,
+    #         stdin=False,
+    #         stdout=True,
+    #         tty=False,
+    #     )
+    #     print("Response: " + resp)
+    # credentials = service_account.Credentials.from_service_account_file(
+    #     "lambda_key.json"
+    # )
+    cluster_name = f'projects/{os.getenv("PROJECT")}/locations/{os.getenv("GCP_ZONE")}/clusters/{os.getenv("GKE_CLUSTER_NAME")}'
+    gke = googleapiclient.discovery.build("container", "v1", credentials=credentials)
+    gke_clusters = gke.projects().locations().clusters()
+    gke_cluster = gke_clusters.get(name=cluster_name).execute()
+    config = kubernetes.client.Configuration()
+    config.host = f'https://{gke_cluster["endpoint"]}'
+    config.api_key_prefix["authorization"] = "Bearer"
+    config.api_key["authorization"] = api_auth_token
+    config.debug = False
+    with NamedTemporaryFile(delete=False) as cert:
+        cert.write(
+            base64.decodebytes(
+                gke_cluster["masterAuth"]["clusterCaCertificate"].encode()
+            )
+        )
+        config.ssl_ca_cert = cert.name  # type: ignore
+
+    client = kubernetes.client.ApiClient(configuration=config)
+    api = kubernetes.client.CoreV1Api(client)
+    #######################################################################
+    # Trigger dag
+    #######################################################################
+    pods = api.list_namespaced_pod(namespace=target_namespace)
+    airflow_pod = None
+    for pod in pods.items:
+        container_status = pod.status.container_statuses[0]
+        if pod.metadata.name.find("airflow") != -1 and container_status.ready:
+            airflow_pod = pod.metadata.name
+            break
+    if airflow_pod:
+        exec_command = ["/bin/sh", "-c", dag_trigger_command]
+        resp = stream(
+            api.connect_get_namespaced_pod_exec,
+            name=airflow_pod,
+            namespace=target_namespace,
+            container="scheduler",
+            command=exec_command,
+            stderr=True,
+            stdin=False,
+            stdout=True,
+            tty=False,
+        )
+        print("Response: " + resp)

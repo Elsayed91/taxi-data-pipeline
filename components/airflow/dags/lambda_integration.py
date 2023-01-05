@@ -35,10 +35,10 @@ with DAG(
         conf = kwargs["dag_run"].conf
         if not bool(conf):
             return "dag triggered but conf is empty. review lambda code"
-        file_uri = conf["URI"]
-        filename = conf["file_name"]
 
         try:
+            file_uri = conf["URI"]
+            filename = conf["filename"]
             assert file_uri == assertion_result_1
             assert filename == assertion_result_2
         except AssertionError:
