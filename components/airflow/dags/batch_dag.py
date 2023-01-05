@@ -13,59 +13,61 @@ default_args = {
 }
 
 # Create a DAG with default_args
-dag = DAG(
+with DAG(
     "batch-dag",
     default_args=default_args,
     description="A dummy DAG to demonstrate command line configuration",
     template_searchpath=["/git/repo/components/airflow/dags"],
-)
+) as dag:
 
-import os
+    t = "{{ dag_run.conf.URI }}"
+    print(f"t={t}")
+    conf = dag.get_dagrun(execution_date=dag.get_latest_execution_date()).conf
+    table_names = conf["URI"]
+    print(f"tablenames={table_names}")
+    import os
 
-GKE_CLUSTER_NAME = os.getenv("GKE_CLUSTER_NAME")
-GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
-STAGING_BUCKET = os.getenv("STAGING_BUCKET")
-BASE = "/git/repo/components"
-TEMPLATES_PATH = f"{BASE}/airflow/dags/templates"
-SCRIPTS_PATH = f"{BASE}/airflow/dags/scripts"
-JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")  # remove z after terraform re
-BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
+    GKE_CLUSTER_NAME = os.getenv("GKE_CLUSTER_NAME")
+    GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
+    STAGING_BUCKET = os.getenv("STAGING_BUCKET")
+    BASE = "/git/repo/components"
+    TEMPLATES_PATH = f"{BASE}/airflow/dags/templates"
+    SCRIPTS_PATH = f"{BASE}/airflow/dags/scripts"
+    JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")  # remove z after terraform re
+    BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
 
-t4 = KubernetesJobOperator(
-    task_id="resize",
-    body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
-    command=["/bin/bash", "-c"],
-    arguments=["echo", "{{ dag_run.conf.URI }}", "clusters;", "echo $dag_uri"],
-    jinja_job_args={
-        "image": "google/cloud-sdk:alpine",
-        "name": "testi",
-    },
-    envs={"dag_uri": "{{ dag_run.conf.URI }}"},
-    in_cluster=True,
-    random_name_postfix_length=2,
-    name_prefix="",
-    dag=dag,
-)
+    t4 = KubernetesJobOperator(
+        task_id="resize",
+        body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
+        command=["/bin/bash", "-c"],
+        arguments=["echo", "{{ dag_run.conf.URI }}", "clusters;", "echo $dag_uri"],
+        jinja_job_args={
+            "image": "google/cloud-sdk:alpine",
+            "name": "testi",
+        },
+        envs={"dag_uri": "{{ dag_run.conf.URI }}"},
+        in_cluster=True,
+        random_name_postfix_length=2,
+        name_prefix="",
+        dag=dag,
+    )
 
+    def print_conf(**kwargs):
+        conf = kwargs["dag_run"].conf
+        if conf:
+            print(f"Configuration received: {conf}")
+        else:
+            print("No configuration received")
 
-def print_conf(**kwargs):
-    conf = kwargs["dag_run"].conf
-    if conf:
-        print(f"Configuration received: {conf}")
-    else:
-        print("No configuration received")
+    # Create a PythonOperator that calls the print_conf function
+    print_conf_task = PythonOperator(
+        task_id="print_conf",
+        python_callable=print_conf,
+        provide_context=True,
+        dag=dag,
+    )
 
-
-# Create a PythonOperator that calls the print_conf function
-print_conf_task = PythonOperator(
-    task_id="print_conf",
-    python_callable=print_conf,
-    provide_context=True,
-    dag=dag,
-)
-
-
-t4 >> print_conf_task
+    t4 >> print_conf_task
 # Set the order of the tasks using set_upstream and set_downstream
 # print_conf_task
 
