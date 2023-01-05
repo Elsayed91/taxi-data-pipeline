@@ -22,9 +22,6 @@ with DAG(
 
     t = "{{ dag_run.conf.URI }}"
     print(f"t={t}")
-    conf = dag.get_dagrun(execution_date=dag.get_latest_execution_date()).conf
-    table_names = conf["URI"]
-    print(f"tablenames={table_names}")
     import os
 
     GKE_CLUSTER_NAME = os.getenv("GKE_CLUSTER_NAME")
