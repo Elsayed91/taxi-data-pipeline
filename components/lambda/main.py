@@ -11,12 +11,21 @@ Functionality:
     If found, it uses the Kubernetes API to execute the command string on the pod to trigger a dag.
     
 Best Practices:
--   Using environment variables for sensitive information such as API keys, project names, and bucket names.
--   Using a temporary file to store the GKE cluster certificate instead of storing it in a variable, 
-    preventing it from being exposed in memory.
--   Using the NamedTemporaryFile context manager to create a temporary file, which automatically deletes the
+    Security:
+        1. Using environment variables for sensitive information such as API keys, project names, and bucket names.
+        2. Using a temporary file to store the GKE cluster certificate instead of storing it in a variable, 
+            preventing it from being exposed in memory.
+        3. using SecretsManager to handle sensitive files like the GCP Service Key
+        4. Using the NamedTemporaryFile context manager to create a temporary file, which automatically deletes the
     file after it is closed.
+    Code Organization:
+        1. Code is broken up into small functions each with single responsibility.
+        2. 
+    Testing: 
+        Integration test in the tests folder
+    Error Handling:
     
+
 References:
     GKE Authentication: https://stackoverflow.com/questions/54410410/authenticating-to-gke-master-in-python
 """
@@ -60,7 +69,7 @@ def get_credentials():
     #     f.name
     # )  # Load the credentials from the temporary file
     # os.unlink(f.name)  # Delete the temporary file
-    return service_account.Credentials.from_service_account_file(secret_value)
+    return service_account.Credentials.from_service_account_info(secret_value)
 
 
 def lambda_handler(event: dict, context: LambdaContext) -> None:
@@ -73,10 +82,9 @@ def lambda_handler(event: dict, context: LambdaContext) -> None:
         event["Records"][0]["s3"]["object"]["key"], encoding="utf-8"
     )
     object_uri = f"s3://{bucket_name}/{key}"
-    cluster_data = f'projects/{os.getenv("PROJECT")}/locations/{os.getenv("GCP_ZONE")}/clusters/{os.getenv("GKE_CLUSTER_NAME")}'
-    DAG_NAME = os.getenv("DAG_NAME")
-    NAMESPACE = os.getenv("TARGET_NAMESPACE")
-    COMMAND_STRING = f"""airflow dags unpause {DAG_NAME} && airflow dags trigger {DAG_NAME} --conf '{{"URI":"{object_uri}", "filename":"{key}"}}'"""
+    cluster_name = f'projects/{os.getenv("PROJECT")}/locations/{os.getenv("GCP_ZONE")}/clusters/{os.getenv("GKE_CLUSTER_NAME")}'
+    namespace = os.getenv("TARGET_NAMESPACE")
+    command = f"""airflow dags unpause {os.getenv("DAG_NAME")} && airflow dags trigger {os.getenv("DAG_NAME")} --conf '{{"URI":"{object_uri}", "filename":"{key}"}}'"""
     #######################################################################
     # setup gke connection
     #######################################################################
@@ -91,7 +99,7 @@ def lambda_handler(event: dict, context: LambdaContext) -> None:
     # api_auth_token = scoped.token
     # gke = googleapiclient.discovery.build("container", "v1", credentials=credentials)
     # gke_clusters = gke.projects().locations().clusters()
-    # gke_cluster = gke_clusters.get(name=cluster_data).execute()
+    # gke_cluster = gke_clusters.get(name=CLUSTER_NAME).execute()
     # config = kubernetes.client.Configuration()
     # config.host = f'https://{gke_cluster["endpoint"]}'
     # config.api_key_prefix["authorization"] = "Bearer"
