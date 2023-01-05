@@ -18,14 +18,14 @@ resource "aws_iam_role" "lambda_role" {
 EOF
 }
 
-data "aws_iam_policy" "AmazonS3FullAccess" {
-  arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-}
+# data "aws_iam_policy" "AmazonS3FullAccess" {
+#   arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+# }
 
-resource "aws_iam_role_policy_attachment" "AmazonS3FullAccess-policy" {
-  role       = aws_iam_role.lambda_role.id
-  policy_arn = data.aws_iam_policy.AmazonS3FullAccess.arn
-}
+# resource "aws_iam_role_policy_attachment" "AmazonS3FullAccess-policy" {
+#   role       = aws_iam_role.lambda_role.id
+#   policy_arn = data.aws_iam_policy.AmazonS3FullAccess.arn
+# }
 
 resource "aws_iam_role_policy" "revoke_keys_role_policy" {
   name = "lambda-policy"
@@ -38,7 +38,9 @@ resource "aws_iam_role_policy" "revoke_keys_role_policy" {
     {
       "Action": [
         "s3:*",
-        "ses:*"
+        "ses:*",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:ListSecretVersionIds"
       ],
       "Effect": "Allow",
       "Resource": "*"
@@ -96,7 +98,7 @@ resource "aws_lambda_function" "lambda_func" {
   handler          = "main.lambda_handler"
   # layers           = [aws_lambda_layer_version.pubsub-layer.arn]
   timeout     = 30
-  memory_size = 512
+  memory_size = each.value.memory_size
   environment {
     variables = each.value.vars
   }

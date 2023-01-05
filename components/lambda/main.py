@@ -16,6 +16,9 @@ Best Practices:
     preventing it from being exposed in memory.
 -   Using the NamedTemporaryFile context manager to create a temporary file, which automatically deletes the
     file after it is closed.
+    
+References:
+    GKE Authentication: https://stackoverflow.com/questions/54410410/authenticating-to-gke-master-in-python
 """
 import os
 from tempfile import NamedTemporaryFile
@@ -27,10 +30,37 @@ from kubernetes.stream import stream
 import urllib.parse
 from google.oauth2 import service_account
 from aws_lambda_typing.context import Context as LambdaContext
+import boto3
+import json
+import logging
 
-# os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = (
-#     os.environ["LAMBDA_TASK_ROOT"] + "/lambda_key.json"
-# )
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
+
+def get_credentials():
+    secrets_manager_client = boto3.client("secretsmanager")
+    get_secret_value_response = secrets_manager_client.get_secret_value(
+        SecretId="gcp_key"
+    )
+    secret_value = get_secret_value_response["SecretString"]
+    logger.info(secret_value)
+    # key_file = json.loads(secret_value)
+    # logger.info(f"jsonkey {key_file}")
+
+    # with NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+    #     json.dump(key_file, f)
+    #     f.flush()
+    # credentials = service_account.Credentials.from_service_account_file(
+    #     f.name
+    # )  # Load the credentials from the temporary file
+    # os.unlink(f.name)  # Delete the temporary file
+    return service_account.Credentials.from_service_account_file(secret_value)
 
 
 def lambda_handler(event: dict, context: LambdaContext) -> None:
@@ -50,51 +80,53 @@ def lambda_handler(event: dict, context: LambdaContext) -> None:
     #######################################################################
     # setup gke connection
     #######################################################################
-    credentials = service_account.Credentials.from_service_account_file(
-        "lambda_key.json"
-    )
-    scopes = ["https://www.googleapis.com/auth/cloud-platform"]
-    scoped = googleapiclient._auth.with_scopes(credentials, scopes)  # type: ignore
-    googleapiclient._auth.refresh_credentials(scoped)  # type: ignore
-    api_auth_token = scoped.token
-    gke = googleapiclient.discovery.build("container", "v1", credentials=credentials)
-    gke_clusters = gke.projects().locations().clusters()
-    gke_cluster = gke_clusters.get(name=cluster_data).execute()
-    config = kubernetes.client.Configuration()
-    config.host = f'https://{gke_cluster["endpoint"]}'
-    config.api_key_prefix["authorization"] = "Bearer"
-    config.api_key["authorization"] = api_auth_token
-    config.debug = False
-    with NamedTemporaryFile(delete=False) as cert:
-        cert.write(
-            base64.decodebytes(
-                gke_cluster["masterAuth"]["clusterCaCertificate"].encode()
-            )
-        )
-        config.ssl_ca_cert = cert.name  # type: ignore
 
-    client = kubernetes.client.ApiClient(configuration=config)
-    api = kubernetes.client.CoreV1Api(client)
-    #######################################################################
-    # Trigger dag
-    #######################################################################
-    pods = api.list_namespaced_pod(namespace=NAMESPACE)
-    airflow_pod = None
-    for pod in pods.items:
-        if pod.metadata.name.find("airflow") != -1:
-            airflow_pod = pod.metadata.name
-            break
-    if airflow_pod:
-        exec_command = ["/bin/sh", "-c", COMMAND_STRING]
-        resp = stream(
-            api.connect_get_namespaced_pod_exec,
-            name=airflow_pod,
-            namespace=NAMESPACE,
-            container="scheduler",
-            command=exec_command,
-            stderr=True,
-            stdin=False,
-            stdout=True,
-            tty=False,
-        )
-        print("Response: " + resp)
+    print(get_credentials())
+    # credentials = service_account.Credentials.from_service_account_file(
+    #     "lambda_key.json"
+    # )
+    # scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+    # scoped = googleapiclient._auth.with_scopes(credentials, scopes)  # type: ignore
+    # googleapiclient._auth.refresh_credentials(scoped)  # type: ignore
+    # api_auth_token = scoped.token
+    # gke = googleapiclient.discovery.build("container", "v1", credentials=credentials)
+    # gke_clusters = gke.projects().locations().clusters()
+    # gke_cluster = gke_clusters.get(name=cluster_data).execute()
+    # config = kubernetes.client.Configuration()
+    # config.host = f'https://{gke_cluster["endpoint"]}'
+    # config.api_key_prefix["authorization"] = "Bearer"
+    # config.api_key["authorization"] = api_auth_token
+    # config.debug = False
+    # with NamedTemporaryFile(delete=False) as cert:
+    #     cert.write(
+    #         base64.decodebytes(
+    #             gke_cluster["masterAuth"]["clusterCaCertificate"].encode()
+    #         )
+    #     )
+    #     config.ssl_ca_cert = cert.name  # type: ignore
+
+    # client = kubernetes.client.ApiClient(configuration=config)
+    # api = kubernetes.client.CoreV1Api(client)
+    # #######################################################################
+    # # Trigger dag
+    # #######################################################################
+    # pods = api.list_namespaced_pod(namespace=NAMESPACE)
+    # airflow_pod = None
+    # for pod in pods.items:
+    #     if pod.metadata.name.find("airflow") != -1:
+    #         airflow_pod = pod.metadata.name
+    #         break
+    # if airflow_pod:
+    #     exec_command = ["/bin/sh", "-c", COMMAND_STRING]
+    #     resp = stream(
+    #         api.connect_get_namespaced_pod_exec,
+    #         name=airflow_pod,
+    #         namespace=NAMESPACE,
+    #         container="scheduler",
+    #         command=exec_command,
+    #         stderr=True,
+    #         stdin=False,
+    #         stdout=True,
+    #         tty=False,
+    #     )
+    #     print("Response: " + resp)

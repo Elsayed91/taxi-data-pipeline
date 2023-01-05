@@ -4,7 +4,6 @@ from airflow.utils.dates import days_ago
 from airflow_kubernetes_job_operator.kubernetes_job_operator import (
     KubernetesJobOperator,
 )
-from airflow import DAG
 from airflow.operators.bash import BashOperator
 from datetime import datetime, timedelta
 
@@ -31,7 +30,7 @@ with DAG(
     BASE = "/git/repo/components"
     TEMPLATES_PATH = f"{BASE}/airflow/dags/templates"
     SCRIPTS_PATH = f"{BASE}/airflow/dags/scripts"
-    JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")  # remove z after terraform re
+    JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
 
     # t4 = KubernetesJobOperator(
@@ -58,11 +57,6 @@ with DAG(
         return bucket, file_path, file_name
 
     # Create a PythonOperator that calls the print_conf function
-    print_conf_task = PythonOperator(
-        task_id="print_conf",
-        python_callable=my_dag_func,
-        provide_context=True,
-    )
 
     task = BashOperator(
         task_id="bash_operator_task",

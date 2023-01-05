@@ -1,5 +1,7 @@
 from components.airflow.dags.addons.parse_state import parse_spark_application
 from components.airflow.dags.addons.extract_target_date import extract_target_date
+from components.airflow.dags.lambda_integration import get_conf
+from datetime import datetime
 
 import pytest
 
@@ -40,3 +42,25 @@ def test_get_run_date():
     # Test with different filename format
     assert extract_target_date("tripdata_2022-10.csv") == "2022-10-01"
     assert extract_target_date("tripdata_2022-10-10.csv") == "2022-10-01"
+
+
+def test_get_conf(mocker):
+    # Create a mock DAG run object
+    dag_run = mocker.Mock()
+
+    # Set the mock DAG run's conf attribute to a dictionary
+    # containing the URI and file_name keys
+    dag_run.conf = {"URI": "x", "file_name": "y"}
+    result = get_conf("x", "y", dag_run=dag_run)
+
+    # Assert that the result is "test successful"
+    assert result == "test successful"
+
+    result = get_conf("a", "b", dag_run=dag_run)
+    assert (
+        result == "dag triggered but have not received correct data, test unsuccessful."
+    )
+
+    dag_run.conf = {}
+    result = get_conf("x", "y", dag_run=dag_run)
+    assert result == "dag triggered but conf is empty. review lambda code"

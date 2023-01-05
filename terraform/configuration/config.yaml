@@ -120,7 +120,7 @@ GCP:
 AWS:
   buckets:
     - name: ${AWS_DUMMY_BUCKET}
-# ########################################
+########################################
   lambdas:
     - name: "die-lambda"
       dependencies_path: "files/lambda/dependencies.zip"
@@ -132,3 +132,9 @@ AWS:
         TARGET_NAMESPACE: "default"
       trigger_bucket: "${AWS_DUMMY_BUCKET}"
       code_path: "./../../components/lambda"
+      memory_size: 128
+########################################
+  secrets:
+    - name: "gcp_key"
+      type: "file"
+      secret_string: "files/lambda_key.json"

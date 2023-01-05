@@ -41,3 +41,4 @@ components/dbt/app/target
 components/dbt/app/.user.yml
 components/docs_app/docker/__pycache__
 terraform/modules/files/cfn_dependencies.zip
+terraform/modules/files/cloud_function

@@ -19,6 +19,7 @@ module "project" {
   gke-node-pools = local.config["GCP"]["node_pools"]
   gcs-buckets    = local.config["GCP"]["buckets"]
   gcs-files      = local.config["GCP"]["files"]
+  s3-secrets     = local.config["AWS"]["secrets"]
   s3-buckets     = local.config["AWS"]["buckets"]
   lambda         = local.config["AWS"]["lambdas"]
   # cloud-function   = local.config["GCP"]["cloud-functions"]

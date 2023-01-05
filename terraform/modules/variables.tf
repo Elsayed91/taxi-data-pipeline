@@ -159,6 +159,7 @@ variable "lambda" {
       vars              = optional(map(any))
       trigger_bucket    = optional(string)
       code_path         = optional(string)
+      memory_size       = optional(number, 128)
     }
   ))
   default = null
@@ -209,6 +210,17 @@ variable "cloud-function" {
           value     = optional(string)
         }))
       }))
+    }
+  ))
+  default = null
+}
+
+variable "s3-secrets" {
+  type = list(object(
+    {
+      name          = string
+      type          = string
+      secret_string = string
     }
   ))
   default = null
