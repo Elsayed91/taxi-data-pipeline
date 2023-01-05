@@ -59,8 +59,8 @@ def get_credentials(secret_id: str = "gcp_key"):
     get_secret_value_response = secrets_manager_client.get_secret_value(
         SecretId=secret_id
     )
-
-    key_file = json.loads(get_secret_value_response["SecretString"])
+    logger.info(get_secret_value_response)
+    key_file = get_secret_value_response["SecretString"]
     logger.info(key_file)
     with NamedTemporaryFile(mode="w", suffix=".json") as f:
         json.dump(key_file, f)
