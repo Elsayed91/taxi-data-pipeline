@@ -18,5 +18,5 @@ source ${SCRIPT_DIR}/functions.sh
 # mass_kubectl "components/*/manifests/*_deployment.yaml"
 # wait_for_all_pods
 
-# kubectl exec -t $(kubectl get pods -o name | grep airflow) -c scheduler -- airflow dags unpause full-refresh &&
-#     airflow dags trigger full-refresh
+kubectl exec -t $(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow) -c scheduler -- airflow dags unpause batch-dag &&
+    airflow dags trigger batch-dag --conf '{{"URI":"s3://nyc-tlc/trip data/yellow_tripdata_2022-10", "filename":"yellow_tripdata_2022-10", "run_date": "2022-10-01"}}'
