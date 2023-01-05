@@ -68,12 +68,13 @@ def get_credentials(secret_id: str = "gcp_key") -> Credentials:
 
     # else:
     #     secrets_manager_client = boto3.client("secretsmanager")
-    secrets_manager_client = boto3.client(
-        "secretsmanager",
-        endpoint_url="http://localhost:4566"
-        if os.getenv("INTEGRATION_TEST") == "true"
-        else None,
-    )
+    secrets_manager_client = boto3.client("secretsmanager")
+    if os.getenv("INTEGRATION_TEST") == "true":
+        secrets_manager_client = boto3.client(
+            "secretsmanager", endpoint_url="http://localhost:4566", region_name="eu-west-1"
+        )
+    else:
+        secrets_manager_client = boto3.client("secretsmanager")
     try:
         get_secret_value_response = secrets_manager_client.get_secret_value(
             SecretId=secret_id
@@ -245,15 +246,22 @@ def pod_exec(
 
 
 def lambda_handler(event: dict, context: LambdaContext) -> None:
-
+"""
+    Handler for S3 Trigger Lambda.
+    Uses the functions above to retrieve credentials, get an 
+    API auth token, retrieve cluster information, build a 
+    Kubernetes API client, get the name of the target pod, and
+    execute a command in the target pod to trigger a DAG with 
+    the given URI and filename as configuration.
+"""
     #### variables
     bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
     key = event["Records"][0]["s3"]["object"]["key"]
     object_uri = f"s3://{bucket_name}/{key}"
     target_namespace = os.getenv("TARGET_NAMESPACE")
     dag = os.getenv("DAG_NAME")
-    dag_trigger_command = f"""airflow dags unpause {dag} && airflow dags trigger \
-        {dag} --conf '{{"URI":"{object_uri}", "filename":"{key}"}}'"""
+    dag_trigger_command = f"""airflow dags unpause {dag} && airflow  \
+        dags trigger {dag} --conf '{{"URI":"{object_uri}", "filename":"{key}"}}'"""
     gcp_project = os.getenv("PROJECT")
     gcp_zone = os.getenv("GCP_ZONE")
     gke_name = os.getenv("GKE_CLUSTER_NAME")
