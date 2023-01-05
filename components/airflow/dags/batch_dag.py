@@ -55,7 +55,7 @@ with DAG(
             "--source",
             "{{ dag_run.conf.uri }}",
             "--destination",
-            f'gs://{STAGING_BUCKET}/"{{{{ dag_run.conf.category }}}}"',
+            f"gs://{STAGING_BUCKET}/{{{{ dag_run.conf.category }}}}",
             "--creds-file",
             "/etc/aws/aws_creds.json",
             "--check-exists",
