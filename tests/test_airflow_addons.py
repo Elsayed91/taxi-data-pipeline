@@ -1,5 +1,5 @@
 from components.airflow.dags.addons.parse_state import parse_spark_application
-from components.airflow.dags.addons.extract_target_date import extract_target_date
+from components.lambdafn.main import extract_target_date
 from components.airflow.dags.lambda_integration import get_conf
 from datetime import datetime
 
@@ -33,9 +33,6 @@ def test_parse_spark_application():
 
 
 def test_get_run_date():
-    # Test with default filename
-    assert extract_target_date() == "2022-08-01"
-
     # Test with different filename
     assert extract_target_date("green_tripdata_2022-09.parquet") == "2022-09-01"
 
@@ -50,17 +47,26 @@ def test_get_conf(mocker):
 
     # Set the mock DAG run's conf attribute to a dictionary
     # containing the URI and file_name keys
-    dag_run.conf = {"URI": "x", "file_name": "y"}
-    result = get_conf("x", "y", dag_run=dag_run)
+    dag_run.conf = {"URI": "x", "filename": "y", "run_date": "z"}
+    result = get_conf("x", "y", "z", dag_run=dag_run)
 
     # Assert that the result is "test successful"
     assert result == "test successful"
 
-    result = get_conf("a", "b", dag_run=dag_run)
-    assert (
-        result == "dag triggered but have not received correct data, test unsuccessful."
-    )
+    with pytest.raises(
+        AssertionError,
+        match="dag triggered but have not received correct data, test unsuccessful.",
+    ):
+        get_conf("a", "b", "z", dag_run=dag_run)
+
+    with pytest.raises(
+        AssertionError,
+        match="dag triggered but have not received correct data, test unsuccessful.",
+    ):
+        get_conf("x", "y", "c", dag_run=dag_run)
 
     dag_run.conf = {}
-    result = get_conf("x", "y", dag_run=dag_run)
-    assert result == "dag triggered but conf is empty. review lambda code"
+    with pytest.raises(
+        AssertionError, match="dag triggered but conf is empty. review lambda code"
+    ):
+        get_conf("x", "y", "z", dag_run=dag_run)

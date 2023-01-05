@@ -24,10 +24,7 @@ with DAG(
     description="A dag that is part of a lambda integration test",
 ) as dag:
 
-    test_file_uri = "s3://stella-9af1e2ce16/yellow_tripdata_2019-08.parquet"
-    test_file_name = "yellow_tripdata_2019-08.parquet"
-
-    def get_conf(assertion_result_1, assertion_result_2, **kwargs):
+    def get_conf(assertion_result_1, assertion_result_2, assertion_result_3, **kwargs):
         """
         Checks that the values of the URI and file_name keys in the DAG
         run configuration are equal to expected values.
@@ -43,16 +40,18 @@ with DAG(
         """
         conf = kwargs["dag_run"].conf
         if not bool(conf):
-            return "dag triggered but conf is empty. review lambda code"
+            raise AssertionError("dag triggered but conf is empty. review lambda code")
 
         try:
             file_uri = conf["URI"]
             filename = conf["filename"]
+            run_date = conf["run_date"]
             logger.info(f"uri is {file_uri}, and file is {filename}")
             assert file_uri == assertion_result_1
             assert filename == assertion_result_2
+            assert run_date == assertion_result_3
         except AssertionError:
-            return (
+            raise AssertionError(
                 "dag triggered but have not received correct data, test unsuccessful."
             )
         else:
@@ -63,8 +62,9 @@ with DAG(
         python_callable=get_conf,
         provide_context=True,
         op_kwargs={
-            "assertion_result_1": test_file_uri,
-            "assertion_result_2": test_file_name,
+            "assertion_result_1": "s3://stella-9af1e2ce16/yellow_tripdata_2019-08.parquet",
+            "assertion_result_2": "yellow_tripdata_2019-08.parquet",
+            "assertion_result_3": "2019-08-01",
         },
     )
 

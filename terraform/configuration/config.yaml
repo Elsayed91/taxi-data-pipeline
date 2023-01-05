@@ -131,7 +131,7 @@ AWS:
         DAG_NAME: "lambda_integration_test"
         TARGET_NAMESPACE: "default"
       trigger_bucket: "${AWS_DUMMY_BUCKET}"
-      code_path: "./../../components/lambda"
+      code_path: "./../../components/lambdafn"
       memory_size: 128
 ########################################
   secrets:

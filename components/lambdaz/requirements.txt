@@ -1,3 +1,0 @@
-google-cloud-storage
-# aws_lambda_powertools
-google-cloud-container
