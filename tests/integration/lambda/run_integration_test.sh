@@ -4,25 +4,50 @@
 
 set -e
 
-# SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 cd $SCRIPT_DIR
 # rm -rf ${SCRIPT_DIR}/files/*
 # cp ${SCRIPT_DIR}/../../../components/lambda/* ${SCRIPT_DIR}/files/
 # python -m pip install --target ${SCRIPT_DIR}/files -r ${SCRIPT_DIR}/files/requirements.txt
 
-SERVICES=lambda,iam,secretsmanager,s3 nohup localstack start &
+# SERVICES=lambda,iam,secretsmanager,s3,logs nohup localstack start &
 
-# kubectl exec -t $(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow) -c scheduler -- airflow dags list-runs -d lambda_integration_test
+# terraform init && terraform apply --auto-approve
 
-process_id=$(ps aux | grep nohup | awk '{print $2}')
-kill $process_id
+# aws --endpoint-url=http://localhost:4566 secretsmanager create-secret --name gcp_key \
+#     --secret-string file:///home/lestrang/grandiose/terraform/modules/files/lambda_key.json \
+#     --region eu-west-1
+# # # touch yellow_tripdata_2019-08.parquet
+# aws --endpoint-url=http://localhost:4566 \
+#     s3api put-object --bucket test-bucket \
+#     --key yellow_tripdata_2019-08.parquet \
+#     --body=yellow_tripdata_2019-08.parquet \
+#     --region eu-west-1
+localstack update all
+# test_run_info=$(kubectl exec -t $(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow) -c scheduler -- airflow dags list-runs -d lambda_integration_test -o yaml | head -6)
+# if [[ -n "$test_run_info" ]]; then
+#     run_id=$(echo "$test_run_info" | grep "run_id" | awk '{print $2}')
+#     start_date=$(echo "$test_run_info" | grep "start_date" | awk '{print $2}' | tr -d "'")
+#     state=$(echo "$test_run_info" | grep "state" | awk '{print $2}')
 
-dag_id | run_id | state | execution_date | start_date | end_date
-========================+======================================+=========+===========================+==================================+=================================
-lambda_integration_test | manual__2023-01-05T13:51:18+00:00 | success | 2023-01-05T13:51:18+00:00 | 2023-01-05T13:51:18.968473+00:00 | 2023-01-05T13:51:20.898639+00:00
-lambda_integration_test | manual__2023-01-05T13:49:46+00:00 | success | 2023-01-05T13:49:46+00:00 | 2023-01-05T13:49:47.499795+00:00 | 2023-01-05T13:49:49.425352+00:00
-lambda_integration_test | manual__2023-01-05T13:38:57+00:00 | failed | 2023-01-05T13:38:57+00:00 | 2023-01-05T13:38:57.803725+00:00 | 2023-01-05T13:38:59.688730+00:00
-lambda_integration_test | scheduled__2023-01-04T00:00:00+00:00 | success | 2023-01-04T00:00:00+00:00 | 2023-01-05T13:38:49.412232+00:00 | 2023-01-05T13:38:52.038676+00:00
-lambda_integration_test | scheduled__2023-01-03T00:00:00+00:00 | success | 2023-01-03T00:00:00+00:00 | 2023-01-05T13:38:49.228748+00:00 | 2023-01-05T13:38:52.062426+00:
+#     if [[ "$run_id" != *"manual"* ]]; then
+#         echo "Error: Last run is not a manual run"
+#         exit 1
+#     fi
 
-grep run id and status
+#     start_timestamp=$(date -d "$start_date" +%s)
+#     current_timestamp=$(date +%s)
+#     if ((current_timestamp - start_timestamp > 180)); then
+#         echo "Error: Last run is not within the past 3 minutes"
+#         exit 1
+#     fi
+
+#     if [[ "$state" == "success" ]]; then
+#         echo "Dag was triggered successfully, and the assertions passed. Test succeeded"
+#     else
+#         echo "Dag was triggered successfully but the assertions failed. Test failed"
+#     fi
+# else
+#     echo "Dag was not triggered, test failed. "
+#     exit 1
+# fi

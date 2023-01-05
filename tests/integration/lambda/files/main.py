@@ -11,12 +11,21 @@ Functionality:
     If found, it uses the Kubernetes API to execute the command string on the pod to trigger a dag.
     
 Best Practices:
--   Using environment variables for sensitive information such as API keys, project names, and bucket names.
--   Using a temporary file to store the GKE cluster certificate instead of storing it in a variable, 
-    preventing it from being exposed in memory.
--   Using the NamedTemporaryFile context manager to create a temporary file, which automatically deletes the
+    Security:
+        1. Using environment variables for sensitive information such as API keys, project names, and bucket names.
+        2. Using a temporary file to store the GKE cluster certificate instead of storing it in a variable, 
+            preventing it from being exposed in memory.
+        3. using SecretsManager to handle sensitive files like the GCP Service Key
+        4. Using the NamedTemporaryFile context manager to create a temporary file, which automatically deletes the
     file after it is closed.
+    Code Organization:
+        1. Code is broken up into small functions each with single responsibility.
+        2. 
+    Testing: 
+        Integration test in the tests folder
+    Error Handling:
     
+
 References:
     GKE Authentication: https://stackoverflow.com/questions/54410410/authenticating-to-gke-master-in-python
 """
@@ -27,73 +36,124 @@ import base64
 import googleapiclient.discovery
 import kubernetes
 from kubernetes.stream import stream
-import urllib.parse
-from google.oauth2 import service_account
+from google.oauth2.service_account import Credentials
 from aws_lambda_typing.context import Context as LambdaContext
+import boto3
+from botocore.exceptions import ClientError
+import json
 
 
-def lambda_handler(event: dict, context: LambdaContext) -> None:
+def get_credentials(secret_id: str = "gcp_key") -> Credentials:
+    """
+    Retrieves GCP service account credentials from AWS Secrets Manager.
 
-    #######################################################################
-    # setup variables
-    #######################################################################
-    bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
-    key = urllib.parse.unquote_plus(
-        event["Records"][0]["s3"]["object"]["key"], encoding="utf-8"
-    )
-    object_uri = f"s3://{bucket_name}/{key}"
-    cluster_data = f'projects/{os.getenv("PROJECT")}/locations/{os.getenv("GCP_ZONE")}/clusters/{os.getenv("GKE_CLUSTER_NAME")}'
-    DAG_NAME = os.getenv("DAG_NAME")
-    NAMESPACE = os.getenv("TARGET_NAMESPACE")
-    COMMAND_STRING = f"""airflow dags unpause {DAG_NAME} && airflow dags trigger {DAG_NAME} --conf '{{"URI":"{object_uri}", "filename":"{key}"}}'"""
-    #######################################################################
-    # setup gke connection
-    #######################################################################
-    credentials = service_account.Credentials.from_service_account_file(
-        "lambda_key.json"
-    )
-    scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+    Args:
+        secret_id (str): The ID of the secret in Secrets Manager. Defaults to "gcp_key".
+
+    Returns:
+        Credentials: The service account credentials object.
+    """
+    secrets_manager_client = boto3.client("secretsmanager")
+    try:
+        get_secret_value_response = secrets_manager_client.get_secret_value(
+            SecretId=secret_id
+        )
+    except ClientError as e:
+        raise ValueError(f"Unable to retrieve secret '{secret_id}': {e}")
+    else:
+        service_account_info = json.loads(get_secret_value_response["SecretString"])
+        return Credentials.from_service_account_info(service_account_info)
+
+
+def token(credentials, *scopes):
+    scopes = [f"https://www.googleapis.com/auth/{s}" for s in scopes]
     scoped = googleapiclient._auth.with_scopes(credentials, scopes)  # type: ignore
     googleapiclient._auth.refresh_credentials(scoped)  # type: ignore
-    api_auth_token = scoped.token
+    return scoped.token
+
+
+def get_cluster_info(project, zone, cluster_name, credentials):
+    cluster_attributes = f"projects/{project}/locations/{zone}/clusters/{cluster_name}"
     gke = googleapiclient.discovery.build("container", "v1", credentials=credentials)
     gke_clusters = gke.projects().locations().clusters()
-    gke_cluster = gke_clusters.get(name=cluster_data).execute()
+    gke_cluster = gke_clusters.get(name=cluster_attributes).execute()
+    return gke_cluster
+
+
+def kubernetes_api(cluster, api_auth_token):
     config = kubernetes.client.Configuration()
-    config.host = f'https://{gke_cluster["endpoint"]}'
+    config.host = f'https://{cluster["endpoint"]}'
     config.api_key_prefix["authorization"] = "Bearer"
     config.api_key["authorization"] = api_auth_token
     config.debug = False
+
     with NamedTemporaryFile(delete=False) as cert:
         cert.write(
-            base64.decodebytes(
-                gke_cluster["masterAuth"]["clusterCaCertificate"].encode()
-            )
+            base64.decodebytes(cluster["masterAuth"]["clusterCaCertificate"].encode())
         )
         config.ssl_ca_cert = cert.name  # type: ignore
 
     client = kubernetes.client.ApiClient(configuration=config)
     api = kubernetes.client.CoreV1Api(client)
-    #######################################################################
-    # Trigger dag
-    #######################################################################
-    pods = api.list_namespaced_pod(namespace=NAMESPACE)
-    airflow_pod = None
+
+    return api
+
+
+def get_target_pod(
+    api, target_namespace, target_pod_substring, cluster, api_auth_token
+):
+    api = kubernetes_api(cluster, api_auth_token)
+    pods = api.list_namespaced_pod(namespace=str(target_namespace))
+    target_pod_name = None
     for pod in pods.items:
-        if pod.metadata.name.find("airflow") != -1:
-            airflow_pod = pod.metadata.name
+        container_status = pod.status.container_statuses[0]
+        if (
+            pod.metadata.name.find(target_pod_substring) != -1
+            and container_status.ready
+        ):
+            target_pod_name = pod.metadata.name
             break
-    if airflow_pod:
-        exec_command = ["/bin/sh", "-c", COMMAND_STRING]
-        resp = stream(
-            api.connect_get_namespaced_pod_exec,
-            name=airflow_pod,
-            namespace=NAMESPACE,
-            container="scheduler",
-            command=exec_command,
-            stderr=True,
-            stdin=False,
-            stdout=True,
-            tty=False,
-        )
-        print("Response: " + resp)
+    return target_pod_name
+
+
+def pod_exec(api, target_namespace, target_pod, container, command_string):
+    resp = stream(
+        api.connect_get_namespaced_pod_exec,
+        name=target_pod,
+        namespace=target_namespace,
+        container=container,
+        command=["/bin/sh", "-c", command_string],
+        stderr=True,
+        stdin=False,
+        stdout=True,
+        tty=False,
+    )
+    print("Response: " + resp)
+
+
+def lambda_handler(event: dict, context: LambdaContext) -> None:
+
+    #### variables
+    bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
+    key = event["Records"][0]["s3"]["object"]["key"]
+    object_uri = f"s3://{bucket_name}/{key}"
+    target_namespace = os.getenv("TARGET_NAMESPACE")
+    dag = os.getenv("DAG_NAME")
+    dag_trigger_command = f"""airflow dags unpause {dag} && airflow dags trigger \
+        {dag} --conf '{{"URI":"{object_uri}", "filename":"{key}"}}'"""
+    gcp_project = os.getenv("PROJECT")
+    gcp_zone = os.getenv("GCP_ZONE")
+    gke_name = os.getenv("GKE_CLUSTER_NAME")
+    target_pod_substring = os.getenv("TARGET_POD", "airflow")
+    target_container = os.getenv("TARGET_CONTAINER", "scheduler")
+    #### processing
+    credentials = get_credentials()
+    api_auth_token = token(credentials, "cloud-platform")
+    gke_cluster = get_cluster_info(gcp_project, gcp_zone, gke_name, credentials)
+    api = kubernetes_api(gke_cluster, api_auth_token)
+    target_pod_name = get_target_pod(
+        api, target_namespace, target_pod_substring, gke_cluster, api_auth_token
+    )
+    pod_exec(
+        api, target_namespace, target_pod_name, target_container, dag_trigger_command
+    )

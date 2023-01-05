@@ -6,13 +6,14 @@ provider "aws" {
   skip_credentials_validation = true
   skip_metadata_api_check     = true
   skip_requesting_account_id  = true
-  s3_force_path_style         = true
+  s3_use_path_style           = true
 
   endpoints {
     lambda         = "http://localhost:4566"
     iam            = "http://localhost:4566"
     secretsmanager = "http://localhost:4566"
     s3             = "http://localhost:4566"
+    logs           = "http://localhost:4566"
   }
 }
 
@@ -26,13 +27,6 @@ resource "aws_s3_bucket_acl" "bucketacl" {
   acl    = "public-read"
 }
 
-
-resource "aws_secretsmanager_secret" "example" {
-  name                    = "gcp_key"
-  recovery_window_in_days = 30
-  secret_string           = file("${path.module}/../terraform/modules/files/lambda_key.json")
-  # rotation_lambda_arn     = aws_lambda_function.rotation_lambda.arn
-}
 
 
 resource "aws_iam_role" "lambda_role" {
@@ -77,9 +71,7 @@ data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "${path.module}/files"
   output_path = "${path.module}/dependencies.zip"
-  depends_on = [
-    null_resource.pack-lambda
-  ]
+
 }
 
 
@@ -94,11 +86,13 @@ resource "aws_lambda_function" "lambda_func" {
   timeout     = 30
   memory_size = 128
   environment {
-    PROJECT          = "stellarismus"
-    GCP_ZONE         = "europe-west1-d"
-    GKE_CLUSTER_NAME = "gke"
-    DAG_NAME         = "lambda_integration_test"
-    TARGET_NAMESPACE = "default"
+    variables = {
+      PROJECT          = "stellarismus"
+      GCP_ZONE         = "europe-west1-d"
+      GKE_CLUSTER_NAME = "gke"
+      DAG_NAME         = "lambda_integration_test"
+      TARGET_NAMESPACE = "default"
+    }
   }
   depends_on = [
     data.archive_file.lambda_zip
@@ -120,3 +114,35 @@ resource "aws_s3_bucket_notification" "aws-lambda-s3-trigger" {
 }
 
 
+
+resource "aws_cloudwatch_log_group" "function_log_group" {
+  name              = "/aws/lambda/test_lambda"
+  retention_in_days = 1
+  lifecycle {
+    prevent_destroy = false
+  }
+
+}
+
+resource "aws_iam_policy" "function_logging_policy" {
+  name = "function-logging-policy"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        Action : [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:CreateLogGroup",
+        ],
+        Effect : "Allow",
+        Resource : "arn:aws:logs:*:*:*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "function_logging_policy_attachment" {
+  role       = aws_iam_role.lambda_role.id
+  policy_arn = aws_iam_policy.function_logging_policy.arn
+}

@@ -42,3 +42,9 @@ components/dbt/app/.user.yml
 components/docs_app/docker/__pycache__
 terraform/modules/files/cfn_dependencies.zip
 terraform/modules/files/cloud_function
+tests/integration/lambda/nohup.out
+tests/integration/lambda/.terraform.lock.hcl
+tests/integration/lambda/.terraform.tfstate.lock.info
+tests/integration/lambda/terraform.tfstate
+tests/integration/lambda/yellow_tripdata_2019-08.parquet
+tests/integration/lambda/terraform.tfstate.backup
