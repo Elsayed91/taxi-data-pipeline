@@ -54,7 +54,7 @@ with DAG(
         command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
         arguments=[
             "--source-bucket",
-            f"s3://{os.getenv('TARGET_S3_BUCKET')}/trip data/{{{{ {dag_run.conf['filename'] }}}}",
+            f"s3://{os.getenv('TARGET_S3_BUCKET')}/trip data/$filename",
             "--target-bucket",
             f"gs://{STAGING_BUCKET}",
             "--project",
@@ -79,6 +79,7 @@ with DAG(
                 }
             ],
         },
+        envs={"filename": "{{ {dag_run.conf['filename'] }}"},
     )
 
     t1
