@@ -35,10 +35,6 @@ while [[ $# -gt 0 ]]; do
         check_exists=true
         shift
         ;;
-    --)
-        shift
-        break
-        ;;
     *)
         echo "Unrecognized option: $1" >&2
         exit 1
@@ -58,35 +54,29 @@ else
     filename=$file_part
 fi
 
-for folder in "${@}"; do
-    if [[ "${check_exists}" == true ]]; then
-        file_path="${destination}/${filename}"
-        result=$(gsutil -q stat $file_path || echo 1)
-        if [[ $result == 1 ]]; then
-            echo "$file_path already exists"
-            continue
-        fi
+if [[ "${check_exists}" == true ]]; then
+    file_path="${destination}/${filename}"
+    result=$(gsutil -q stat $file_path || echo 1)
+    if [[ $result == 1 ]]; then
+        echo "$file_path already exists"
+        exit 0
     fi
-    job=$(gcloud transfer jobs create \
-        "${source}" "${target_bucket}/${folder}/" \
-        --source-creds-file="${creds_file}" \
-        --project "${project}" \
-        ${include_prefixes:+"--include-prefixes=${include_prefixes[@]}"} \
-        ${exclude_prefixes:+"--exclude-prefixes=${exclude_prefixes[@]}"} |
-        sed -n 's/.*name://p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-    echo -n "job created with id $job"
-    # Wait for job to finish
-    while true; do
-        STATUS=$(gcloud transfer operations list --job-names=${job} --format="value(metadata.status)" | grep .)
-        echo -n "current job status: $STATUS"
-        if [[ -n ${STATUS} && ${STATUS} = "SUCCESS" ]]; then
-            break
-        fi
-        sleep 5
-    done
+fi
 
+job=$(gcloud transfer jobs create \
+    "${source}" "${destination}/" \
+    --source-creds-file="${creds_file}" \
+    --project "${project}" \
+    ${include_prefixes:+"--include-prefixes=${include_prefixes[@]}"} \
+    ${exclude_prefixes:+"--exclude-prefixes=${exclude_prefixes[@]}"} |
+    sed -n 's/.*name://p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+echo -n "job created with id $job"
+# Wait for job to finish
+while true; do
+    STATUS=$(gcloud transfer operations list --job-names=${job} --format="value(metadata.status)" | grep .)
+    echo -n "current job status: $STATUS"
+    if [[ -n ${STATUS} && ${STATUS} = "SUCCESS" ]]; then
+        break
+    fi
+    sleep 5
 done
-
-gcloud transfer jobs create \
-    "s3://nyc-tlc/trip data/ " "gs://raw-8d74c9728b/yellow/" \
-    --source-creds-file="secrets/aws_creds.json"
