@@ -52,7 +52,7 @@ def get_secret_manager() -> boto3.client:
         boto3.client: A boto3 secretsmanager client object.
     """
     secrets_manager_client = boto3.client("secretsmanager")
-    integration_test = os.getenv("integration_test") == "true"
+    integration_test = os.getenv("INTEGRATION_TEST") == "true"
     if integration_test:
         secrets_manager_client.meta.endpoint_url = "http://localhost:4566"
     return secrets_manager_client
@@ -174,8 +174,8 @@ def lambda_handler(event: dict, context: LambdaContext) -> None:
     target_pod_substring = os.getenv("TARGET_POD", "airflow")
     target_container = os.getenv("TARGET_CONTAINER", "scheduler")
     #### processing
-    secret_manager = get_secret_manager()
-    credentials = get_credentials(secret_manager)
+    secrets_manager_client = get_secret_manager()
+    credentials = get_credentials(secrets_manager_client)
     api_auth_token = token(credentials, "cloud-platform")
     gke_cluster = get_cluster_info(gcp_project, gcp_zone, gke_name, credentials)
     api = kubernetes_api(gke_cluster, api_auth_token)

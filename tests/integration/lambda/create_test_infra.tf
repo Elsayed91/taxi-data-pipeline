@@ -92,6 +92,7 @@ resource "aws_lambda_function" "lambda_func" {
       GKE_CLUSTER_NAME = "gke"
       DAG_NAME         = "lambda_integration_test"
       TARGET_NAMESPACE = "default"
+      INTEGRATION_TEST = true
     }
   }
   depends_on = [
