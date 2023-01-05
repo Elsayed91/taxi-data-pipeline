@@ -91,6 +91,15 @@ def lambda_handler(event: dict, context: LambdaContext) -> None:
     #######################################################################
 
     print(get_credentials())
+
+    secrets_manager_client = boto3.client("secretsmanager")
+    get_secret_value_response = secrets_manager_client.get_secret_value(
+        SecretId="gcp-key"
+    )
+    key_file = get_secret_value_response["SecretString"]
+    service_account_info = json.loads(key_file)
+    credentials = Credentials.from_service_account_info(service_account_info)
+    print(credentials)
     # credentials = service_account.Credentials.from_service_account_file(
     #     "lambda_key.json"
     # )
