@@ -58,8 +58,6 @@ with DAG(
             f'gs://{STAGING_BUCKET}/"{{{{ dag_run.conf.category }}}}"',
             "--creds-file",
             "/etc/aws/aws_creds.json",
-            "--filename",
-            "{{ dag_run.conf.filename }}",
             "--check-exists",
         ],
         jinja_job_args={
