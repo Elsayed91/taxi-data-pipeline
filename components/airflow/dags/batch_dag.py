@@ -1,28 +1,43 @@
+import os
+from datetime import datetime, timedelta
+
+import pendulum
 from airflow import DAG
-from airflow.operators.python import PythonOperator
-from airflow.utils.dates import days_ago
 from airflow_kubernetes_job_operator.kubernetes_job_operator import (
     KubernetesJobOperator,
 )
-from airflow.operators.bash import BashOperator
-from datetime import datetime, timedelta
+from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
+from addons.parse_state import SparkApplication
 
-# default_args are the default arguments for the DAG
+
+KubeResourceKind.register_global_kind(SparkApplication)
+
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
 default_args = {
-    "owner": "me",
-    "start_date": days_ago(2),
+    "owner": "airflow",
+    "start_date": pendulum.yesterday(),
     "depends_on_past": False,
+    "retries": 0,
+    "retry_delay": timedelta(minutes=60),
+    "concurrency": 1,
+    "max_active_runs": 1,
+    "in_cluster": True,
+    "random_name_postfix_length": 2,
+    "name_prefix": "",
 }
 
-# Create a DAG with default_args
+
 with DAG(
-    "batch-dag",
+    dag_id="batch-dag",
     default_args=default_args,
-    description="A dummy DAG to demonstrate command line configuration",
+    schedule_interval=None,
+    catchup=False,
+    description="batch data pipeline",
     template_searchpath=["/git/repo/components/airflow/dags"],
 ) as dag:
-
-    import os
 
     GKE_CLUSTER_NAME = os.getenv("GKE_CLUSTER_NAME")
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
@@ -33,43 +48,40 @@ with DAG(
     JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
 
-    # t4 = KubernetesJobOperator(
-    #     task_id="resize",
-    #     body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
-    #     command=["/bin/bash", "-c"],
-    #     arguments=["echo", "{{ dag_run.conf.URI }}", "clusters;", "echo $dag_uri"],
-    #     jinja_job_args={
-    #         "image": "google/cloud-sdk:alpine",
-    #         "name": "testi",
-    #     },
-    #     envs={"dag_uri": "{{ dag_run.conf.URI }}"},
-    #     in_cluster=True,
-    #     random_name_postfix_length=2,
-    #     name_prefix="",
-    #     dag=dag,
-    # )
-
-    def my_dag_func(**kwargs):
-        conf = kwargs["dag_run"].conf
-        file_uri = conf["URI"]
-        bucket, file_path = file_uri.replace("s3://", "").split("/", 1)
-        file_name = file_path.split("/")[-1]
-        return bucket, file_path, file_name
-
-    # Create a PythonOperator that calls the print_conf function
-
-    task = BashOperator(
-        task_id="bash_operator_task",
-        bash_command='echo "Bucket: {{ task_instance.xcom_pull(task_ids="print_conf_task", key="bucket") }}, \
-        File Path: {{ task_instance.xcom_pull(task_ids="print_conf_task", key="file_path") }}"',
+    t1 = KubernetesJobOperator(
+        task_id="aws_to_gcs",
+        body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
+        command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
+        arguments=[
+            "--source-bucket",
+            f"s3://{os.getenv('TARGET_S3_BUCKET')}/trip data/' {{{{ {dag_run.conf["filename"] }}}} '",
+            "--target-bucket",
+            f"gs://{STAGING_BUCKET}",
+            "--project",
+            f"{GOOGLE_CLOUD_PROJECT}",
+            "--creds-file",
+            "/etc/aws/aws_creds.json",
+            "--include-prefixes",
+            "yellow_tripdata_20",
+            "--exclude-prefixes",
+            "--check-exists",
+            "--",
+            "yellow",
+        ],
+        jinja_job_args={
+            "image": "google/cloud-sdk:alpine",
+            "name": "from-aws-to-gcs",
+            "gitsync": True,
+            "nodeSelector": BASE_NODE_POOL,
+            "volumes": [
+                {
+                    "name": "aws-creds",
+                    "type": "secret",
+                    "reference": "aws-creds",
+                    "mountPath": "/etc/aws",
+                }
+            ],
+        },
     )
-    # Pass in the variables using the `provide_context` parameter
-    # provide_context=True
 
-    print_conf_task >> task
-# Set the order of the tasks using set_upstream and set_downstream
-# print_conf_task
-
-# Specify the command line arguments for the DAG in the form "key=value"
-# For example, to pass a configuration called "foo" with value "bar", you can use:
-# $ airflow trigger_dag dummy_dag --conf '{"foo":"bar"}'
+    t1

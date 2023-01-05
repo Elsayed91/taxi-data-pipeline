@@ -88,9 +88,9 @@ GCP:
     - name: "${JOBS_NODE_POOL}"
       cluster: "${GKE_CLUSTER_NAME}"
       node_count: ~
-      autoscaling: 
-        min_node_count: 0
-        max_node_count: 10
+      # autoscaling: 
+      #   min_node_count: 0
+      #   max_node_count: 10
       management:
         auto_repair: true
         auto_upgrade: true

@@ -8,7 +8,7 @@ from airflow_kubernetes_job_operator.kubernetes_job_operator import (
 )
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
 from addons.parse_state import SparkApplication
-from addons.extract_target_date import extract_target_date
+
 
 KubeResourceKind.register_global_kind(SparkApplication)
 
@@ -39,6 +39,7 @@ with DAG(
     default_args=default_args,
     catchup=False,
     tags=["full-refresh"],
+    description="initial load/full refresh data pipeline",
     template_searchpath=["/git/repo/components/airflow/dags"],
 ) as dag:
     GKE_CLUSTER_NAME = os.getenv("GKE_CLUSTER_NAME")
@@ -47,7 +48,7 @@ with DAG(
     BASE = "/git/repo/components"
     TEMPLATES_PATH = f"{BASE}/airflow/dags/templates"
     SCRIPTS_PATH = f"{BASE}/airflow/dags/scripts"
-    JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")  # remove z after terraform re
+    JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
     t1 = KubernetesJobOperator(
         task_id="aws_to_gcs",
@@ -84,9 +85,6 @@ with DAG(
                 }
             ],
         },
-        in_cluster=True,
-        random_name_postfix_length=2,
-        name_prefix="",
     )
 
     t2 = KubernetesJobOperator(

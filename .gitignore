@@ -48,3 +48,4 @@ tests/integration/lambda/.terraform.tfstate.lock.info
 tests/integration/lambda/terraform.tfstate
 tests/integration/lambda/yellow_tripdata_2019-08.parquet
 tests/integration/lambda/terraform.tfstate.backup
+tests/integration/lambda/files
