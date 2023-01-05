@@ -94,7 +94,7 @@ def lambda_handler(event: dict, context: LambdaContext) -> None:
 
     secrets_manager_client = boto3.client("secretsmanager")
     get_secret_value_response = secrets_manager_client.get_secret_value(
-        SecretId="gcp-key"
+        SecretId="gcp_key"
     )
     key_file = get_secret_value_response["SecretString"]
     try:
