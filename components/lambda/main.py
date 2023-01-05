@@ -59,15 +59,13 @@ def get_credentials(secret_id: str = "gcp_key"):
     get_secret_value_response = secrets_manager_client.get_secret_value(
         SecretId=secret_id
     )
-    secret_value = get_secret_value_response["SecretString"]
-    key_file = json.loads(secret_value)
+    key_file = json.loads(get_secret_value_response["SecretString"])
 
-    with NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+    with NamedTemporaryFile(mode="w", suffix=".json") as f:
         json.dump(key_file, f)
+        credentials = Credentials.from_service_account_file(f.name)
         f.flush()
-    credentials = Credentials.from_service_account_file(f.name)
-    os.unlink(f.name)  # Delete the temporary file
-    return Credentials.from_service_account_info(credentials)
+    return credentials
 
 
 def lambda_handler(event: dict, context: LambdaContext) -> None:
