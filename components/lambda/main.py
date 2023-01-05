@@ -40,7 +40,7 @@ import urllib.parse
 from google.oauth2 import service_account
 from aws_lambda_typing.context import Context as LambdaContext
 import boto3
-from base64 import decodebytes
+from base64 import decodebytes, encode
 
 import json
 import logging
@@ -61,7 +61,7 @@ def get_credentials(secret_id: str = "gcp_key"):
     )
     secret_value = get_secret_value_response["SecretString"]
 
-    key = decodebytes(secret_value["privateKeyData"])
+    key = decodebytes(secret_value["privateKeyData"]).encode()  # type: ignore
     key = json.loads(key)  # type: ignore
 
     logger.info(key)
