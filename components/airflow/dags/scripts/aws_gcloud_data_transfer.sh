@@ -79,3 +79,7 @@ for folder in "${@}"; do
     done
 
 done
+
+gcloud transfer jobs create \
+    "s3://nyc-tlc/trip data/*/" "gs://raw-8d74c9728b/yellow/" \
+    --source-creds-file="secrets/aws_creds.json"

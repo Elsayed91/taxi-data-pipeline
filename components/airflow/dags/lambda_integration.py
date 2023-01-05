@@ -43,7 +43,7 @@ with DAG(
             raise AssertionError("dag triggered but conf is empty. review lambda code")
 
         try:
-            file_uri = conf["URI"]
+            file_uri = conf["uri"]
             filename = conf["filename"]
             run_date = conf["run_date"]
             logger.info(
