@@ -41,7 +41,7 @@ while [[ $# -gt 0 ]]; do
         ;;
     esac
 done
-
+echo $destination
 if [[ -z "$project" ]]; then
     project=$(gcloud config get-value project)
 fi
@@ -52,6 +52,7 @@ if [[ -z "$file_part" ]]; then
     filename="*"
 else
     filename=$file_part
+    echo $filename
 fi
 
 if [[ "${check_exists}" == true ]]; then
