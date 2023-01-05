@@ -70,9 +70,9 @@ def get_credentials(secret_id: str = "gcp_key") -> Credentials:
     #     secrets_manager_client = boto3.client("secretsmanager")
     secrets_manager_client = boto3.client(
         "secretsmanager",
-        endpoint_url=None
+        endpoint_url="http://localhost:4566"
         if os.getenv("INTEGRATION_TEST") == "true"
-        else "http://localhost:4566",
+        else None,
     )
     try:
         get_secret_value_response = secrets_manager_client.get_secret_value(
