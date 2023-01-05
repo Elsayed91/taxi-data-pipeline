@@ -59,7 +59,7 @@ def get_credentials(secret_id: str = "gcp_key"):
     get_secret_value_response = secrets_manager_client.get_secret_value(
         SecretId=secret_id
     )
-    secret_value = get_secret_value_response["SecretString"]
+    secret_value = json.loads(get_secret_value_response["SecretString"])
 
     key = decodebytes(secret_value["privateKeyData"].encode())
     key = json.loads(key)  # type: ignore
