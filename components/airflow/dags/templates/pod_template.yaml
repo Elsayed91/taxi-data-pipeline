@@ -14,19 +14,10 @@ spec:
           limits:
               cpu: {{ job.resources.cpu }}
               memory: {{ job.resources.memory }}
-             {% if job.nodeSelector is defined and job.nodeSelector.startswith("gpu") %}
-              nvidia.com/gpu: {{ job.gpu_count | default(1) }}
-              {% endif %}
           requests:
               cpu: {{ job.resources.cpu }}
               memory: {{ job.resources.memory }}
               core: {{ job.resources.core }}
-      {% else %}
-      resources:
-          {% if job.nodeSelector is defined and job.nodeSelector.startswith("gpu") %}
-          limits:
-              nvidia.com/gpu: {{ job.gpu_count | default(1) }}
-          {% endif %}
       {% endif %}
       {% if job.volumes is defined or (job.gitsync is defined and job.gitsync) %}
       volumeMounts:
