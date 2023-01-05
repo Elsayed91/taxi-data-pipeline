@@ -83,9 +83,6 @@ spec:
     {% if job.nodeSelector is defined %}
     cloud.google.com/gke-nodepool: {{ job.nodeSelector }}
     {% endif %}
-    # {% if job.nodeSelector is defined and job.nodeSelector.startswith("gpu") %}
-    # cloud.google.com/gke-accelerator: {{ job.gpu | default("nvidia-tesla-t4") }}
-    # {% endif %}
   {% if job.initContainer is defined or (job.gitsync is defined and job.gitsync) %}
   initContainers:
     {% if job.initContainer is defined %}
