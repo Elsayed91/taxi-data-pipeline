@@ -12,7 +12,7 @@ cd $SCRIPT_DIR
 
 # SERVICES=lambda,iam,secretsmanager,s3,logs nohup localstack start &
 
-# terraform init && terraform apply --auto-approve
+# terraform init && terraform apply --auto-approve --destroy
 
 # aws --endpoint-url=http://localhost:4566 secretsmanager create-secret --name gcp_key \
 #     --secret-string file:///home/lestrang/grandiose/terraform/modules/files/lambda_key.json \
@@ -23,7 +23,7 @@ cd $SCRIPT_DIR
 #     --key yellow_tripdata_2019-08.parquet \
 #     --body=yellow_tripdata_2019-08.parquet \
 #     --region eu-west-1
-localstack update all
+
 # test_run_info=$(kubectl exec -t $(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow) -c scheduler -- airflow dags list-runs -d lambda_integration_test -o yaml | head -6)
 # if [[ -n "$test_run_info" ]]; then
 #     run_id=$(echo "$test_run_info" | grep "run_id" | awk '{print $2}')

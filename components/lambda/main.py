@@ -43,26 +43,12 @@ from botocore.exceptions import ClientError
 import json
 
 
-def get_secret_manager() -> boto3.client:
-    """
-    Retrieves a boto3 secretsmanager client object. If the environmental variable 'integration_test' is set to 'true',
-    the client will be connected to a localstack secretsmanager instance at the endpoint 'http://localhost:4566'.
-    Otherwise, the client will be connected to the AWS secretsmanager service.
-    Returns:
-        boto3.client: A boto3 secretsmanager client object.
-    """
-    secrets_manager_client = boto3.client("secretsmanager")
-    integration_test = os.getenv("INTEGRATION_TEST") == "true"
-    if integration_test:
-        secrets_manager_client.meta.endpoint_url = "http://localhost:4566"
-    return secrets_manager_client
-
-
-def get_credentials(
-    secret_manager_client: boto3.client, secret_id: str = "gcp_key"
-) -> Credentials:
+def get_credentials(secret_id: str = "gcp_key") -> Credentials:
     """
     Retrieves GCP service account credentials from AWS Secrets Manager.
+    It will initially check if INTEGRATION_TEST env var is set, if true
+    it will connect the client to the localstack endpoint, otherwise it
+    will be connected to the standard AWS AWS secretsmanager service.
 
     Args:
         secret_id (str): The ID of the secret in Secrets Manager. Defaults to "gcp_key".
@@ -71,6 +57,10 @@ def get_credentials(
     Returns:
         Credentials: The service account credentials object.
     """
+    secrets_manager_client = boto3.client("secretsmanager")
+    integration_test = os.getenv("INTEGRATION_TEST") == "true"
+    if integration_test:
+        secrets_manager_client.meta.endpoint_url = "http://localhost:4566"
     try:
         get_secret_value_response = secrets_manager_client.get_secret_value(
             SecretId=secret_id
@@ -174,8 +164,7 @@ def lambda_handler(event: dict, context: LambdaContext) -> None:
     target_pod_substring = os.getenv("TARGET_POD", "airflow")
     target_container = os.getenv("TARGET_CONTAINER", "scheduler")
     #### processing
-    secrets_manager_client = get_secret_manager()
-    credentials = get_credentials(secrets_manager_client)
+    credentials = get_credentials()
     api_auth_token = token(credentials, "cloud-platform")
     gke_cluster = get_cluster_info(gcp_project, gcp_zone, gke_name, credentials)
     api = kubernetes_api(gke_cluster, api_auth_token)
