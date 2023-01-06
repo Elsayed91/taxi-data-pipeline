@@ -63,6 +63,8 @@ spec:
       secretRef:
           name: {{ envFrom.name }}
       {% endif %}
+    {% endfor %}
+    {% endif %}
     {% set conf = {} %}
     {% if dag_run.conf is defined %}
       {% do conf.update(dag_run.conf) %}
@@ -79,6 +81,7 @@ spec:
               value: {{ value }}
         {% endfor %}
     {% endif %}
+
     labels:
       version: 3.1.2
       metrics-exposed: "true"
