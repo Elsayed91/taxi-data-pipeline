@@ -93,8 +93,6 @@ with DAG(
                 "STAGING_BUCKET": STAGING_BUCKET,
                 "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
                 "VALIDATION_THRESHOLD": "10%",
-                "CATEGORY": CATEGORY,
-                "URI": URI,
             },
         },
     )
