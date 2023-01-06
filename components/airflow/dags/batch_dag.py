@@ -85,14 +85,14 @@ with DAG(
             "gitsync": True,
             "nodeSelector": JOBS_NODE_POOL,
             "executor_memory": "2048m",
+            "ENV_CATEGORY": "{{ dag_run.conf.category }}",
+            "ENV_URI": "{{ dag_run.conf.uri }}",
             "env": {
                 "CONFIG_DIR": f"{BASE}/data_validation/config",
                 "PROJECT": GOOGLE_CLOUD_PROJECT,
                 "STAGING_BUCKET": STAGING_BUCKET,
                 "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
                 "VALIDATION_THRESHOLD": "10%",
-                "ENV_CATEGORY": "{{ dag_run.conf.category }}",
-                "ENV_URI": "{{ dag_run.conf.uri }}",
             },
         },
     )
