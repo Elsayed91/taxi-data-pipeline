@@ -9,7 +9,6 @@ from airflow_kubernetes_job_operator.kubernetes_job_operator import (
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
 from parse_state import SparkApplication
 
-# envs={"dag_uri": "{{ dag_run.conf.URI }}"},
 KubeResourceKind.register_global_kind(SparkApplication)
 
 import logging
@@ -21,7 +20,6 @@ default_args = {
     "start_date": pendulum.yesterday(),
     "depends_on_past": False,
     "retries": 0,
-    "retry_delay": timedelta(minutes=60),
     "concurrency": 1,
     "max_active_runs": 1,
     "in_cluster": True,
@@ -52,7 +50,7 @@ with DAG(
         body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
         command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
         arguments=[
-            "--source",
+            "--data-source",
             "{{ dag_run.conf.uri }}",
             "--destination",
             f"gs://{STAGING_BUCKET}/{{{{ dag_run.conf.category }}}}",
@@ -62,7 +60,7 @@ with DAG(
         ],
         jinja_job_args={
             "image": "google/cloud-sdk:alpine",
-            "name": "from-aws-to-gcs",
+            "name": "aws-to-gcs",
             "gitsync": True,
             "nodeSelector": BASE_NODE_POOL,
             "volumes": [
