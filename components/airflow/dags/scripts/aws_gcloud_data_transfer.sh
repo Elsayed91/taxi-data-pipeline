@@ -56,15 +56,10 @@ fi
 
 if [[ "${check_exists}" == true ]]; then
     file_path="${destination}/${filename}"
-    # result=$(gsutil -q stat $file_path || echo 1) if [ "$result" -eq 1 ]; then # If the result is 1, then the file does not exist
-    result=$(gsutil stat $file_path)
-
-    # If the result contains "No URLs matched", then the file does not exist
-    if [[ "$result" == *"No URLs matched"* ]]; then
-        # File does not exist, so continue with script
+    result=$(gsutil -q stat $file_path || echo 1)
+    if [[ "$result" == 1 ]]; then # If the result is 1, then the file does not exist
         echo "File does not exist. Continuing with script."
     else
-        # File exists, so exit script without error
         echo "File already exists. Exiting script."
         exit 0
     fi
