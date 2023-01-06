@@ -46,8 +46,6 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-set -e
-
 if [[ -z "$project" ]]; then
     project=$(gcloud config get-value project)
 fi
