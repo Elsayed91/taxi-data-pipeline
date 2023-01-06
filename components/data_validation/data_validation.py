@@ -43,7 +43,7 @@ def main():
     data_context.build_data_docs()
 
     # Retrieve the success percentage from the checkpoint result
-    success_percentage = next(retrieve_nested_value(cp_result, "success_percent"))
+    success_percentage = list(retrieve_nested_value(cp_result, "success_percent"))[0]
 
     # Validate the success percentage against the threshold
     if success_percentage < VALIDATION_THRESHOLD:
