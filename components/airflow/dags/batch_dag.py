@@ -33,7 +33,6 @@ with DAG(
     schedule_interval=None,
     catchup=False,
     description="batch data pipeline",
-    template_searchpath=["/git/repo/components/airflow/dags"],
 ) as dag:
 
     GKE_CLUSTER_NAME = os.getenv("GKE_CLUSTER_NAME")
@@ -44,7 +43,7 @@ with DAG(
     SCRIPTS_PATH = f"{BASE}/airflow/dags/scripts"
     JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
-
+    CATEGORY = "{{ dag_run.conf.category }}"
     # t1 = KubernetesJobOperator(
     #     task_id="aws_to_gcs",
     #     body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
@@ -86,7 +85,7 @@ with DAG(
             "gitsync": True,
             "nodeSelector": JOBS_NODE_POOL,
             "executor_memory": "2048m",
-            "ENV_CATEGORY": "{{ dag_run.conf.category }}",
+            "ENV_CATEGORY": CATEGORY,
             "ENV_URI": "{{ dag_run.conf.uri }}",
             "env": {
                 "GE_CONFIG_DIR": f"{BASE}/data_validation/config",
