@@ -86,6 +86,7 @@ if [[ "${check_exists}" == true ]]; then
     fi
 fi
 
+echo "prejob echo tests"
 if [[ -z "$include_prefixes" && "$file_name" != "*" ]]; then
     job=$(gcloud transfer jobs create \
         "${data_source}" "${destination}/" \
@@ -101,7 +102,7 @@ else
         ${include_prefixes:+"--include-prefixes=${include_prefixes[@]}"} \
         ${exclude_prefixes:+"--exclude-prefixes=${exclude_prefixes[@]}"})
 fi
-
+echo "pre sed echo test"
 job=$(echo "$job" | sed -n 's/.*name://p' | sed -e 's/^[[:space:]]*//' -e \
     's/[[:space:]]*$//')
 
