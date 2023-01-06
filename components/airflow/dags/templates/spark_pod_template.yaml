@@ -65,18 +65,19 @@ spec:
       {% endif %}
     {% endfor %}
     {% endif %}
-    {% if job.env is defined %}
-    env:
+    {% set conf = {} %}
+    {% for key, value in dag_run.conf.items() %}
+    {% set conf[key] = value %}
+    {% endfor %}
     {% for key, value in job.env.items() %}
+    {% set conf[key] = value %}
+    {% endfor %}
+
+    env:
+    {% for key, value in conf.items() %}
+
     - name: {{ key }}
       value: {{ value }}
-    {% endfor %}
-    {% endif %}
-    {% for key, value in job.items() %}
-    {% if key.startswith('ENV_') %}
-    - name: {{ key[4:] }}
-      value: {{ value }}
-    {% endif %}
     {% endfor %}
     labels:
       version: 3.1.2

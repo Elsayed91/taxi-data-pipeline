@@ -3,11 +3,11 @@ import os
 import pendulum
 from airflow import DAG
 
-# from airflow_kubernetes_job_operator.kubernetes_job_operator import (
-#     KubernetesJobOperator,
-# )
+from airflow_kubernetes_job_operator.kubernetes_job_operator import (
+    KubernetesJobOperator,
+)
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
-from addons.parse_state import SparkApplication, KJO
+from addons.parse_state import SparkApplication
 
 KubeResourceKind.register_global_kind(SparkApplication)
 
@@ -75,7 +75,7 @@ with DAG(
     #     },
     # )
 
-    t2 = KJO(
+    t2 = KubernetesJobOperator(
         task_id="data_validation",
         body_filepath=f"{TEMPLATES_PATH}/spark_pod_template.yaml",
         jinja_job_args={
@@ -87,14 +87,14 @@ with DAG(
             "gitsync": True,
             "nodeSelector": JOBS_NODE_POOL,
             "executor_memory": "2048m",
-            "ENV_CATEGORY": CATEGORY,
-            "ENV_URI": URI,
             "env": {
                 "GE_CONFIG_DIR": f"{BASE}/data_validation/config",
                 "PROJECT": GOOGLE_CLOUD_PROJECT,
                 "STAGING_BUCKET": STAGING_BUCKET,
                 "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
                 "VALIDATION_THRESHOLD": "10%",
+                "CATEGORY": CATEGORY,
+                "URI": URI,
             },
         },
     )
