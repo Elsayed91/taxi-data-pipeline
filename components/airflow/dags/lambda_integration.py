@@ -52,7 +52,7 @@ with DAG(
             file_uri = conf["uri"]
             filename = conf["filename"]
             run_date = conf["run_date"]
-            run_date = conf["category"]
+            category = conf["category"]
             logger.info(
                 f"uri is {file_uri}, and file is {filename} \
                 and run_date is {run_date}"

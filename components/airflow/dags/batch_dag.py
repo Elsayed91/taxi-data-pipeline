@@ -1,5 +1,4 @@
 import os
-from datetime import datetime, timedelta
 
 import pendulum
 from airflow import DAG
@@ -7,7 +6,7 @@ from airflow_kubernetes_job_operator.kubernetes_job_operator import (
     KubernetesJobOperator,
 )
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
-from components.airflow.dags.addons.parse_state import SparkApplication
+from addons.parse_state import SparkApplication
 
 KubeResourceKind.register_global_kind(SparkApplication)
 
