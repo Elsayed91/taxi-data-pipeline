@@ -86,7 +86,6 @@ with DAG(
             "nodeSelector": JOBS_NODE_POOL,
             "executor_memory": "2048m",
             "env": {
-                "VALIDATION_THRESHOLD": "0.1",
                 "CONFIG_DIR": f"{BASE}/data_validation/config",
                 "PROJECT": GOOGLE_CLOUD_PROJECT,
                 "STAGING_BUCKET": STAGING_BUCKET,
@@ -96,6 +95,7 @@ with DAG(
         envs={
             "CATEGORY": "{{ dag_run.conf.category }}",
             "URI": "{{ dag_run.conf.uri }}",
+            "VALIDATION_THRESHOLD": "0.1",
         },
     )
     t2  # type: ignore
