@@ -56,7 +56,7 @@ with DAG(
             f"gs://{STAGING_BUCKET}/{{{{ dag_run.conf.category }}}}",
             "--creds-file",
             "/etc/aws/aws_creds.json",
-            # "--check-exists",
+            "--check-exists",
         ],
         jinja_job_args={
             "image": "google/cloud-sdk:alpine",
