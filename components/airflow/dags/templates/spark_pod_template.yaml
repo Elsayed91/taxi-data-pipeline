@@ -67,17 +67,16 @@ spec:
     {% endif %}
     {% set conf = {} %}
     {% for key, value in dag_run.conf.items() %}
-    {% set conf[key] = value %}
+        {% set conf[key] = value %}
     {% endfor %}
     {% for key, value in job.env.items() %}
-    {% set conf[key] = value %}
+        {% set conf[key] = value %}
     {% endfor %}
-
+    {% if conf %}
     env:
     {% for key, value in conf.items() %}
-
-    - name: {{ key }}
-      value: {{ value }}
+        - name: {{ key }}
+          value: {{ value }}
     {% endfor %}
     labels:
       version: 3.1.2
