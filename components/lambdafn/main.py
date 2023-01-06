@@ -258,8 +258,8 @@ def lambda_handler(event: dict, context: LambdaContext) -> None:
     target_namespace = os.getenv("TARGET_NAMESPACE")
     dag = os.getenv("DAG_NAME")
     dag_trigger_command = f"""airflow dags unpause {dag} && airflow  \
-        dags trigger {dag} --conf '{{"uri":"{object_uri}", \
-        "filename":"{key}", "run_date": "{run_date}", "category": "{category}"}}'"""
+        dags trigger {dag} --conf '{{"URI":"{object_uri}", \
+        "FILENAME":"{key}", "RUN_DATE": "{run_date}", "CATEGORY": "{category}"}}'"""
     gcp_project = os.getenv("PROJECT")
     gcp_zone = os.getenv("GCP_ZONE")
     gke_name = os.getenv("GKE_CLUSTER_NAME")
