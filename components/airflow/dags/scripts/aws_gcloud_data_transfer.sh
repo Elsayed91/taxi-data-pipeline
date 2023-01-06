@@ -45,7 +45,6 @@ done
 
 if [[ -z "$project" ]]; then
     project=$(gcloud config get-value project)
-    echo $project
 fi
 
 file_part=${source##*/}
@@ -59,7 +58,11 @@ else
     source=${source%*}
     filename=$file_part
     include_prefixes="$filename"
+
 fi
+
+echo $source
+echo $filename
 
 if [[ "${check_exists}" == true ]]; then
     file_path="${destination}/${filename}"
@@ -80,12 +83,15 @@ job=$(gcloud transfer jobs create \
     ${exclude_prefixes:+"--exclude-prefixes=${exclude_prefixes[@]}"} |
     sed -n 's/.*name://p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 echo -n "job created with id $job"
-# Wait for job to finish
-while true; do
-    STATUS=$(gcloud transfer operations list --job-names=${job} --format="value(metadata.status)" | grep .)
-    echo -n "current job status: $STATUS"
-    if [[ -n ${STATUS} && ${STATUS} = "SUCCESS" ]]; then
-        break
-    fi
-    sleep 10
-done
+
+if [[ "$job" =~ transferJobs/[0-9]+ ]]; then #prevents loops due to sed interferring with error
+    # Wait for job to finish
+    while true; do
+        STATUS=$(gcloud transfer operations list --job-names=${job} --format="value(metadata.status)" | grep .)
+        echo -n "current job status: $STATUS"
+        if [[ -n ${STATUS} && ${STATUS} = "SUCCESS" ]]; then
+            break
+        fi
+        sleep 10
+    done
+fi
