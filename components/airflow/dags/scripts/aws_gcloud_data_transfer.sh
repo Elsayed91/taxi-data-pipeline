@@ -108,27 +108,16 @@ job=$(echo "$job" | sed -n 's/.*name://p' | sed -e 's/^[[:space:]]*//' -e \
 printf "job created with id %s\n" "$job"
 # Wait for job to finish
 
-set -ex
-operation_successful=false
-
-# Loop until the operation is successful
-while [[ "${operation_successful}" = false ]]; do
-    # Check if the output of the gcloud command contains "SUCCESS"
-    if gcloud transfer operations list --job-names="${job}" \
-        --format="value(metadata.status)" | while read line; do
-        if [[ "${line}" == "SUCCESS" ]]; then
-            exit 0
-        else
-            printf "Current status: %s\n" "${line}"
-        fi
-    done; then
-        # Set the flag to indicate that the operation has completed successfully
-        operation_successful=true
+set -e
+while true; do
+    STATUS=$(gcloud transfer operations list --job-names="${job}" \
+        --format="value(metadata.status)")
+    printf "current job status: %s\n" "$STATUS"
+    if [[ -n "${STATUS}" && "${STATUS}" = "SUCCESS" ]]; then
+        printf "Breaking loop because status is SUCCESS\n"
+        break
     else
-        # Increment the number of retries
-        echo "Sleeping 5 seconds then rechecking."
-
-        # Sleep for a short period before retrying
+        printf "Sleeping for 5 seconds\n"
         sleep 5
     fi
 done
