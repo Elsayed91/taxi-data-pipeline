@@ -72,7 +72,7 @@ spec:
       value: "{{ value | string }}"
     {% endfor %}
     {% endif %}
-    {% for key, value in params.items() %}
+    {% for key, value in job.items() %}
     {% if key.startswith('ENV_') %}
     - name: {{ key[4:] }}
       value: "{{ value | string }}"
