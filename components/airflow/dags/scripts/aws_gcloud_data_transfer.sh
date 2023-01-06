@@ -111,7 +111,7 @@ printf "job created with id %s\n" "$job"
 while true; do
     STATUS=$(gcloud transfer operations list --job-names="${job}" \
         --format="value(metadata.status)" | grep .)
-    echo -e "current job status: "$STATUS""
+    printf "current job status: %s\n" "$STATUS"
     if [[ -n "${STATUS}" && "${STATUS}" = "SUCCESS" ]]; then
         break
     fi
