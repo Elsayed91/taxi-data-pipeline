@@ -106,12 +106,12 @@ echo "pre sed echo test"
 job=$(echo "$job" | sed -n 's/.*name://p' | sed -e 's/^[[:space:]]*//' -e \
     's/[[:space:]]*$//')
 
-echo -en "job created with id "$job""
+printf "job created with id %s\n" "$job"
 # Wait for job to finish
 while true; do
     STATUS=$(gcloud transfer operations list --job-names="${job}" \
         --format="value(metadata.status)" | grep .)
-    echo -en "current job status: "$STATUS"\r"
+    echo -e "current job status: "$STATUS""
     if [[ -n "${STATUS}" && "${STATUS}" = "SUCCESS" ]]; then
         break
     fi
