@@ -99,10 +99,10 @@ else
 fi
 
 while true; do
-    STATUS=$(gcloud transfer operations list --job-names=${job} --format="value(metadata.status)" | grep .)
+    STATUS=$(gcloud transfer operations list --job-names=${job} --format="value(metadata.status)")
     echo -n "current job status: $STATUS"
     if [[ -n ${STATUS} && ${STATUS} = "SUCCESS" ]]; then
         break
     fi
-    sleep 10
+    sleep 5
 done
