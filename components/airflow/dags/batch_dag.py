@@ -91,9 +91,9 @@ with DAG(
                 "PROJECT": GOOGLE_CLOUD_PROJECT,
                 "STAGING_BUCKET": STAGING_BUCKET,
                 "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
-                "CATEGORY": "{{ dag_run.conf.category }}",
-                "URI": "{{ dag_run.conf.uri }}",
             },
+            "env.CATEGORY": "{{ dag_run.conf.category }}",
+            "env.URI": "{{ dag_run.conf.uri }}",
         },
     )
     t2  # type: ignore
