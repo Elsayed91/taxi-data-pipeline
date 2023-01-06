@@ -91,7 +91,7 @@ job=$(gcloud transfer jobs create \
 echo -n "job created with id $job"
 
 if [[ "$job" =~ transferJobs/[0-9]+ ]]; then #prevents loops due to sed interferring with error
-    continue
+    true
 else
     echo "Error: $job does not match regex transferJobs/<numbers>"
     exit 1
