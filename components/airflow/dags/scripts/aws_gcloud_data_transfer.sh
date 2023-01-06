@@ -3,7 +3,6 @@
 # It accepts the following arguments:
 # source-bucket, target-bucket, project, creds-file, include-prefixes, exclude-prefixes, and check-exists.
 # It has an option to check if the files already exist before transferring them.
-set -e
 
 while [[ $# -gt 0 ]]; do
     key="$1"
@@ -46,6 +45,8 @@ while [[ $# -gt 0 ]]; do
         ;;
     esac
 done
+
+set -e
 
 if [[ -z "$project" ]]; then
     project=$(gcloud config get-value project)
