@@ -44,6 +44,7 @@ with DAG(
     JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
     CATEGORY = "{{ dag_run.conf.category }}"
+    URI = "{{ dag_run.conf.uri }}"
     # t1 = KubernetesJobOperator(
     #     task_id="aws_to_gcs",
     #     body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
@@ -85,17 +86,15 @@ with DAG(
             "gitsync": True,
             "nodeSelector": JOBS_NODE_POOL,
             "executor_memory": "2048m",
-            "ENV_CATEGORY": CATEGORY,
             "env": {
                 "GE_CONFIG_DIR": f"{BASE}/data_validation/config",
                 "PROJECT": GOOGLE_CLOUD_PROJECT,
                 "STAGING_BUCKET": STAGING_BUCKET,
                 "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
                 "VALIDATION_THRESHOLD": "10%",
+                "CATEGORY": CATEGORY,
+                "URI": URI,
             },
-        },
-        envs={
-            "ENV_URI": "{{ dag_run.conf.uri }}",
         },
     )
     t2  # type: ignore
