@@ -78,6 +78,7 @@ spec:
         - name: {{ key }}
           value: {{ value }}
     {% endfor %}
+    {% endif %}
     labels:
       version: 3.1.2
       metrics-exposed: "true"
