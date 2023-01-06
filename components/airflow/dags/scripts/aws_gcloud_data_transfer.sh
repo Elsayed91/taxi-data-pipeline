@@ -41,7 +41,7 @@ while [[ $# -gt 0 ]]; do
         ;;
     esac
 done
-echo $destination
+
 if [[ -z "$project" ]]; then
     project=$(gcloud config get-value project)
 fi
@@ -56,9 +56,11 @@ fi
 
 if [[ "${check_exists}" == true ]]; then
     file_path="${destination}/${filename}"
-    result=$(gsutil -q stat $file_path || echo 1)
-    # If the result is 1, then the file does not exist
-    if [ "$result" -eq 1 ]; then
+    # result=$(gsutil -q stat $file_path || echo 1) if [ "$result" -eq 1 ]; then # If the result is 1, then the file does not exist
+    result=$(gsutil stat $file_path)
+    echo $result
+    # If the result contains "No URLs matched", then the file does not exist
+    if [[ "$result" == *"No URLs matched"* ]]; then
         # File does not exist, so continue with script
         echo "File does not exist. Continuing with script."
     else
