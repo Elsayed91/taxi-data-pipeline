@@ -85,6 +85,7 @@ with DAG(
             "gitsync": True,
             "nodeSelector": JOBS_NODE_POOL,
             "executor_memory": "2048m",
+            "ENV_CATEGORY": CATEGORY,
             "env": {
                 "GE_CONFIG_DIR": f"{BASE}/data_validation/config",
                 "PROJECT": GOOGLE_CLOUD_PROJECT,
@@ -94,7 +95,6 @@ with DAG(
             },
         },
         envs={
-            "ENV_CATEGORY": CATEGORY,
             "ENV_URI": "{{ dag_run.conf.uri }}",
         },
     )
