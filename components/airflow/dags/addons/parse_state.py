@@ -30,6 +30,6 @@ SparkApplication = KubeApiConfiguration.register_kind(
 )
 
 
-class KubernetesJobOperator(_KubernetesJobOperator):
+class KJO(_KubernetesJobOperator):
     template_fields = list(_KubernetesJobOperator.template_fields)
     template_fields.append("jinja_job_args")
