@@ -65,22 +65,21 @@ spec:
       {% endif %}
     {% endfor %}
     {% endif %}
+
     {% set conf = {} %}
-    {% if dag_run.conf is defined %}
-      {% do conf.update(dag_run.conf) %}
-    {% endif %}
+    {% for key, value in dag_run.conf.items() %}
+        {% do conf.update({key: value}) %}
+    {% endfor %}
+    {% for key, value in job.env.items() %}
+        {% do conf.update({key: value}) %}
+    {% endfor %}
 
-    {% if job.env is defined %}
-        {% do conf.update(job.env) %}
-    {% endif %}
+    env:
+    {% for key, value in conf.items() %}
+    - name: {{ key }}
+      value: {{ value }}
+    {% endfor %}
 
-    {% if conf %}
-        env:
-        {% for key, value in conf.items() %}
-            - name: {{ key }}
-              value: {{ value }}
-        {% endfor %}
-    {% endif %}
 
     labels:
       version: 3.1.2
