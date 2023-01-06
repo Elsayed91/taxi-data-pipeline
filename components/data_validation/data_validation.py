@@ -14,8 +14,8 @@ It also builds the data docs folder in the data_docs_sites
 from pyspark.sql import SparkSession
 from great_expectations.data_context.types.base import DataContextConfig
 from great_expectations.data_context import BaseDataContext
-from helpers import *
-
+from components.data_validation.dv_helpers import *
+from components.data_validation.dv_helpers import ConfigLoader
 
 # Constants for configuration file paths
 CONFIG_DIR = os.getenv("GE_CONFIG_DIR")

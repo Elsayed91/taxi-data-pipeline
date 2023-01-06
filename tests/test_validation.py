@@ -2,7 +2,7 @@ import os
 import yaml
 import pytest
 
-from components.great_expectations.helpers import ConfigLoader, retrieve_nested_value
+from components.data_validation.dv_helpers import ConfigLoader, retrieve_nested_value
 
 
 @pytest.fixture

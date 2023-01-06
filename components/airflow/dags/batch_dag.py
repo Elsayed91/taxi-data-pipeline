@@ -82,11 +82,20 @@ with DAG(
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
             "mainApplicationFile": f"local://{BASE}/spark/scripts/data_validation.py",
             "name": "great-expectations",
-            "instances": 2,
+            "instances": 4,
             "gitsync": True,
             "nodeSelector": JOBS_NODE_POOL,
             "executor_memory": "2048m",
             "env": {},
         },
+        envs={
+            "VALIDATION_THRESHOLD": "0.1",
+            "CONFIG_DIR": f"{BASE}/data_validation/config",
+            "PROJECT": GOOGLE_CLOUD_PROJECT,
+            "STAGING_BUCKET": STAGING_BUCKET,
+            "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
+            "CATEGORY": "{{ dag_run.conf.category }}",
+            "URI": "{{ dag_run.conf.uri }}",
+        },
     )
-    t1
+    t1 >> t2  # type: ignore
