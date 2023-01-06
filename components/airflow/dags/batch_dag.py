@@ -2,11 +2,12 @@ import os
 
 import pendulum
 from airflow import DAG
-from airflow_kubernetes_job_operator.kubernetes_job_operator import (
-    KubernetesJobOperator,
-)
+
+# from airflow_kubernetes_job_operator.kubernetes_job_operator import (
+#     KubernetesJobOperator,
+# )
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
-from addons.parse_state import SparkApplication
+from addons.parse_state import SparkApplication, KubernetesJobOperator
 
 KubeResourceKind.register_global_kind(SparkApplication)
 

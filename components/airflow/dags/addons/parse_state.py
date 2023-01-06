@@ -2,6 +2,9 @@ from airflow_kubernetes_job_operator.kube_api import (
     KubeResourceState,
     KubeApiConfiguration,
 )
+from airflow_kubernetes_job_operator.kubernetes_job_operator import (
+    KubernetesJobOperator as _KubernetesJobOperator,
+)
 
 
 def parse_spark_application(body) -> KubeResourceState:
@@ -25,3 +28,8 @@ SparkApplication = KubeApiConfiguration.register_kind(
     api_version="sparkoperator.k8s.io/v1beta2",
     parse_kind_state=parse_spark_application,
 )
+
+
+class KubernetesJobOperator(_KubernetesJobOperator):
+    template_fields = list(_KubernetesJobOperator.template_fields)
+    template_fields.append("jinja_job_args")
