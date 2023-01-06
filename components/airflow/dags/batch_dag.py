@@ -11,9 +11,6 @@ from parse_state import SparkApplication
 
 KubeResourceKind.register_global_kind(SparkApplication)
 
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
 
 default_args = {
     "owner": "airflow",
