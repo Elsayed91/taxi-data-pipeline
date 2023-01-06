@@ -105,19 +105,18 @@ fi
 job=$(echo "$job" | sed -n 's/.*name://p' | sed -e 's/^[[:space:]]*//' -e \
     's/[[:space:]]*$//')
 
-printf "job created with id %s\n" "$job"
+printf "job created with id %s\n" "$job."
 # Wait for job to finish
 
-set -e
 while true; do
     STATUS=$(gcloud transfer operations list --job-names="${job}" \
         --format="value(metadata.status)")
     printf "current job status: %s\n" "$STATUS"
     if [[ -n "${STATUS}" && "${STATUS}" = "SUCCESS" ]]; then
-        printf "Breaking loop because status is SUCCESS\n"
+        printf "Breaking loop because status is SUCCESS\n."
         break
     else
-        printf "Sleeping for 5 seconds\n"
+        printf "Sleeping for 5 seconds\n."
         sleep 5
     fi
 done

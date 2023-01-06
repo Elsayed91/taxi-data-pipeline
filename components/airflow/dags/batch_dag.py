@@ -7,7 +7,7 @@ from airflow_kubernetes_job_operator.kubernetes_job_operator import (
     KubernetesJobOperator,
 )
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
-from parse_state import SparkApplication
+from components.airflow.dags.addons.parse_state import SparkApplication
 
 KubeResourceKind.register_global_kind(SparkApplication)
 
@@ -56,7 +56,7 @@ with DAG(
             f"gs://{STAGING_BUCKET}/{{{{ dag_run.conf.category }}}}",
             "--creds-file",
             "/etc/aws/aws_creds.json",
-            # "--check-exists",
+            "--check-exists",
         ],
         jinja_job_args={
             "image": "google/cloud-sdk:alpine",
@@ -74,4 +74,19 @@ with DAG(
         },
     )
 
+    t2 = KubernetesJobOperator(
+        task_id="data_validation",
+        body_filepath=f"{TEMPLATES_PATH}/spark_pod_template.yaml",
+        jinja_job_args={
+            "project": GOOGLE_CLOUD_PROJECT,
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
+            "mainApplicationFile": f"local://{BASE}/spark/scripts/data_validation.py",
+            "name": "great-expectations",
+            "instances": 2,
+            "gitsync": True,
+            "nodeSelector": JOBS_NODE_POOL,
+            "executor_memory": "2048m",
+            "env": {},
+        },
+    )
     t1

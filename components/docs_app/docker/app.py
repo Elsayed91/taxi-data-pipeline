@@ -4,7 +4,7 @@ The app has four routes, /dbt, /elementary, /ge, and a default error handler rou
 Any number of static docs can be served through this app by simply including one more load_index and route.
 """
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory, send_file
 import logging
 from typing import Union
 import gcsfs
@@ -48,6 +48,11 @@ def elementary():
 @app.route("/ge")
 def ge():
     return load_index(DOCS_BUCKET, "great_expectations/docs/index.html")
+
+
+@app.route("/ge/static/<path:filename>")
+def serve_static(filename):
+    return load_index(DOCS_BUCKET, f"great_expectations/docs/{filename}")
 
 
 @app.errorhandler(500)

@@ -1,4 +1,4 @@
-from components.airflow.dags.parse_state import parse_spark_application
+from components.airflow.dags.addons.parse_state import parse_spark_application
 from components.lambdafn.main import extract_target_date
 from components.airflow.dags.lambda_integration import get_conf
 from datetime import datetime

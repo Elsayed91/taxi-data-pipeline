@@ -7,7 +7,7 @@ from airflow_kubernetes_job_operator.kubernetes_job_operator import (
     KubernetesJobOperator,
 )
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
-from parse_state import SparkApplication
+from components.airflow.dags.addons.parse_state import SparkApplication
 
 KubeResourceKind.register_global_kind(SparkApplication)
 
@@ -159,4 +159,4 @@ with DAG(
         name_prefix="",
     )
 
-    t1 >> t2 >> t3
+    t1 >> t2 >> t3  # type: ignore

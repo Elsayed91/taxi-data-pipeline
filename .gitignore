@@ -51,3 +51,4 @@ tests/integration/lambda/terraform.tfstate.backup
 tests/integration/lambda/files
 myschema.json
 t.sh
+components/great_expectations/__pycache__

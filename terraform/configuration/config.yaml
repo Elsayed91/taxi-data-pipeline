@@ -69,10 +69,10 @@ GCP:
     - bucket_name: "${CODE_BUCKET}"
     - bucket_name: "${DOCS_BUCKET}"
     - bucket_name: "${MLFLOW_BUCKET}"
-  files: []
-    # - content_path: "../../components/great_expectations/expectations/"
-    #   hash_strategy: "folder"
-    #   gsutil_command: "gsutil -m rsync -r ./../components/great_expectations/expectations gs://${DOCS_BUCKET}/great_expectations/expectations/"
+  files:
+    - content_path: "../../components/great_expectations/expectations/"
+      hash_strategy: "folder"
+      gsutil_command: "gsutil -m rsync -r ./../components/great_expectations/expectations gs://${DOCS_BUCKET}/great_expectations/expectations/"
 ########################################
   clusters:
     - name: "${GKE_CLUSTER_NAME}"
