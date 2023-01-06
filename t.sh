@@ -1,14 +1,11 @@
 #!/bin/bash
 
 source="s3://nyc-tlc/trip data/"
-
+source2="s3://nyc-tlc/trip data/yellow_tripdata_2022-10.parquet"
 # Extract the part of the s3_source link after the last slash
-file_part=${source##*/}
-echo $file_part
-source=${source%*}
+
+source=${source%/*}
 echo $source
-if [[ -z "$file_part" ]]; then
-    filename="*"
-else
-    filename=$file_part
-fi
+
+source2=${source2%/*}/
+echo $source2

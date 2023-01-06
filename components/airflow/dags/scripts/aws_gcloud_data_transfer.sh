@@ -51,11 +51,11 @@ file_part=${source##*/}
 
 if [[ -z "$file_part" ]]; then
     # Filename is empty, so set source and filename to *
-    source=${source%*}
+    source=${source%/*}/
     filename="*"
 else
     # Filename is not empty, so set source and include_prefixes
-    source=${source%*}
+    source=${source%/*}/
     filename=$file_part
     include_prefixes="$filename"
 
@@ -94,4 +94,6 @@ if [[ "$job" =~ transferJobs/[0-9]+ ]]; then #prevents loops due to sed interfer
         fi
         sleep 10
     done
+else
+    echo "Error: $job does not match regex transferJobs/<numbers>"
 fi
