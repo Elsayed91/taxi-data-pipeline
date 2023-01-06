@@ -108,6 +108,7 @@ job=$(echo "$job" | sed -n 's/.*name://p' | sed -e 's/^[[:space:]]*//' -e \
 printf "job created with id %s\n" "$job"
 # Wait for job to finish
 
+set -ex
 STATUS=
 while [[ "${STATUS}" != "SUCCESS" ]]; do
     STATUS=$(gcloud transfer operations list --job-names="${job}" \
