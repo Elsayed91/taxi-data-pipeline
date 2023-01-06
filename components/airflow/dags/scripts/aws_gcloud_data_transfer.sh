@@ -3,6 +3,7 @@
 # It accepts the following arguments:
 # source-bucket, target-bucket, project, creds-file, include-prefixes, exclude-prefixes, and check-exists.
 # It has an option to check if the files already exist before transferring them.
+set -e
 
 while [[ $# -gt 0 ]]; do
     key="$1"
@@ -44,14 +45,20 @@ done
 
 if [[ -z "$project" ]]; then
     project=$(gcloud config get-value project)
+    echo $project
 fi
 
 file_part=${source##*/}
 
 if [[ -z "$file_part" ]]; then
+    # Filename is empty, so set source and filename to *
+    source=${source%*}
     filename="*"
 else
+    # Filename is not empty, so set source and include_prefixes
+    source=${source%*}
     filename=$file_part
+    include_prefixes="$filename"
 fi
 
 if [[ "${check_exists}" == true ]]; then
