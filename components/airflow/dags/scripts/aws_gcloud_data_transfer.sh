@@ -36,6 +36,10 @@ while [[ $# -gt 0 ]]; do
         check_exists=true
         shift
         ;;
+    --fail-if-exists)
+        fail_if_exists=true
+        shift
+        ;;
     *)
         echo "Unrecognized option: $1" >&2
         exit 1
@@ -61,9 +65,6 @@ else
 
 fi
 
-echo $source
-echo $filename
-
 if [[ "${check_exists}" == true ]]; then
     file_path="${destination}/${filename}"
     result=$(gsutil -q stat $file_path || echo 1)
@@ -71,7 +72,11 @@ if [[ "${check_exists}" == true ]]; then
         echo "File does not exist. Continuing with script."
     else
         echo "File already exists. Exiting script."
-        exit 0
+        if [[ "${fail_if_exists}" == true ]]; then
+            exit 1
+        else
+            exit 0
+        fi
     fi
 fi
 
@@ -82,18 +87,21 @@ job=$(gcloud transfer jobs create \
     ${include_prefixes:+"--include-prefixes=${include_prefixes[@]}"} \
     ${exclude_prefixes:+"--exclude-prefixes=${exclude_prefixes[@]}"} |
     sed -n 's/.*name://p' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+
 echo -n "job created with id $job"
 
 if [[ "$job" =~ transferJobs/[0-9]+ ]]; then #prevents loops due to sed interferring with error
-    # Wait for job to finish
-    while true; do
-        STATUS=$(gcloud transfer operations list --job-names=${job} --format="value(metadata.status)" | grep .)
-        echo -n "current job status: $STATUS"
-        if [[ -n ${STATUS} && ${STATUS} = "SUCCESS" ]]; then
-            break
-        fi
-        sleep 10
-    done
+    continue
 else
     echo "Error: $job does not match regex transferJobs/<numbers>"
+    exit 1
 fi
+
+while true; do
+    STATUS=$(gcloud transfer operations list --job-names=${job} --format="value(metadata.status)" | grep .)
+    echo -n "current job status: $STATUS"
+    if [[ -n ${STATUS} && ${STATUS} = "SUCCESS" ]]; then
+        break
+    fi
+    sleep 10
+done
