@@ -69,13 +69,13 @@ spec:
     env:
     {% for key, value in job.env.items() %}
     - name: {{ key }}
-      value: "{{ value }}"
+      value: {{ value }}
     {% endfor %}
     {% endif %}
     {% for key, value in job.items() %}
     {% if key.startswith('ENV_') %}
     - name: {{ key[4:] }}
-      value: "{{ value }}"
+      value: {{ value }}
     {% endif %}
     {% endfor %}
     labels:
