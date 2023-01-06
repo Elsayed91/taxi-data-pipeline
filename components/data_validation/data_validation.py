@@ -22,7 +22,8 @@ GE_CONFIG_PATH = f"{CONFIG_DIR}/great_expectations.yaml"
 CP_CONFIG_PATH = f"{CONFIG_DIR}/checkpoint.yaml"
 
 # Constants for validation threshold and validation error message
-VALIDATION_THRESHOLD = float(os.getenv("VALIDATION_THRESHOLD"))  # type: ignore
+THRESHOLD_PERCENTAGE = os.getenv("VALIDATION_THRESHOLD")
+VALIDATION_THRESHOLD = float(THRESHOLD_PERCENTAGE.replace("%", "")) / 100  # type: ignore
 VALIDATION_ERROR_MSG = "Validation failed: success percentage below threshold"
 
 

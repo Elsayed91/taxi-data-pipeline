@@ -90,12 +90,10 @@ with DAG(
                 "PROJECT": GOOGLE_CLOUD_PROJECT,
                 "STAGING_BUCKET": STAGING_BUCKET,
                 "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
+                "VALIDATION_THRESHOLD": "10%",
+                "ENV_CATEGORY": "{{ dag_run.conf.category }}",
+                "ENV_URI": "{{ dag_run.conf.uri }}",
             },
-        },
-        envs={
-            "CATEGORY": "{{ dag_run.conf.category }}",
-            "URI": "{{ dag_run.conf.uri }}",
-            "VALIDATION_THRESHOLD": "0.1",
         },
     )
     t2  # type: ignore

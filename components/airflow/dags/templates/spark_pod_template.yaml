@@ -69,9 +69,15 @@ spec:
     env:
     {% for key, value in job.env.items() %}
     - name: {{ key }}
-      value: {{ value }}
+      value: "{{ value | string }}"
     {% endfor %}
     {% endif %}
+    {% for key, value in params.items() %}
+    {% if key.startswith('ENV_') %}
+    - name: {{ key[4:] }}
+      value: "{{ value | string }}"
+    {% endif %}
+    {% endfor %}
     labels:
       version: 3.1.2
       metrics-exposed: "true"
