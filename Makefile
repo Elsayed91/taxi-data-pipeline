@@ -20,7 +20,7 @@ r:
 	@kubectl delete -f ${arg} && cat ${arg} | envsubst | kubectl apply -f -
 
 gitex:
-	@bash -c 'source scripts/functions.sh; gitpush; kill_failed; sleep 6; kubectl exec -t $$(kubectl get pods -o name | grep airflow) -c scheduler -- airflow dags trigger full-refresh'
+	@bash -c 'source scripts/functions.sh; gitpush; kill_failed; sleep 6'
 
 k:
 	@bash x.sh

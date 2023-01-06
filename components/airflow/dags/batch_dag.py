@@ -44,34 +44,34 @@ with DAG(
     JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
 
-    t1 = KubernetesJobOperator(
-        task_id="aws_to_gcs",
-        body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
-        command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
-        arguments=[
-            "--data-source",
-            "{{ dag_run.conf.uri }}",
-            "--destination",
-            f"gs://{STAGING_BUCKET}/{{{{ dag_run.conf.category }}}}",
-            "--creds-file",
-            "/etc/aws/aws_creds.json",
-            "--check-exists",
-        ],
-        jinja_job_args={
-            "image": "google/cloud-sdk:alpine",
-            "name": "aws-to-gcs",
-            "gitsync": True,
-            "nodeSelector": BASE_NODE_POOL,
-            "volumes": [
-                {
-                    "name": "aws-creds",
-                    "type": "secret",
-                    "reference": "aws-creds",
-                    "mountPath": "/etc/aws",
-                }
-            ],
-        },
-    )
+    # t1 = KubernetesJobOperator(
+    #     task_id="aws_to_gcs",
+    #     body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
+    #     command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
+    #     arguments=[
+    #         "--data-source",
+    #         "{{ dag_run.conf.uri }}",
+    #         "--destination",
+    #         f"gs://{STAGING_BUCKET}/{{{{ dag_run.conf.category }}}}",
+    #         "--creds-file",
+    #         "/etc/aws/aws_creds.json",
+    #         "--check-exists",
+    #     ],
+    #     jinja_job_args={
+    #         "image": "google/cloud-sdk:alpine",
+    #         "name": "aws-to-gcs",
+    #         "gitsync": True,
+    #         "nodeSelector": BASE_NODE_POOL,
+    #         "volumes": [
+    #             {
+    #                 "name": "aws-creds",
+    #                 "type": "secret",
+    #                 "reference": "aws-creds",
+    #                 "mountPath": "/etc/aws",
+    #             }
+    #         ],
+    #     },
+    # )
 
     t2 = KubernetesJobOperator(
         task_id="data_validation",
@@ -79,7 +79,7 @@ with DAG(
         jinja_job_args={
             "project": GOOGLE_CLOUD_PROJECT,
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-            "mainApplicationFile": f"local://{BASE}/spark/scripts/data_validation.py",
+            "mainApplicationFile": f"local://{BASE}/data_validation/data_validation.py",
             "name": "great-expectations",
             "instances": 4,
             "gitsync": True,
@@ -97,4 +97,4 @@ with DAG(
             "URI": "{{ dag_run.conf.uri }}",
         },
     )
-    t1 >> t2  # type: ignore
+    t2  # type: ignore
