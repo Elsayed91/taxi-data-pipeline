@@ -93,9 +93,9 @@ with DAG(
                 "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
             },
         },
-        envs={
-            "CATEGORY": "{{ dag_run.conf.category }}",
-            "URI": "{{ dag_run.conf.uri }}",
-        },
+        # envs={
+        #     "CATEGORY": "{{ dag_run.conf.category }}",
+        #     "URI": "{{ dag_run.conf.uri }}",
+        # },
     )
     t2  # type: ignore
