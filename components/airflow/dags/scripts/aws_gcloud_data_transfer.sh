@@ -111,8 +111,11 @@ printf "job created with id %s\n" "$job"
 STATUS=
 while [[ "${STATUS}" != "SUCCESS" ]]; do
     STATUS=$(gcloud transfer operations list --job-names="${job}" \
-        --format="value(metadata.status)") ||
-        printf "current job status: %s\n" "$STATUS"
+        --format="value(metadata.status)") || {
+        printf "Error running gcloud command: exit status $?\n"
+        exit 1
+    }
+    printf "current job status: %s\n" "$STATUS"
     # If job is "SUCCESS", break loop
     if [[ "${STATUS}" = "SUCCESS" ]]; then
         printf "Breaking loop because status is SUCCESS\n"
