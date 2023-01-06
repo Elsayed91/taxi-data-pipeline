@@ -65,7 +65,7 @@ spec:
       {% endif %}
     {% set conf = {} %}
     {% if dag_run.conf is defined %}
-      {% do conf.update(dag_run.conf}) %}
+      {% do conf.update(dag_run.conf) %}
     {% endfor %}
 
     {% if job.env is defined %}
