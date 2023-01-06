@@ -88,7 +88,7 @@ with DAG(
             "ENV_CATEGORY": "{{ dag_run.conf.category }}",
             "ENV_URI": "{{ dag_run.conf.uri }}",
             "env": {
-                "CONFIG_DIR": f"{BASE}/data_validation/config",
+                "GE_CONFIG_DIR": f"{BASE}/data_validation/config",
                 "PROJECT": GOOGLE_CLOUD_PROJECT,
                 "STAGING_BUCKET": STAGING_BUCKET,
                 "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
