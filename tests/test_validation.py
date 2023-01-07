@@ -70,11 +70,6 @@ def test_retrieve_nested_value():
     mapping = {
         "key1": "value1",
         "key2": {"key3": "value3", "key4": "value4"},
-        "key5": [{"key6": "value6"}, {"key7": "value7"}],
-        "key8": [
-            [{"key9": "value9"}],
-            [{"key10": {"key12": "value12"}, "key11": "value11"}],
-        ],
     }
 
     # Test retrieval of top-level key
@@ -82,8 +77,3 @@ def test_retrieve_nested_value():
 
     # Test retrieval of nested key
     assert list(retrieve_nested_value(mapping, "key3")) == ["value3"]
-
-    # Test retrieval of key in list of mappings
-    assert list(retrieve_nested_value(mapping, "key6")) == ["value6"]
-    assert list(retrieve_nested_value(mapping, "key9")) == ["value9"]
-    assert list(retrieve_nested_value(mapping, "key12")) == ["value12"]

@@ -1,0 +1,33 @@
+{
+    "data_asset_type": null,
+    "expectation_suite_name": "yellow_expectations",
+    "expectations": [
+        {
+            "expectation_type": "expect_table_columns_to_match_ordered_list",
+            "kwargs": {
+                "column_list": [
+                    "VendorID",
+                    "tpep_pickup_datetime",
+                    "tpep_dropoff_datetime",
+                    "passenger_count",
+                    "trip_distance",
+                    "RatecodeID",
+                    "store_and_fwd_flag",
+                    "PULocationID",
+                    "DOLocationID",
+                    "payment_type",
+                    "fare_amount",
+                    "extra",
+                    "mta_tax",
+                    "tip_amount",
+                    "tolls_amount",
+                    "improvement_surcharge",
+                    "total_amount",
+                    "congestion_surcharge",
+                    "airport_fee"
+                ]
+            },
+            "meta": {}
+        }
+    ]
+}

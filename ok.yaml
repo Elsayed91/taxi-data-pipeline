@@ -1,58 +1,29 @@
-checkpoint_store_name: checkpoint_GCS_store
-config_version: 3
-data_docs_sites:
-  gs_site:
-    class_name: SiteBuilder
-    show_how_to_buttons: false
-    site_index_builder:
-      class_name: DefaultSiteIndexBuilder
-    store_backend:
-      bucket: docs-bffa103539
-      class_name: TupleGCSStoreBackend
-      prefix: great_expectations/docs
-      project: stellarismus
-datasources:
-  gcs_data:
-    class_name: Datasource
-    data_connectors:
-      default_inferred_data_connector_name:
-        bucket_or_name: raw-8d74c9728b
-        class_name: InferredAssetGCSDataConnector
-        default_regex:
-          pattern: (.*)\.parquet
-        project: stellarismus
-      default_runtime_data_connector_name:
-        batch_identifiers:
-        - default_identifier_name
-        class_name: RuntimeDataConnector
-    execution_engine:
-      class_name: SparkDFExecutionEngine
-      module_name: great_expectations.execution_engine
-    module_name: great_expectations.datasource
-evaluation_parameter_store_name: evaluation_parameter_store
-expectations_store_name: expectations_GCS_store
-stores:
-  checkpoint_GCS_store:
-    class_name: CheckpointStore
-    store_backend:
-      bucket: docs-bffa103539
-      class_name: TupleGCSStoreBackend
-      prefix: great_expectations/checkpoints
-      project: stellarismus
-  evaluation_parameter_store:
-    class_name: EvaluationParameterStore
-  expectations_GCS_store:
-    class_name: ExpectationsStore
-    store_backend:
-      bucket: docs-bffa103539
-      class_name: TupleGCSStoreBackend
-      prefix: great_expectations/expectations
-      project: stellarismus
-  validations_GCS_store:
-    class_name: ValidationsStore
-    store_backend:
-      bucket: docs-bffa103539
-      class_name: TupleGCSStoreBackend
-      prefix: great_expectations/validations
-      project: stellarismus
-validations_store_name: validations_GCS_store
+name: cp
+config_version: 1
+class_name: Checkpoint
+run_name_template: "%Y%m%d-${CATEGORY}"
+validations:
+  - batch_request:
+      datasource_name: NyTaxiData
+      data_connector_name: default_runtime_data_connector_name
+      data_asset_name: ${CATEGORY}
+      batch_identifiers:
+        default_identifier_name: default_identifier
+      runtime_parameters:
+        path: "gs://${STAGING_BUCKET}/${CATEGORY}/${FILENAME}"
+    expectation_suite_name: ${CATEGORY}
+    action_list:
+        - name: store_validation_result
+          action:
+            class_name: StoreValidationResultAction
+        - name: store_evaluation_params
+          action:
+            class_name: StoreEvaluationParametersAction
+        - name: update_data_docs
+          action:
+            class_name: UpdateDataDocsAction
+    # runtime_configuration:
+    #   result_format:
+    #     result_format: COMPLETE
+
+

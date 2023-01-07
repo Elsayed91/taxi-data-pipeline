@@ -34,4 +34,4 @@ lambda_test:
 # aws s3 cp "s3://nyc-tlc/trip data/yellow_tripdata_2022-10.parquet" s3://stella-9af1e2ce16
 
 py:
-	@python components/great_expectations/data_validation.py
+	@python components/data_validation/data_validation.py

@@ -99,14 +99,6 @@ def retrieve_nested_value(mapping: dict[str, Any], key_of_interest: str) -> Any:
         for key, value in items:
             if key == key_of_interest:
                 yield value
-            elif isinstance(value, dict):
-                # append dictionaries to the mappings list
+            else:
+                # type of the value will be checked in the next loop
                 mappings.append(value)
-            elif isinstance(value, list):
-                # check if value is a list of lists
-                if all(isinstance(item, list) for item in value):
-                    # append all items in the inner lists to the mappings list
-                    mappings.extend([item for sublist in value for item in sublist])
-                else:
-                    # value is a normal list, so just append it to the mappings list
-                    mappings.extend(value)
