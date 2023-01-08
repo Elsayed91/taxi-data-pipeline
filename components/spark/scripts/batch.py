@@ -26,22 +26,12 @@ if __name__ == "__main__":
     PART = reformat_date(RUN_DATE, "MONTH")
     create_temptable(spark, URI, MAPPING)
     df_hist = spark.sql(SUMMARY_QUERY)
-    df_hist.write.mode("overwrite").format("bigquery").option(
-        LABEL_KEY, f"etl-hist-{PART}"
-    ).option("datePartition", PART).option(
-        "partitionField", opts["partition_col_hist"]
-    ).option(
-        "partitionType", "MONTH"
-    ).option(
-        "clusteredFields", opts["cf_hist"]
-    )
-
     write_to_bigquery(
         df_hist,
         HIST_TARGET,
         f"hist-{PART}",
         PART,
-        partition_column="first_day_of_month",
+        partition_column=opts["partition_col_hist"],
         clustering=opts["cf_hist"],
     )
     df_clean, df_triage = process_current(spark, FILTERS)
