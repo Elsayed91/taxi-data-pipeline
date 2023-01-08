@@ -163,13 +163,14 @@ def process(
     spark: SparkSession,
     uri: str,
     partition_filter: str,
+    run_date: str,
     **kwargs,
 ):
     df = spark.read.parquet(uri)
     df = cast_columns(df, kwargs["mapping"])
     df = df.filter(
-        f"{kwargs['partition_col']} BETWEEN '{partition_filter}' \
-                AND '{partition_filter}' + INTERVAL 1 MONTH"
+        f"{kwargs['partition_col']} BETWEEN '{run_date}' \
+                AND '{run_date}' + INTERVAL 1 MONTH"
     )
     df.createOrReplaceTempView("temp_table")
     df_hist = spark.sql(kwargs["summary_query"])
