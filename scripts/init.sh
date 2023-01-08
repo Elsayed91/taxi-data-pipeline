@@ -28,7 +28,7 @@ echo "turning on APIs needed for the project"
 API_LIST=(iam iamcredentials compute storagetransfer servicemanagement
     bigqueryconnection bigqueryconnection cloudresourcemanager cloudfunctions
     artifactregistry containerregistry container cloudbuild eventarc dataproc
-    secretmanager cloudresourcemanager)
+    secretmanager cloudresourcemanager bigquery)
 
 for SERVICE in "${API_LIST[@]}"; do
     gcloud services enable ${SERVICE}.googleapis.com --async --project $PROJECT >/dev/null
