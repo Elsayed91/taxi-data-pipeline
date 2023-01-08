@@ -35,11 +35,9 @@ exp_id = exp.experiment_id
 df = load_data(target_dataset, target_table, 40)  # type: ignore
 print(f"df shape is {df.shape}")
 y = df[target_column]
-
 X = df.drop([target_column], axis=1)
-print(f"shape y is {len(X)}")
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.3)
-print("done splitting data")
+
 # param = {
 #     "max_depth": [2, 4, 6],
 #     "n_estimators": [10, 15, 25, 50, 100, 500],
@@ -86,7 +84,7 @@ with mlflow.start_run(experiment_id=exp_id, run_name="XGBoostRegressor", nested=
             mlflow.log_params(params)
 
             # log the R2 score
-            mlflow.log_metric("RMSE", metric)
+            mlflow.log_metric("RMSE", -metric)
 
             # set the rank
             mlflow.set_tag("rank", rank)

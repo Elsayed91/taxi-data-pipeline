@@ -144,7 +144,7 @@ with DAG(
             "MLFLOW_EXPERIMENT_NAME": "taxi-fare-prediction-v3",
             "TARGET_COLUMN": "fare_amount",
             "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET", "mlflow-cacfcc1b69"),
-            "CROSS_VALIDATIONS": "1",
+            "CROSS_VALIDATIONS": "2",
         },
     )
     t4  # type: ignore

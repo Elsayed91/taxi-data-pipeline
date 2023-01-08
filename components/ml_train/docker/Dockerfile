@@ -10,4 +10,5 @@ RUN rm -rf requirements.txt && \
     rm -rf /var/cache/apt/* && \
     rm -rf /root/.cache/pip
 
-ENTRYPOINT ["python]
+
+ENTRYPOINT ["/bin/bash"]
