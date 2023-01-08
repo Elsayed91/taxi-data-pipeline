@@ -130,7 +130,7 @@ with DAG(
     t4 = KubernetesJobOperator(
         task_id="train_model",
         body_filepath=POD_TEMPALTE,
-        command=["/bin/bash", f"sleep infinity"],
+        command=["/bin/bash", "-c", f"sleep infinity"],
         # command=["python", f"{BASE}/ml_train/script/train.py"],
         jinja_job_args={
             "name": "xgb-model-training",
