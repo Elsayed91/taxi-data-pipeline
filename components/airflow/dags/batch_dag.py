@@ -148,7 +148,7 @@ with DAG(
         },
         envs={
             "DBT_PROFILES_DIR": f"{BASE}/dbt/app",
-            "RUN_DATE": "{{ dag_run.conf.run_date }}",
+            "RUN_DATE": "{{ dag_run.conf.RUN_DATE }}",
         },
     )
     t3  # type: ignore
