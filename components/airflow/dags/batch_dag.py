@@ -101,14 +101,6 @@ with DAG(
     #     },
     # )
 
-    HISTORICAL_TARGET = (
-        f"{os.getenv('HISTORICAL_DATASET')}.{os.getenv('HISTORICAL_TABLE')}"
-    )
-    STAGING_TARGET = (
-        f"{os.getenv('STAGING_DATASET')}.{os.getenv('YELLOW_STAGING_TABLE')}"
-    )
-    TRIAGE_TARGET = f"{os.getenv('TRIAGE_DATASET')}.{os.getenv('YELLOW_TRIAGE_TABLE')}"
-
     t3 = KubernetesJobOperator(
         task_id="etl-batch",
         body_filepath=SPARK_POD_TEMPLATE,
@@ -123,9 +115,6 @@ with DAG(
             "executor_memory": "2048m",
             "env": {
                 "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
-                "HISTORICAL_TARGET": HISTORICAL_TARGET,
-                "STAGING_TARGET": STAGING_TARGET,
-                "TRIAGE_TAREGET": TRIAGE_TARGET,
                 "STAGING_BUCKET": STAGING_BUCKET,
             },
         },
