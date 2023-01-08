@@ -20,12 +20,13 @@ if __name__ == "__main__":
     URI = str(os.getenv("URI"))
     _, SRC_BUCKET, _, SRC_FOLDER = uri_parser(URI)
     CATEGORY = str(os.getenv("CATEGORY"))
-    MAPPING = options[CATEGORY]["mapping"]
-    SUMMARY_QUERY = options[CATEGORY]["summary_query"]
-    FILTERS = options[CATEGORY]["filter_conditions"]
-    HIST_TARGET = options[CATEGORY]["historical_table"]
-    STAGING_TARGET = options[CATEGORY]["staging_table"]
-    TRIAGE_TAREGET = options[CATEGORY]["triage_table"]
+    opts = options[CATEGORY]
+    MAPPING = opts["mapping"]
+    SUMMARY_QUERY = opts["summary_query"]
+    FILTERS = opts["filter_conditions"]
+    HIST_TARGET = opts["historical_table"]
+    STAGING_TARGET = opts["staging_table"]
+    TRIAGE_TAREGET = opts["triage_table"]
 
     blobs = get_gcs_files(SRC_BUCKET, SRC_FOLDER, SRC_FOLDER)
     blobs = list_files(blobs)
@@ -33,10 +34,4 @@ if __name__ == "__main__":
     lists = schema_groups(df)
     for l in lists:
         idx = lists.index(l)
-        create_temptable(spark, l, MAPPING)
-        df_hist = spark.sql(SUMMARY_QUERY)
-        write_to_bigquery(df_hist, HIST_TARGET, f"hist-{idx}")
-        create_temptable(spark, l, MAPPING, date_filter=True)
-        df_clean, df_triage = process_current(spark, FILTERS)
-        write_to_bigquery(df_clean, STAGING_TARGET, f"clean-{idx}")
-        write_to_bigquery(df_triage, TRIAGE_TAREGET, f"triage-{idx}")
+        process_initial_load(spark, l, MAPPING, idx, **opts)

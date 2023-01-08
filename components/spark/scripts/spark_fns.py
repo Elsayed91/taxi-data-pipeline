@@ -6,6 +6,7 @@ import pyspark.sql.functions as F
 from pyspark.sql import DataFrame
 from typing import Union
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import to_timestamp, to_date
 
 
 def get_gcs_files(bucket: str, folder: str, file_prefix: str) -> list[bytes]:
@@ -158,78 +159,76 @@ def reformat_date(date_string: str, output_format: str) -> str:
         raise ValueError("Invalid output format")
 
 
-def write_to_bigquery(
-    df: DataFrame,
-    target: str,
-    label_value: str,
-    date_partition: Union[str, None] = None,
-    clustering: Union[str, None] = None,
-    partition_type: str = "MONTH",
-    mode: str = "append",
-    label_key: str = "bigQueryJobLabel.spark",
-    partition_column: str = "tpep_pickup_datetime",
-) -> None:
-    if date_partition is not None and mode is None:
-        mode = "overwrite"
-
-    df_write = (
-        df.write.mode(mode).format("bigquery").option(label_key, f"etl-{label_value}")
+def process(
+    spark: SparkSession,
+    uri: str,
+    mapping: dict[str, str],
+    partition_filter: str,
+    **kwargs,
+):
+    df = spark.read.parquet(uri)
+    df = cast_columns(df, mapping)
+    start_timestamp = to_timestamp(partition_filter + "01", "YYYYMMdd")
+    end_timestamp = start_timestamp + F.expr("INTERVAL 1 MONTH")
+    df = df.filter(
+        F.col(kwargs["partition_col"]).between(start_timestamp, end_timestamp)
     )
-    if date_partition is not None:
-        df_write = (
-            df_write.option("datePartition", date_partition)
-            .option("partitionField", partition_column)
-            .option("partitionType", partition_type)
-        )
-    if clustering is not None:
-        dw_write = df_write.option("clusteredFields", clustering)
-    df_write.save(target)
+    df.createOrReplaceTempView("temp_table")
+    df_hist = spark.sql(kwargs["summary_query"])
+    df_hist.write.mode("overwrite").format("bigquery").option(
+        "datePartition", partition_filter
+    ).option("partitionField", kwargs["partition_col_hist"]).option(
+        "partitionType", "MONTH"
+    ).option(
+        "clusteredFields", kwargs["cf_hist"]
+    ).option(
+        "bigQueryJobLabel.spark", f"hist-{partition_filter}"
+    ).save(
+        kwargs["historical_table"]
+    )
+    df_clean = spark.sql(f"SELECT * FROM temp_table WHERE {kwargs['filters']}")
+    df_triage = spark.sql(f"SELECT * FROM temp_table WHERE NOT ({kwargs['filters']})")
+
+    shared_options = {
+        "datePartition": partition_filter,
+        "partitionField": kwargs["partition_col"],
+        "partitionType": "MONTH",
+        "clusteredFields": kwargs["cf_current"],
+    }
+    df_clean.write.mode("overwrite").format("bigquery").option(**shared_options).option(
+        "bigQueryJobLabel.spark", f"clean-{partition_filter}"
+    ).save(kwargs["historical_table"])
+    df_triage.write.mode("overwrite").format("bigquery").option(
+        **shared_options
+    ).option("bigQueryJobLabel.spark", f"triage-{partition_filter}").save(
+        kwargs["historical_table"]
+    )
 
 
-def create_temptable(
+def process_initial_load(
     spark: SparkSession,
     uri: Union[str, list[str]],
     mapping: dict[str, str],
-    temp_table_name: str = "temp_table",
-    date_filter: bool = False,
-) -> None:
-    if isinstance(uri, str):
-        df = spark.read.parquet(uri)
-    elif isinstance(uri, list):
-        df = spark.read.parquet(*uri)
-    else:
-        raise ValueError("Invalid URI type")
-
-    # Cast the columns to the correct data types
-    df = cast_columns(df, mapping)  # type: ignore
-    if date_filter:
-        df = df.filter(
-            F.col("tpep_pickup_datetime")
-            > F.current_timestamp() - F.expr("INTERVAL 6 MONTH")
-        )
-    # Create the temporary table
-    df.createOrReplaceTempView(temp_table_name)
-
-
-def process_current(
-    spark: SparkSession, filter_conditions: str, temp_table_name: str = "temp_table"
-) -> tuple[DataFrame, DataFrame]:
-    """
-    Process the current data in the given Spark session.
-
-    Parameters:
-    - spark (SparkSession): The Spark session to use for processing the data.
-    - filter_conditions (str): A string representing the filter conditions to apply to the
-    data.
-    - temp_table_name (str, optional): The name of the temporary table to use for
-    processing the data. Defaults to "temp_table".
-
-    Returns: - tuple: A tuple containing two DataFrames: the first contains the cleaned
-    data that meets the filter conditions, and the second contains the triaged data that
-    does not meet the filter conditions.
-    """
-    df_clean = spark.sql(f"SELECT * FROM {temp_table_name} WHERE {filter_conditions}")
-    df_triage = spark.sql(
-        f"SELECT * FROM {temp_table_name} WHERE NOT ({filter_conditions})"
+    idx: int,
+    **kwargs,
+):
+    df = spark.read.parquet(*uri)
+    df = cast_columns(df, mapping)
+    df.createOrReplaceTempView("temp_table")
+    df_hist = spark.sql(kwargs["summary_query"])
+    df_hist.write.mode("append").format("bigquery").option(
+        "bigQueryJobLabel.spark", f"hist-{idx}"
+    ).save(kwargs["historical_table"])
+    df = df.filter(
+        F.col(kwargs["partition_col"])
+        > F.current_timestamp() - F.expr("INTERVAL 6 MONTH")
     )
-    return df_clean, df_triage
+    df.createOrReplaceTempView("temp_table")
+    df_clean = spark.sql(f"SELECT * FROM temp_table WHERE {kwargs['filters']}")
+    df_triage = spark.sql(f"SELECT * FROM temp_table WHERE NOT ({kwargs['filters']})")
+    df_clean.write.mode("append").format("bigquery").option(
+        "bigQueryJobLabel.spark", f"clean-{idx}"
+    ).save(kwargs["staging_table"])
+    df_triage.write.mode("append").format("bigquery").option(
+        "bigQueryJobLabel.spark", f"triage-{idx}"
+    ).save(kwargs["triage_table"])

@@ -68,14 +68,14 @@ yellow_filter_conditions = """
 options = {
     "yellow": {
         "mapping": yellow_schema_mapping,
-        "filter_conditions": yellow_filter_conditions,
+        "filters": yellow_filter_conditions,
         "summary_query": yellow_historical_transformation,
         "historical_table": os.getenv("YELLOW_SUMMARY"),
         "staging_table": os.getenv("YELLOW_STAGING"),
         "triage_table": os.getenv("YELLOW_TRIAGE"),
         "cf_hist": os.getenv("YELLOW_HIST_CLUSTERING_COL"),
         "cf_current": os.getenv("YELLOW_CLUSTERING_COL"),
-        "partition_col_current": os.getenv("YELLOW_PART_COL"),
+        "partition_col": os.getenv("YELLOW_PART_COL"),
         "partition_col_hist": os.getenv("YELLOW_HIST_PART_COL"),
     }
 }

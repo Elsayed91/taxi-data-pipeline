@@ -23,22 +23,6 @@ if __name__ == "__main__":
     STAGING_TARGET = opts["staging_table"]
     TRIAGE_TAREGET = opts["triage_table"]
     RUN_DATE = str(os.getenv("RUN_DATE"))
-    PART = reformat_date(RUN_DATE, "MONTH")
-    create_temptable(spark, URI, MAPPING)
-    df_hist = spark.sql(SUMMARY_QUERY)
-    write_to_bigquery(
-        df_hist,
-        HIST_TARGET,
-        f"hist-{PART}",
-        PART,
-        partition_column=opts["partition_col_hist"],
-        clustering=opts["cf_hist"],
-    )
-    df_clean, df_triage = process_current(spark, FILTERS)
+    PARTITION = reformat_date(RUN_DATE, "MONTH")
 
-    write_to_bigquery(
-        df_clean, STAGING_TARGET, f"c-{PART}", PART, clustering=opts["cf_current"]
-    )
-    write_to_bigquery(
-        df_triage, TRIAGE_TAREGET, f"t-{PART}", PART, clustering=opts["cf_current"]
-    )
+    process(spark, URI, MAPPING, PARTITION, **opts)
