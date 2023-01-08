@@ -167,10 +167,9 @@ def process(
 ):
     df = spark.read.parquet(uri)
     df = cast_columns(df, kwargs["mapping"])
-    start_timestamp = to_timestamp(partition_filter + "01", "YYYYMMdd")
-    end_timestamp = start_timestamp + F.expr("INTERVAL 1 MONTH")
     df = df.filter(
-        F.col(kwargs["partition_col"]).between(start_timestamp, end_timestamp)
+        f"{kwargs['partition_col']} BETWEEN '{partition_filter}' \
+                AND '{partition_filter}' + INTERVAL 1 MONTH"
     )
     df.createOrReplaceTempView("temp_table")
     df_hist = spark.sql(kwargs["summary_query"])
