@@ -117,6 +117,7 @@ with DAG(
                 "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
                 "STAGING_BUCKET": STAGING_BUCKET,
             },
+            "envFrom": [{"type": "configMapRef", "name": "spark-env"}],
         },
     )
     t3  # type: ignore
