@@ -163,10 +163,11 @@ def write_to_bigquery(
     target: str,
     label_value: str,
     date_partition: Union[str, None] = None,
-    partition_column: str = "tpep_pickup_datetime",
+    clustering: Union[str, None] = None,
     partition_type: str = "MONTH",
     mode: str = "append",
     label_key: str = "bigQueryJobLabel.spark",
+    partition_column: str = "tpep_pickup_datetime",
 ) -> None:
     if date_partition is not None and mode is None:
         mode = "overwrite"
@@ -180,6 +181,8 @@ def write_to_bigquery(
             .option("partitionField", partition_column)
             .option("partitionType", partition_type)
         )
+    if clustering is not None:
+        dw_write = df_write.option("clusteredFields", clustering)
     df_write.save(target)
 
 
@@ -208,8 +211,23 @@ def create_temptable(
     df.createOrReplaceTempView(temp_table_name)
 
 
-def process_current(spark, filter_conditions, temp_table_name: str = "temp_table"):
+def process_current(
+    spark: SparkSession, filter_conditions: str, temp_table_name: str = "temp_table"
+) -> tuple[DataFrame, DataFrame]:
+    """
+    Process the current data in the given Spark session.
 
+    Parameters:
+    - spark (SparkSession): The Spark session to use for processing the data.
+    - filter_conditions (str): A string representing the filter conditions to apply to the
+    data.
+    - temp_table_name (str, optional): The name of the temporary table to use for
+    processing the data. Defaults to "temp_table".
+
+    Returns: - tuple: A tuple containing two DataFrames: the first contains the cleaned
+    data that meets the filter conditions, and the second contains the triaged data that
+    does not meet the filter conditions.
+    """
     df_clean = spark.sql(f"SELECT * FROM {temp_table_name} WHERE {filter_conditions}")
     df_triage = spark.sql(
         f"SELECT * FROM {temp_table_name} WHERE NOT ({filter_conditions})"
