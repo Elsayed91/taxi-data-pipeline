@@ -136,7 +136,6 @@ with DAG(
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/ml_train",
             "gitsync": True,
             "nodeSelector": JOBS_NODE_POOL,
-            "imagePullPolicy": "IfNotPresent",
         },
         envs={
             "TARGET_DATASET": os.getenv("ML_DATASET"),
