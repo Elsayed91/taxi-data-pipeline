@@ -140,7 +140,7 @@ with DAG(
         },
         envs={
             "TARGET_DATASET": os.getenv("ML_DATASET"),
-            "TARGET_TABLE": "ml_yellow_fare_sample",
+            "TARGET_TABLE": "dbt__ml__yellow_fare",
             "TRACKING_SERVICE": "mlflow-service",
             "MLFLOW_EXPERIMENT_NAME": "taxi-fare-prediction-v3",
             "TARGET_COLUMN": "fare_amount",
