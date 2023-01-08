@@ -166,6 +166,8 @@ def write_to_bigquery(
     mode: str = "append",
     label_key: str = "bigQueryJobLabel.spark",
 ) -> None:
+    if date_partition is not None and mode is None:
+        mode = "overwrite"
 
     df_write = (
         df.write.mode(mode).format("bigquery").option(label_key, f"etl-{label_value}")
@@ -182,15 +184,6 @@ def create_temptable(
     temp_table_name: str = "temp_table",
     date_filter: bool = False,
 ) -> None:
-    """Create a temporary table from data stored in a parquet file.
-
-    Args:
-        spark: A SparkSession object.
-        uri: The URI(s) of the parquet file(s) to read from.
-
-    Returns:
-        None
-    """
     if isinstance(uri, str):
         df = spark.read.parquet(uri)
     elif isinstance(uri, list):

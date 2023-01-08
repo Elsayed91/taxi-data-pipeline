@@ -21,7 +21,7 @@ if __name__ == "__main__":
     _, SRC_BUCKET, _, SRC_FOLDER = uri_parser(URI)
     CATEGORY = str(os.getenv("CATEGORY"))
     MAPPING = options[CATEGORY]["mapping"]
-    TRANSFORMATION_QUERY = options[CATEGORY]["transformation_query"]
+    SUMMARY_QUERY = options[CATEGORY]["summary_query"]
     FILTERS = options[CATEGORY]["filter_conditions"]
     HIST_TARGET = str(os.getenv("HISTORICAL_TARGET"))
     STAGING_TARGET = str(os.getenv("STAGING_TARGET"))
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     for l in lists:
         idx = lists.index(l)
         create_temptable(spark, l, MAPPING)
-        df_hist = spark.sql(TRANSFORMATION_QUERY)
+        df_hist = spark.sql(SUMMARY_QUERY)
         write_to_bigquery(df_hist, HIST_TARGET, f"hist-{idx}")
         create_temptable(spark, l, MAPPING, date_filter=True)
         df_clean, df_triage = process_current(spark, FILTERS)
