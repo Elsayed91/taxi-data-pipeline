@@ -33,7 +33,7 @@ model_name = "xgboost-fare-predictor"
 exp = mlflow.set_experiment(mlflow_experiment_name)
 exp_id = exp.experiment_id
 print(exp_id)
-df = load_data(target_dataset, target_table, 50)  # type: ignore
+df = load_data(target_dataset, target_table, 1)  # type: ignore
 print("splitting data")
 y = df[target_column]
 X = df.drop([target_column], axis=1)

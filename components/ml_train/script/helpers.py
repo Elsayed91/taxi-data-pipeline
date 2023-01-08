@@ -14,5 +14,5 @@ def load_data(
 
     query = f"SELECT * FROM `{dataset}`.`{table}` \
             TABLESAMPLE SYSTEM ({sample_size} PERCENT)"
-    df = pd.read_gbq(query)
+    df = pd.read_gbq(query, progress_bar_type="tqdm")
     return df
