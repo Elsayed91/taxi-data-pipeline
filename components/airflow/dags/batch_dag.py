@@ -113,9 +113,9 @@ with DAG(
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
             "mainApplicationFile": f"local://{BASE}/spark/scripts/main_batch.py",
             "name": "spark-k8s",
-            "instances": 4,
+            "instances": 5,
             "gitsync": True,
-            "nodeSelector": "base",
+            "nodeSelector": JOBS_NODE_POOL,
             "executor_memory": "2048m",
             "env": {
                 "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
