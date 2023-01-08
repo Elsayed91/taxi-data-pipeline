@@ -163,7 +163,6 @@ def process(
     spark: SparkSession,
     uri: str,
     partition_filter: str,
-    run_date: str,
     **kwargs,
 ):
     df = spark.read.parquet(uri)
