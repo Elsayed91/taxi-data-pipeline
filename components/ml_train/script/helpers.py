@@ -12,7 +12,7 @@ def load_data(
     a big query table using pandas read_gbq. returns a pandas DataFrame.
     """
 
-    query = f"SELECT * EXCEPT(data_timestamp) FROM `{dataset}`.`{table}` \
+    query = f"SELECT * FROM `{dataset}`.`{table}` \
             TABLESAMPLE SYSTEM ({sample_size} PERCENT)"
     df = pd.read_gbq(query)
     return df
