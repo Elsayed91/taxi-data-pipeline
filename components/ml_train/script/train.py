@@ -8,7 +8,6 @@ from sklearn.model_selection import GridSearchCV
 import mlflow
 import os
 from helpers import *
-
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -32,26 +31,22 @@ model_name = "xgboost-fare-predictor"
 
 exp = mlflow.set_experiment(mlflow_experiment_name)
 exp_id = exp.experiment_id
-df = load_data(target_dataset, target_table, 18)  # type: ignore
+df = load_data(target_dataset, target_table, 15)  # type: ignore
 print(f"df shape is {df.shape}")
 y = df[target_column]
 X = df.drop([target_column], axis=1)
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.3)
 
-# param = {
-#     "max_depth": [2, 4, 6],
-#     "n_estimators": [10, 15, 25, 50, 100, 500],
-#     "colsample_bytree": [0.2, 0.6, 0.8],
-#     "min_child_weight": [3, 5, 7],
-#     "gamma": [0.3, 0.5, 0.7],
-#     "subsample": [0.4, 0.6, 0.8],
-#     "loss": ["ls", "lad"],
-# }
-
 param = {
-    "max_depth": [2, 4],
-    "n_estimators": [10, 15],
+    "max_depth": [2, 4, 6],
+    "n_estimators": [15, 25, 100, 500],
+    "colsample_bytree": [0.2, 0.6, 0.8],
+    "min_child_weight": [3, 5, 7],
+    "gamma": [0.3, 0.5, 0.7],
+    "subsample": [0.4, 0.6, 0.8],
+    "loss": ["ls", "lad"],
 }
+
 
 print("using grid search")
 grid_search = GridSearchCV(
@@ -84,7 +79,7 @@ with mlflow.start_run(experiment_id=exp_id, run_name="XGBoostRegressor", nested=
             mlflow.log_params(params)
 
             # log the R2 score
-            mlflow.log_metric("RMSE", -metric)
+            mlflow.log_metric("RMSE", np.sqrt(-metric))
 
             # set the rank
             mlflow.set_tag("rank", rank)
