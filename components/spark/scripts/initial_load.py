@@ -21,12 +21,6 @@ if __name__ == "__main__":
     _, SRC_BUCKET, _, SRC_FOLDER = uri_parser(URI)
     CATEGORY = str(os.getenv("CATEGORY"))
     opts = options[CATEGORY]
-    MAPPING = opts["mapping"]
-    SUMMARY_QUERY = opts["summary_query"]
-    FILTERS = opts["filter_conditions"]
-    HIST_TARGET = opts["historical_table"]
-    STAGING_TARGET = opts["staging_table"]
-    TRIAGE_TAREGET = opts["triage_table"]
 
     blobs = get_gcs_files(SRC_BUCKET, SRC_FOLDER, SRC_FOLDER)
     blobs = list_files(blobs)
@@ -34,4 +28,4 @@ if __name__ == "__main__":
     lists = schema_groups(df)
     for l in lists:
         idx = lists.index(l)
-        process_initial_load(spark, l, MAPPING, idx, **opts)
+        process_initial_load(spark, l, idx, **opts)

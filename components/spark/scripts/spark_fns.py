@@ -208,12 +208,11 @@ def process(
 def process_initial_load(
     spark: SparkSession,
     uri: Union[str, list[str]],
-    mapping: dict[str, str],
     idx: int,
     **kwargs,
 ):
     df = spark.read.parquet(*uri)
-    df = cast_columns(df, mapping)
+    df = cast_columns(df, kwargs["mapping"])
     df.createOrReplaceTempView("temp_table")
     df_hist = spark.sql(kwargs["summary_query"])
     df_hist.write.mode("append").format("bigquery").option(
