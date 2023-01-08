@@ -58,7 +58,7 @@ print("using grid search")
 grid_search = GridSearchCV(
     estimator=XGBRegressor(),
     param_grid=param,
-    scoring="rmse",
+    scoring="neg_mean_squared_error",
     cv=cross_validations,
     n_jobs=-1,
 )
