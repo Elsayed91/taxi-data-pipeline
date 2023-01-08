@@ -77,26 +77,26 @@ with DAG(
     #     },
     # )
 
-    t2 = KubernetesJobOperator(
-        task_id="etl",
-        body_filepath=SPARK_POD_TEMPLATE,
-        jinja_job_args={
-            "project": GOOGLE_CLOUD_PROJECT,
-            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-            "mainApplicationFile": f"local://{BASE}/spark/scripts/initial_load.py",
-            "name": "spark-k8s-init",
-            "instances": 5,
-            "gitsync": True,
-            "nodeSelector": JOBS_NODE_POOL,
-            "executor_memory": "2048m",
-            "env": {
-                "CATEGORY": "yellow",
-                "URI": f"gs://{STAGING_BUCKET}/yellow/*",
-                "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
-            },
-            "envFrom": [{"type": "configMapRef", "name": "spark-env"}],
-        },
-    )
+    # t2 = KubernetesJobOperator(
+    #     task_id="etl",
+    #     body_filepath=SPARK_POD_TEMPLATE,
+    #     jinja_job_args={
+    #         "project": GOOGLE_CLOUD_PROJECT,
+    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
+    #         "mainApplicationFile": f"local://{BASE}/spark/scripts/initial_load.py",
+    #         "name": "spark-k8s-init",
+    #         "instances": 7,
+    #         "gitsync": True,
+    #         "nodeSelector": JOBS_NODE_POOL,
+    #         "executor_memory": "2048m",
+    #         "env": {
+    #             "CATEGORY": "yellow",
+    #             "URI": f"gs://{STAGING_BUCKET}/yellow/*",
+    #             "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
+    #         },
+    #         "envFrom": [{"type": "configMapRef", "name": "spark-env"}],
+    #     },
+    # )
 
     t3 = KubernetesJobOperator(
         task_id="dbt",
@@ -107,7 +107,8 @@ with DAG(
             "--seed",
             "--commands",
             "dbt run --full-refresh",
-            "--tests" "--generate-docs",
+            "--tests",
+            "--generate-docs",
         ],
         jinja_job_args={
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
@@ -126,5 +127,5 @@ with DAG(
         envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app", "RUN_DATE": today},
     )
 
-    t2 >> t3  # type: ignore
+    t3  # type: ignore
     # t1 >> t2 >> t3  # type: ignore

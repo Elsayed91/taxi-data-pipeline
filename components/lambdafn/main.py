@@ -115,22 +115,12 @@ def get_cluster_info(
     Returns:
         A dictionary containing the cluster info.
 
-    Raises:
-        HttpError: If there is a connection error or the request returns an HTTP error.
     """
-    try:
-        cluster_attributes = (
-            f"projects/{project}/locations/{zone}/clusters/{cluster_name}"
-        )
-        gke = googleapiclient.discovery.build(
-            "container", "v1", credentials=credentials
-        )
-        gke_clusters = gke.projects().locations().clusters()
-        gke_cluster = gke_clusters.get(name=cluster_attributes).execute()
-        return gke_cluster
-    except HttpError as error:
-        print(f"An error occurred while getting cluster info: {error}")
-        raise error
+    cluster_attributes = f"projects/{project}/locations/{zone}/clusters/{cluster_name}"
+    gke = googleapiclient.discovery.build("container", "v1", credentials=credentials)
+    gke_clusters = gke.projects().locations().clusters()
+    gke_cluster = gke_clusters.get(name=cluster_attributes).execute()
+    return gke_cluster
 
 
 def kubernetes_api(
@@ -219,25 +209,20 @@ def pod_exec(
         target_pod: The name of the target pod.
         container: The name of the container in the target pod.
         command_string: The command to execute in the pod.
-    Raises:
-        KubernetesError: If there is an error executing the command in the pod.
     """
-    try:
-        resp = stream(
-            api.connect_get_namespaced_pod_exec,
-            name=target_pod,
-            namespace=target_namespace,
-            container=container,
-            command=["/bin/sh", "-c", command_string],
-            stderr=True,
-            stdin=False,
-            stdout=True,
-            tty=False,
-        )
-        print("Response: " + resp)
-    except kubernetes.client.rest.ApiException as error:
-        print(f"An error occurred while executing the command in the pod: {error}")
-        raise kubernetes.client.KubernetesError(error)
+
+    resp = stream(
+        api.connect_get_namespaced_pod_exec,
+        name=target_pod,
+        namespace=target_namespace,
+        container=container,
+        command=["/bin/sh", "-c", command_string],
+        stderr=True,
+        stdin=False,
+        stdout=True,
+        tty=False,
+    )
+    print("Response: " + resp)
 
 
 def lambda_handler(event: dict, context: LambdaContext) -> None:

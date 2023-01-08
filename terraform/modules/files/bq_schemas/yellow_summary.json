@@ -31,7 +31,7 @@
     },
     {
         "name": "average_passenger_count",
-        "type": "INTEGER",
+        "type": "FLOAT",
         "mode": "NULLABLE"
     },
     {
