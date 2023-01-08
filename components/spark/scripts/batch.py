@@ -18,4 +18,4 @@ if __name__ == "__main__":
     RUN_DATE = str(os.getenv("RUN_DATE"))
     PARTITION = reformat_date(RUN_DATE, "MONTH")
 
-    process(spark, URI, PARTITION, RUN_DATE, **opts)
+    process(spark, URI, PARTITION, **opts)

@@ -168,10 +168,11 @@ def process(
 ):
     df = spark.read.parquet(uri)
     df = cast_columns(df, kwargs["mapping"])
+    df.withColumn("run_date", to_date(F.lit(partition_filter + "01"), "yyyyMMdd"))
     df = df.filter(
-        f"{kwargs['partition_col']} BETWEEN CAST({run_date}) AS DATE) \
-                AND CAST({run_date}) AS DATE) + INTERVAL 1 MONTH"
-    )
+        f"{kwargs['partition_col']} BETWEEN run_date \
+                AND run_date + INTERVAL 1 MONTH"
+    ).drop("run_date")
     df.createOrReplaceTempView("temp_table")
     df_hist = spark.sql(kwargs["summary_query"])
     df_hist.write.mode("overwrite").format("bigquery").option(
