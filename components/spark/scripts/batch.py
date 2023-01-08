@@ -21,10 +21,17 @@ if __name__ == "__main__":
     STAGING_TARGET = options[CATEGORY]["staging_table"]
     TRIAGE_TAREGET = options[CATEGORY]["triage_table"]
     RUN_DATE = str(os.getenv("RUN_DATE"))
-    PARTITION = reformat_date(RUN_DATE, "MONTH")
+    PART = reformat_date(RUN_DATE, "MONTH")
     create_temptable(spark, URI, MAPPING)
     df_hist = spark.sql(SUMMARY_QUERY)
+    write_to_bigquery(
+        df_hist,
+        HIST_TARGET,
+        f"hist-{PART}",
+        PART,
+        partition_column="first_day_of_month",
+    )
     df_clean, df_triage = process_current(spark, FILTERS)
-    write_to_bigquery(df_hist, HIST_TARGET, f"hist-{PARTITION}", PARTITION)
-    write_to_bigquery(df_clean, STAGING_TARGET, f"c-{PARTITION}", PARTITION)
-    write_to_bigquery(df_triage, TRIAGE_TAREGET, f"t-{PARTITION}", PARTITION)
+
+    write_to_bigquery(df_clean, STAGING_TARGET, f"c-{PART}", PART)
+    write_to_bigquery(df_triage, TRIAGE_TAREGET, f"t-{PART}", PART)
