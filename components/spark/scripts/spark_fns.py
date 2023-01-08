@@ -163,6 +163,8 @@ def write_to_bigquery(
     target: str,
     label_value: str,
     date_partition: Union[str, None] = None,
+    partition_column: str = "tpep_pickup_datetime",
+    partition_type: str = "MONTH",
     mode: str = "append",
     label_key: str = "bigQueryJobLabel.spark",
 ) -> None:
@@ -173,7 +175,11 @@ def write_to_bigquery(
         df.write.mode(mode).format("bigquery").option(label_key, f"etl-{label_value}")
     )
     if date_partition is not None:
-        df_write = df_write.option("datePartition", date_partition)
+        df_write = (
+            df_write.option("datePartition", date_partition)
+            .option("partitionField", partition_column)
+            .option("partitionType", partition_type)
+        )
     df_write.save(target)
 
 
