@@ -190,17 +190,13 @@ def create_temptable(
     Returns:
         None
     """
-    try:
-        df = spark.read.parquet(uri)
-    except Exception as e:
-        print(f"Error reading from BigQuery: {e}")
-        return
+    df = spark.read.parquet(uri)
 
     # Cast the columns to the correct data types
     df = cast_columns(df, mapping)  # type: ignore
 
     # Create the temporary table
-    return df.createOrReplaceTempView(temp_table_name)
+    df.createOrReplaceTempView(temp_table_name)
 
 
 def process_current(
