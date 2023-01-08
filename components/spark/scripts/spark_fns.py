@@ -200,7 +200,7 @@ def create_temptable(
     df = cast_columns(df, mapping)  # type: ignore
 
     # Create the temporary table
-    df.createOrReplaceTempView(temp_table_name)
+    return df.createOrReplaceTempView(temp_table_name)
 
 
 def process_current(
