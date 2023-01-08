@@ -113,7 +113,7 @@ with DAG(
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
             "mainApplicationFile": f"local://{BASE}/spark/scripts/main_batch.py",
             "name": "spark-k8s",
-            "instances": 7,
+            "instances": 4,
             "gitsync": True,
             "nodeSelector": "base",
             "executor_memory": "2048m",
