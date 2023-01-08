@@ -19,6 +19,9 @@ if __name__ == "__main__":
     mlflow_experiment_name = os.getenv(
         "MLFLOW_EXPERIMENT_NAME", "taxi-fare-prediction-v2"
     )
+    mlflow.set_tracking_uri(
+        f"http://{mlflow_tracking_server}.default.svc.cluster.local:5000"
+    )
     target_column = os.getenv("TARGET_COLUMN", "fare_amount")
     mlflow_bucket = os.getenv("MLFLOW_BUCKET", "mlflow-cacfcc1b69")
     cross_validations = int(os.getenv("CROSS_VALIDATIONS", 1))  # type: ignore
@@ -28,9 +31,6 @@ if __name__ == "__main__":
 
     exp = mlflow.set_experiment(mlflow_experiment_name)
     exp_id = exp.experiment_id
-    mlflow.set_tracking_uri(
-        f"http://{mlflow_tracking_server}.default.svc.cluster.local:5000"
-    )
 
     df = load_data(target_dataset, target_table, 50)  # type: ignore
 
