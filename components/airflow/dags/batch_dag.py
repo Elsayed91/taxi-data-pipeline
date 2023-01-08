@@ -101,23 +101,54 @@ with DAG(
     #     },
     # )
 
+    # t3 = KubernetesJobOperator(
+    #     task_id="etl-batch",
+    #     body_filepath=SPARK_POD_TEMPLATE,
+    #     jinja_job_args={
+    #         "project": GOOGLE_CLOUD_PROJECT,
+    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
+    #         "mainApplicationFile": f"local://{BASE}/spark/scripts/batch.py",
+    #         "name": "spark-k8s",
+    #         "instances": 5,
+    #         "gitsync": True,
+    #         "nodeSelector": JOBS_NODE_POOL,
+    #         "executor_memory": "2048m",
+    #         "env": {
+    #             "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
+    #             "STAGING_BUCKET": STAGING_BUCKET,
+    #         },
+    #         "envFrom": [{"type": "configMapRef", "name": "spark-env"}],
+    #     },
+    # )
+
     t3 = KubernetesJobOperator(
-        task_id="etl-batch",
-        body_filepath=SPARK_POD_TEMPLATE,
+        task_id="dbt",
+        body_filepath=POD_TEMPALTE,
+        command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
+        arguments=[
+            "--deps",
+            "--seed",
+            "--commands",
+            "dbt run",
+            "--generate-docs",
+        ],
         jinja_job_args={
-            "project": GOOGLE_CLOUD_PROJECT,
-            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-            "mainApplicationFile": f"local://{BASE}/spark/scripts/batch.py",
-            "name": "spark-k8s",
-            "instances": 5,
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
+            "name": "dbt",
             "gitsync": True,
-            "nodeSelector": JOBS_NODE_POOL,
-            "executor_memory": "2048m",
-            "env": {
-                "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
-                "STAGING_BUCKET": STAGING_BUCKET,
-            },
-            "envFrom": [{"type": "configMapRef", "name": "spark-env"}],
+            "volumes": [
+                {
+                    "name": "gcsfs-creds",
+                    "type": "secret",
+                    "reference": "gcsfs-creds",
+                    "mountPath": "/mnt/secrets",
+                }
+            ],
+            "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
+        },
+        envs={
+            "DBT_PROFILES_DIR": f"{BASE}/dbt/app",
+            "RUN_DATE": "{{ dag_run.conf.run_date }}",
         },
     )
     t3  # type: ignore
