@@ -107,7 +107,7 @@ with DAG(
         jinja_job_args={
             "project": GOOGLE_CLOUD_PROJECT,
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-            "mainApplicationFile": f"local://{BASE}/spark/scripts/main_batch.py",
+            "mainApplicationFile": f"local://{BASE}/spark/scripts/batch.py",
             "name": "spark-k8s",
             "instances": 5,
             "gitsync": True,

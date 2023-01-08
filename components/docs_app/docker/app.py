@@ -45,8 +45,7 @@ def elementary():
     return load_index(DOCS_BUCKET, "elementary/index.html")
 
 
-@app.route("/ge", defaults={"path": "index.html"})
-@app.route("/ge/<path:path>")
+@app.route("/ge/<path:path>", defaults={"path": "index.html"})
 def ge(path):
     return load_index(DOCS_BUCKET, f"great_expectations/docs/{path}")
 
