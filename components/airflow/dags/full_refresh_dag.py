@@ -139,7 +139,7 @@ with DAG(
             "imagePullPolicy": "Always",
         },
         envs={
-            "TARGET_DATASET": os.getenv("ML_MODELS_DATASET"),
+            "TARGET_DATASET": os.getenv("ML_DATASET"),
             "TARGET_TABLE": "ml_yellow_fare_sample",
             "TRACKING_SERVICE": "mlflow-service",
             "MLFLOW_EXPERIMENT_NAME": "taxi-fare-prediction-v3",
