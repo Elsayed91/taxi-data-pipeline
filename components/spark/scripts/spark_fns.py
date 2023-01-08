@@ -188,18 +188,27 @@ def process(
     df_clean = spark.sql(f"SELECT * FROM temp_table WHERE {kwargs['filters']}")
     df_triage = spark.sql(f"SELECT * FROM temp_table WHERE NOT ({kwargs['filters']})")
 
-    shared_options = {
-        "datePartition": partition_filter,
-        "partitionField": kwargs["partition_col"],
-        "partitionType": "MONTH",
-        "clusteredFields": kwargs["cf_current"],
-    }
-    df_clean.write.mode("overwrite").format("bigquery").option(**shared_options).option(
+    df_clean.write.mode("overwrite").format("bigquery").option(
+        "datePartition", partition_filter
+    ).option("partitionField", kwargs["partition_col"]).option(
+        "partitionType", "MONTH"
+    ).option(
+        "clusteredFields", kwargs["cf_current"]
+    ).option(
         "bigQueryJobLabel.spark", f"clean-{partition_filter}"
-    ).save(kwargs["staging_table"])
+    ).save(
+        kwargs["staging_table"]
+    )
+
     df_triage.write.mode("overwrite").format("bigquery").option(
-        **shared_options
-    ).option("bigQueryJobLabel.spark", f"triage-{partition_filter}").save(
+        "datePartition", partition_filter
+    ).option("partitionField", kwargs["partition_col"]).option(
+        "partitionType", "MONTH"
+    ).option(
+        "clusteredFields", kwargs["cf_current"]
+    ).option(
+        "bigQueryJobLabel.spark", f"clean-{partition_filter}"
+    ).save(
         kwargs["triage_table"]
     )
 
