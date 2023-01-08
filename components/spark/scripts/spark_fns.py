@@ -197,11 +197,11 @@ def process(
     }
     df_clean.write.mode("overwrite").format("bigquery").option(**shared_options).option(
         "bigQueryJobLabel.spark", f"clean-{partition_filter}"
-    ).save(kwargs["historical_table"])
+    ).save(kwargs["staging_table"])
     df_triage.write.mode("overwrite").format("bigquery").option(
         **shared_options
     ).option("bigQueryJobLabel.spark", f"triage-{partition_filter}").save(
-        kwargs["historical_table"]
+        kwargs["triage_table"]
     )
 
 
