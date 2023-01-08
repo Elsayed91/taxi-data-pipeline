@@ -94,6 +94,7 @@ with DAG(
                 "URI": f"gs://{STAGING_BUCKET}/yellow/*",
                 "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
             },
+            "envFrom": [{"type": "configMapRef", "name": "spark-env"}],
         },
     )
 
