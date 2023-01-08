@@ -76,13 +76,6 @@ with DAG(
     #         ],
     #     },
     # )
-    HISTORICAL_TARGET = (
-        f"{os.getenv('HISTORICAL_DATASET')}.{os.getenv('HISTORICAL_TABLE')}"
-    )
-    STAGING_TARGET = (
-        f"{os.getenv('STAGING_DATASET')}.{os.getenv('YELLOW_STAGING_TABLE')}"
-    )
-    TRIAGE_TARGET = f"{os.getenv('TRIAGE_DATASET')}.init_3_months"
 
     t2 = KubernetesJobOperator(
         task_id="etl",
@@ -92,17 +85,14 @@ with DAG(
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
             "mainApplicationFile": f"local://{BASE}/spark/scripts/initial_load.py",
             "name": "spark-k8s-init",
-            "instances": 7,
+            "instances": 5,
             "gitsync": True,
-            "nodeSelector": "base",
+            "nodeSelector": JOBS_NODE_POOL,
             "executor_memory": "2048m",
             "env": {
                 "CATEGORY": "yellow",
                 "URI": f"gs://{STAGING_BUCKET}/yellow/*",
                 "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
-                "HISTORICAL_TARGET": HISTORICAL_TARGET,
-                "STAGING_TARGET": STAGING_TARGET,
-                "TRIAGE_TAREGET": TRIAGE_TARGET,
             },
         },
     )
