@@ -32,7 +32,7 @@ model_name = "xgboost-fare-predictor"
 
 exp = mlflow.set_experiment(mlflow_experiment_name)
 exp_id = exp.experiment_id
-df = load_data(target_dataset, target_table, 10)  # type: ignore
+df = load_data(target_dataset, target_table, 40)  # type: ignore
 print(f"df shape is {df.shape}")
 y = df[target_column]
 
@@ -97,4 +97,4 @@ with mlflow.start_run(experiment_id=exp_id, run_name="XGBoostRegressor", nested=
     mlflow.log_params(grid_search.best_params_)
     mlflow.log_metrics({"RMSE": mean_squared_error(y_test, y_pred, squared=False)})
 
-    mlflow.xgboost.log_model(model_name, model)
+    mlflow.xgboost.log_model(model, model_name)
