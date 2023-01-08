@@ -15,8 +15,7 @@ if __name__ == "__main__":
     CATEGORY = str(os.getenv("CATEGORY"))
     opts = options[CATEGORY]
     URI = f"gs://{STAGING_BUCKET}/{CATEGORY}/{FILENAME}"
-    FILTERS = opts["filters"]
     RUN_DATE = str(os.getenv("RUN_DATE"))
     PARTITION = reformat_date(RUN_DATE, "MONTH")
 
-    process(spark, URI, PARTITION, **opts)
+    process(spark, URI, PARTITION, RUN_DATE, **opts)
