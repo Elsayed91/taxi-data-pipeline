@@ -49,38 +49,39 @@ with DAG(
     SCRIPTS_PATH = f"{BASE}/airflow/dags/scripts"
     JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
-    # t1 = KubernetesJobOperator(
-    #     task_id="aws_to_gcs",
-    #     body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
-    #     command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
-    #     arguments=[
-    #         "--data-source",
-    #         f"s3://{os.getenv('TARGET_S3_BUCKET')}/trip data/",
-    #         "--destination",
-    #         f"gs://{STAGING_BUCKET}/yellow",
-    #         "--creds-file",
-    #         "/etc/aws/aws_creds.json",
-    #         "--include-prefixes",
-    #         "yellow_tripdata_20",
-    #         "--exclude-prefixes",
-    #         "yellow_tripdata_2009,yellow_tripdata_2010",
-    #         "--check-exists",
-    #     ],
-    #     jinja_job_args={
-    #         "image": "google/cloud-sdk:alpine",
-    #         "name": "from-aws-to-gcs",
-    #         "gitsync": True,
-    #         "nodeSelector": JOBS_NODE_POOL,
-    #         "volumes": [
-    #             {
-    #                 "name": "aws-creds",
-    #                 "type": "secret",
-    #                 "reference": "aws-creds",
-    #                 "mountPath": "/etc/aws",
-    #             }
-    #         ],
-    #     },
-    # )
+
+    t1 = KubernetesJobOperator(
+        task_id="aws_to_gcs",
+        body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
+        command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
+        arguments=[
+            "--data-source",
+            f"s3://{os.getenv('TARGET_S3_BUCKET')}/trip data/",
+            "--destination",
+            f"gs://{STAGING_BUCKET}/yellow",
+            "--creds-file",
+            "/etc/aws/aws_creds.json",
+            "--include-prefixes",
+            "yellow_tripdata_20",
+            "--exclude-prefixes",
+            "yellow_tripdata_2009,yellow_tripdata_2010",
+            "--check-exists",
+        ],
+        jinja_job_args={
+            "image": "google/cloud-sdk:alpine",
+            "name": "from-aws-to-gcs",
+            "gitsync": True,
+            "nodeSelector": JOBS_NODE_POOL,
+            "volumes": [
+                {
+                    "name": "aws-creds",
+                    "type": "secret",
+                    "reference": "aws-creds",
+                    "mountPath": "/etc/aws",
+                }
+            ],
+        },
+    )
     HISTORICAL_TARGET = (
         f"{os.getenv('HISTORICAL_DATASET')}.{os.getenv('HISTORICAL_TABLE')}"
     )
@@ -138,32 +139,6 @@ with DAG(
             "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
         },
         envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app", "RUN_DATE": today},
-    )
-
-    t4 = KubernetesJobOperator(
-        task_id="resize",
-        body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
-        command=["/bin/bash", "-c"],
-        arguments=[
-            "gcloud",
-            "container",
-            "clusters",
-            "resize",
-            f"{GKE_CLUSTER_NAME}",
-            "--node-pool",
-            f"{JOBS_NODE_POOL}",
-            "--num-nodes",
-            "0",
-            "-q",
-        ],
-        jinja_job_args={
-            "image": "google/cloud-sdk:alpine",
-            "name": "resize-cluster",
-            "nodeSelector": BASE_NODE_POOL,
-        },
-        in_cluster=True,
-        random_name_postfix_length=2,
-        name_prefix="",
     )
 
     t1 >> t2 >> t3  # type: ignore

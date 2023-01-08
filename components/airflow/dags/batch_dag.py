@@ -75,25 +75,55 @@ with DAG(
     #     },
     # )
 
-    t2 = KubernetesJobOperator(
-        task_id="data_validation",
+    # t2 = KubernetesJobOperator(
+    #     task_id="data_validation",
+    #     body_filepath=f"{TEMPLATES_PATH}/spark_pod_template.yaml",
+    #     jinja_job_args={
+    #         "project": GOOGLE_CLOUD_PROJECT,
+    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
+    #         "mainApplicationFile": f"local://{BASE}/data_validation/data_validation.py",
+    #         "name": "great-expectations",
+    #         "instances": 4,
+    #         "gitsync": True,
+    #         "nodeSelector": JOBS_NODE_POOL,
+    #         "executor_memory": "2048m",
+    #         "env": {
+    #             "GE_CONFIG_DIR": f"{BASE}/data_validation/config",
+    #             "PROJECT": GOOGLE_CLOUD_PROJECT,
+    #             "STAGING_BUCKET": STAGING_BUCKET,
+    #             "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
+    #             "VALIDATION_THRESHOLD": "10%",
+    #         },
+    #     },
+    # )
+
+    HISTORICAL_TARGET = (
+        f"{os.getenv('HISTORICAL_DATASET')}.{os.getenv('HISTORICAL_TABLE')}"
+    )
+    STAGING_TARGET = (
+        f"{os.getenv('STAGING_DATASET')}.{os.getenv('YELLOW_STAGING_TABLE')}"
+    )
+    TRIAGE_TARGET = f"{os.getenv('TRIAGE_DATASET')}.{os.getenv('YELLOW_TRIAGE_TABLE')}"
+
+    t3 = KubernetesJobOperator(
+        task_id="etl-batch",
         body_filepath=f"{TEMPLATES_PATH}/spark_pod_template.yaml",
         jinja_job_args={
             "project": GOOGLE_CLOUD_PROJECT,
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-            "mainApplicationFile": f"local://{BASE}/data_validation/data_validation.py",
-            "name": "great-expectations",
-            "instances": 4,
+            "mainApplicationFile": f"local://{BASE}/spark/scripts/main_batch.py",
+            "name": "spark-k8s",
+            "instances": 7,
             "gitsync": True,
-            "nodeSelector": JOBS_NODE_POOL,
+            "nodeSelector": "base",
             "executor_memory": "2048m",
             "env": {
-                "GE_CONFIG_DIR": f"{BASE}/data_validation/config",
-                "PROJECT": GOOGLE_CLOUD_PROJECT,
+                "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
+                "HISTORICAL_TARGET": HISTORICAL_TARGET,
+                "STAGING_TARGET": STAGING_TARGET,
+                "TRIAGE_TAREGET": TRIAGE_TARGET,
                 "STAGING_BUCKET": STAGING_BUCKET,
-                "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
-                "VALIDATION_THRESHOLD": "10%",
             },
         },
     )
-    t2  # type: ignore
+    t3  # type: ignore
