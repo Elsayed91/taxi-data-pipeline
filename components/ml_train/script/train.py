@@ -8,8 +8,16 @@ from sklearn.model_selection import GridSearchCV
 import mlflow
 import os
 from helpers import *
+import logging
 
 # http://michael-harmon.com/blog/GreenBuildings3.html
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 if __name__ == "__main__":
     # define environmental variables
@@ -33,13 +41,13 @@ if __name__ == "__main__":
     exp_id = exp.experiment_id
 
     df = load_data(target_dataset, target_table, 50)  # type: ignore
-
+    logger.info("splitting data")
     y = df[target_column]
     X = df.drop([target_column], axis=1)
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, random_state=1, test_size=0.3
     )
-
+    logger.info("done splitting data")
     # param = {
     #     "max_depth": [2, 4, 6],
     #     "n_estimators": [10, 15, 25, 50, 100, 500],
@@ -55,6 +63,7 @@ if __name__ == "__main__":
         "n_estimators": [10, 15],
     }
 
+    logger.info("using grid search")
     grid_search = GridSearchCV(
         estimator=XGBRegressor(),
         param_grid=param,
@@ -63,9 +72,12 @@ if __name__ == "__main__":
         n_jobs=-1,
     )
 
+    logger.info(grid_search)
+    logger.info("fitting model")
     xgb_model = grid_search.fit(X_train, y_train)
     y_pred = xgb_model.predict(X_test)
     model = grid_search.best_estimator_
+    logger.info(model)
     with mlflow.start_run(
         experiment_id=exp_id, run_name="XGBoostRegressor", nested=True
     ):
