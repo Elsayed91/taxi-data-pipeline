@@ -45,9 +45,19 @@ def elementary():
     return load_index(DOCS_BUCKET, "elementary/index.html")
 
 
-@app.route("/ge/<path:filename>")
-def ge(filename):
-    return load_index(DOCS_BUCKET, "great_expectations/docs/{filename}")
+@app.route("/ge")
+def ge():
+    return load_index(DOCS_BUCKET, "great_expectations/docs/index.html")
+
+
+@app.route("/ge/static/<path:filename>")
+def serve_static(filename):
+    return load_index(DOCS_BUCKET, f"great_expectations/docs/static/{filename}")
+
+
+@app.route("/ge/validations/<path:filename>")
+def serve_validations(filename):
+    return load_index(DOCS_BUCKET, f"great_expectations/docs/validations/{filename}")
 
 
 @app.errorhandler(500)
