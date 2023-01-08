@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     exp = mlflow.set_experiment(mlflow_experiment_name)
     exp_id = exp.experiment_id
-
+    logger.info(exp_id)
     df = load_data(target_dataset, target_table, 50)  # type: ignore
     logger.info("splitting data")
     y = df[target_column]
