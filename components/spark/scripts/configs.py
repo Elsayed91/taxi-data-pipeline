@@ -62,6 +62,7 @@ yellow_filter_conditions = """
     AND DOLocationID IS NOT NULL AND PULocationID IS NOT NULL 
     AND fare_amount IS NOT NULL AND trip_distance IS NOT NULL 
     AND tpep_dropoff_datetime IS NOT NULL AND tpep_pickup_datetime IS NOT NULL
+    AND tpep_dropoff_datetime < CURRENT_TIMESTAMP()
     """
 
 
