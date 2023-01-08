@@ -52,3 +52,4 @@ tests/integration/lambda/files
 myschema.json
 t.sh
 components/great_expectations/__pycache__
+components/data_validation/__pycache__

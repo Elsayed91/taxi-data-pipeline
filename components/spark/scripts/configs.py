@@ -1,6 +1,3 @@
-import pyspark.sql.functions as F
-
-
 yellow_schema_mapping = {
     "VendorID": "integer",
     "tpep_pickup_datetime": "timestamp",
@@ -42,7 +39,7 @@ yellow_historical_transformation = """
         sum(airport_fee) as monthly_airport_fee,
         avg(passenger_count) as average_passenger_count,
         avg(trip_distance) as average_trip_distance
-    FROM df_view
+    FROM temp_table
     GROUP BY
         VendorID,
         payment_type,
@@ -70,6 +67,6 @@ options = {
     "yellow": {
         "mapping": yellow_schema_mapping,
         "filter_conditions": yellow_filter_conditions,
-        "transformation_query": yellow_historical_transformation,
+        "summary_query": yellow_historical_transformation,
     }
 }

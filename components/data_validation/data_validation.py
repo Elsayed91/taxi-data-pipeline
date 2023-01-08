@@ -52,9 +52,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # spark = SparkSession.builder.getOrCreate()
-    from pyspark.sql import SparkSession
-
-    # Create a SparkSession
-    spark = SparkSession.builder.appName("MyApp").master("local[12]").getOrCreate()
+    spark = SparkSession.builder.getOrCreate()
     main()

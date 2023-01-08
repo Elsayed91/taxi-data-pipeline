@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch
-from components.spark.scripts.fix_schema import *
+from components.spark.scripts.spark_fns import *
 import mock
 import pyarrow.parquet as pq
 import google.cloud.storage as storage
@@ -10,7 +10,6 @@ import unittest.mock
 import unittest
 import pandas as pd
 import tempfile
-from pyspark.sql import SparkSession
 
 
 @pytest.mark.parametrize(
@@ -158,15 +157,6 @@ def test_schema_groups():
     assert schema_groups(df) == expected_output
 
 
-# @pytest.fixture
-# def spark_session():
-#     from pyspark.sql import SparkSession
-
-#     spark = SparkSession.builder.appName("test").master("local[*]").getOrCreate()
-#     yield spark
-#     spark.stop()
-
-
 def test_cast_columns(spark_session):
     # Create a test DataFrame
     df = spark_session.createDataFrame(
@@ -227,3 +217,11 @@ def test_uri_parser():
         "another_category",
     )
     assert uri_parser(uri) == expected_output
+
+
+def test_reformat_date():
+    assert reformat_date("2023-10-01", "MONTH") == "202310"
+    assert reformat_date("2022-09-05", "YEAR") == "2022"
+    assert reformat_date("2021-02-22", "DAY") == "2021-02-22"
+    with pytest.raises(ValueError):
+        reformat_date("2022-10-01", "HOUR")

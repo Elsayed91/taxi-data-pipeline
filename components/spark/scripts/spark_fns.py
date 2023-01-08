@@ -4,6 +4,8 @@ import pyarrow.parquet as pq
 import gcsfs
 import pyspark.sql.functions as F
 from pyspark.sql import DataFrame
+from typing import Union
+from pyspark.sql import SparkSession
 
 
 def get_gcs_files(bucket: str, folder: str, file_prefix: str) -> list[bytes]:
@@ -133,3 +135,82 @@ def uri_parser(uri: str) -> tuple[str, str, str, str]:
     blob_path = "/".join(uri.split("/")[3:])
     category = uri.split("/")[-2]
     return filename, bucket, blob_path, category
+
+
+def reformat_date(date_string: str, output_format: str) -> str:
+    """
+    Reformats a date string in the format "YYYY-MM-DD" to a different format specified by
+    the output_format parameter.
+
+    Parameters: - date_string (str): The date string to reformat. - output_format (str):
+    The desired output format for the date. Can be "MONTH", "YEAR", or "DAY".
+
+    Returns: - str: The date in the specified output format.
+    """
+    year, month, _ = date_string.split("-")
+    if output_format == "MONTH":
+        return f"{year}{month}"
+    elif output_format == "YEAR":
+        return year
+    elif output_format == "DAY":
+        return date_string
+    else:
+        raise ValueError("Invalid output format")
+
+
+def write_to_bigquery(
+    df: DataFrame,
+    target: str,
+    label_value: str,
+    date_partition: Union[str, None] = None,
+    mode: str = "append",
+    label_key: str = "bigQueryJobLabel.spark",
+) -> None:
+
+    df_write = (
+        df.write.mode(mode).format("bigquery").option(label_key, f"etl-{label_value}")
+    )
+    if date_partition is not None:
+        df_write = df_write.option("datePartition", date_partition)
+    df_write.save(target)
+
+
+def create_temptable(
+    spark: SparkSession,
+    uri: str,
+    mapping: dict[str, str],
+    temp_table_name: str = "temp_table",
+) -> None:
+    """Create a temporary table from data stored in a parquet file.
+
+    Args:
+        spark: A SparkSession object.
+        uri: The URI of the parquet file to read from.
+
+    Returns:
+        None
+    """
+    try:
+        df = spark.read.parquet(uri)
+    except Exception as e:
+        print(f"Error reading from BigQuery: {e}")
+        return
+
+    # Cast the columns to the correct data types
+    df = cast_columns(df, mapping)  # type: ignore
+
+    # Create the temporary table
+    df.createOrReplaceTempView(temp_table_name)
+
+
+def process_current(
+    spark, summary_query, filter_conditions, temp_table_name: str = "temp_table"
+):
+    df_hist = spark.sql(summary_query)
+
+    df_clean = spark.sql(f"SELECT * FROM {temp_table_name} WHERE {filter_conditions}")
+    df_triage = spark.sql(
+        f"SELECT * FROM {temp_table_name} WHERE NOT ({filter_conditions})"
+    )
+
+    return df_hist, df_clean, df_triage

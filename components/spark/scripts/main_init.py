@@ -9,7 +9,7 @@ transformations on the data.
 environmental variables that are set when the module is run.
 """
 import os
-from fix_schema import *
+from spark_fns import *
 from configs import *
 from pyspark.sql import SparkSession
 

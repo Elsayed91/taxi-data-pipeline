@@ -81,9 +81,16 @@ with DAG(
     #         ],
     #     },
     # )
+    HISTORICAL_TARGET = (
+        f"{os.getenv('HISTORICAL_DATASET')}.{os.getenv('HISTORICAL_TABLE')}"
+    )
+    STAGING_TARGET = (
+        f"{os.getenv('STAGING_DATASET')}.{os.getenv('YELLOW_STAGING_TABLE')}"
+    )
+    TRIAGE_TARGET = f"{os.getenv('TRIAGE_DATASET')}.{os.getenv('YELLOW_TRIAGE_TABLE')}"
 
     t2 = KubernetesJobOperator(
-        task_id="test",
+        task_id="etl",
         body_filepath=f"{TEMPLATES_PATH}/spark_pod_template.yaml",
         jinja_job_args={
             "project": GOOGLE_CLOUD_PROJECT,
@@ -98,9 +105,9 @@ with DAG(
                 "CATEGORY": "yellow",
                 "URI": f"gs://{STAGING_BUCKET}/yellow/*",
                 "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
-                "HISTORICAL_TARGET": f"{os.getenv('HISTORICAL_DATASET')}.{os.getenv('HISTORICAL_TABLE')}",
-                "STAGING_TARGET": f"{os.getenv('STAGING_DATASET')}.{os.getenv('YELLOW_STAGING_TABLE')}",
-                "TRIAGE_TAREGET": f"{os.getenv('TRIAGE_DATASET')}.{os.getenv('YELLOW_TRIAGE_TABLE')}",
+                "HISTORICAL_TARGET": HISTORICAL_TARGET,
+                "STAGING_TARGET": STAGING_TARGET,
+                "TRIAGE_TAREGET": TRIAGE_TARGET,
             },
         },
     )

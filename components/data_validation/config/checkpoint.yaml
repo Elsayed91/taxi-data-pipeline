@@ -1,7 +1,7 @@
 name: cp
 config_version: 1
 class_name: Checkpoint
-run_name_template: "%Y%m%d-${CATEGORY}"
+run_name_template: "%Y%m%d%H%M-${CATEGORY}"
 validations:
   - batch_request:
       datasource_name: NyTaxiData
