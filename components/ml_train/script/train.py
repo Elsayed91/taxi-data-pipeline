@@ -8,101 +8,93 @@ from sklearn.model_selection import GridSearchCV
 import mlflow
 import os
 from helpers import *
-import logging
+
 
 # http://michael-harmon.com/blog/GreenBuildings3.html
-logger = logging.getLogger(__name__)
 
 
-if __name__ == "__main__":
-    # define environmental variables
-    target_dataset = os.getenv("TARGET_DATASET")
-    target_table = os.getenv("TARGET_TABLE")
-    mlflow_tracking_server = os.getenv("TRACKING_SERVICE", "mlflow-service")
-    logger.info("before setting uri")
-    mlflow.set_tracking_uri(
-        f"http://{mlflow_tracking_server}.default.svc.cluster.local:5000"
-    )
-    mlflow_experiment_name = os.getenv(
-        "MLFLOW_EXPERIMENT_NAME", "taxi-fare-prediction-v2"
-    )
-    logger.info("after setting uri")
-    target_column = os.getenv("TARGET_COLUMN", "fare_amount")
-    mlflow_bucket = os.getenv("MLFLOW_BUCKET", "mlflow-cacfcc1b69")
-    cross_validations = int(os.getenv("CROSS_VALIDATIONS", 1))  # type: ignore
-    # setup mlflow
+# define environmental variables
+target_dataset = os.getenv("TARGET_DATASET")
+target_table = os.getenv("TARGET_TABLE")
+mlflow_tracking_server = os.getenv("TRACKING_SERVICE", "mlflow-service")
+print("before setting uri")
+mlflow.set_tracking_uri(
+    f"http://{mlflow_tracking_server}.default.svc.cluster.local:5000"
+)
+mlflow_experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "taxi-fare-prediction-v2")
+print("after setting uri")
+target_column = os.getenv("TARGET_COLUMN", "fare_amount")
+mlflow_bucket = os.getenv("MLFLOW_BUCKET", "mlflow-cacfcc1b69")
+cross_validations = int(os.getenv("CROSS_VALIDATIONS", 1))  # type: ignore
+# setup mlflow
 
-    model_name = "xgboost-fare-predictor"
+model_name = "xgboost-fare-predictor"
 
-    exp = mlflow.set_experiment(mlflow_experiment_name)
-    exp_id = exp.experiment_id
-    logger.info(exp_id)
-    df = load_data(target_dataset, target_table, 50)  # type: ignore
-    logger.info("splitting data")
-    y = df[target_column]
-    X = df.drop([target_column], axis=1)
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, random_state=1, test_size=0.3
-    )
-    logger.info("done splitting data")
-    # param = {
-    #     "max_depth": [2, 4, 6],
-    #     "n_estimators": [10, 15, 25, 50, 100, 500],
-    #     "colsample_bytree": [0.2, 0.6, 0.8],
-    #     "min_child_weight": [3, 5, 7],
-    #     "gamma": [0.3, 0.5, 0.7],
-    #     "subsample": [0.4, 0.6, 0.8],
-    #     "loss": ["ls", "lad"],
-    # }
+exp = mlflow.set_experiment(mlflow_experiment_name)
+exp_id = exp.experiment_id
+print(exp_id)
+df = load_data(target_dataset, target_table, 50)  # type: ignore
+print("splitting data")
+y = df[target_column]
+X = df.drop([target_column], axis=1)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.3)
+print("done splitting data")
+# param = {
+#     "max_depth": [2, 4, 6],
+#     "n_estimators": [10, 15, 25, 50, 100, 500],
+#     "colsample_bytree": [0.2, 0.6, 0.8],
+#     "min_child_weight": [3, 5, 7],
+#     "gamma": [0.3, 0.5, 0.7],
+#     "subsample": [0.4, 0.6, 0.8],
+#     "loss": ["ls", "lad"],
+# }
 
-    param = {
-        "max_depth": [2, 4],
-        "n_estimators": [10, 15],
-    }
+param = {
+    "max_depth": [2, 4],
+    "n_estimators": [10, 15],
+}
 
-    logger.info("using grid search")
-    grid_search = GridSearchCV(
-        estimator=XGBRegressor(),
-        param_grid=param,
-        scoring="rmse",
-        cv=cross_validations,
-        n_jobs=-1,
-    )
+print("using grid search")
+grid_search = GridSearchCV(
+    estimator=XGBRegressor(),
+    param_grid=param,
+    scoring="rmse",
+    cv=cross_validations,
+    n_jobs=-1,
+)
 
-    logger.info(grid_search)
-    logger.info("fitting model")
-    xgb_model = grid_search.fit(X_train, y_train)
-    y_pred = xgb_model.predict(X_test)
-    model = grid_search.best_estimator_
-    logger.info(model)
-    with mlflow.start_run(
-        experiment_id=exp_id, run_name="XGBoostRegressor", nested=True
+print(grid_search)
+print("fitting model")
+xgb_model = grid_search.fit(X_train, y_train)
+y_pred = xgb_model.predict(X_test)
+model = grid_search.best_estimator_
+print(model)
+with mlflow.start_run(experiment_id=exp_id, run_name="XGBoostRegressor", nested=True):
+
+    cv_results = grid_search.cv_results_
+
+    # loop over each of the parameters and log them along
+    # with the metric and rank of the model
+    for params, metric, rank in zip(
+        cv_results["params"],
+        cv_results["mean_test_score"],
+        cv_results["rank_test_score"],
     ):
 
-        cv_results = grid_search.cv_results_
+        with mlflow.start_run(experiment_id=exp_id, nested=True):
+            # log the parameters
+            mlflow.log_params(params)
 
-        # loop over each of the parameters and log them along
-        # with the metric and rank of the model
-        for params, metric, rank in zip(
-            cv_results["params"],
-            cv_results["mean_test_score"],
-            cv_results["rank_test_score"],
-        ):
+            # log the R2 score
+            mlflow.log_metric("RMSE", metric)
 
-            with mlflow.start_run(experiment_id=exp_id, nested=True):
-                # log the parameters
-                mlflow.log_params(params)
+            # set the rank
+            mlflow.set_tag("rank", rank)
 
-                # log the R2 score
-                mlflow.log_metric("RMSE", metric)
+    # For the best estimator (xbg_model)
+    # let's log the parameters for the best model and
+    # its metric artifacts
+    mlflow.log_params(grid_search.best_params_)
+    mlflow.log_metrics({"RMSE": mean_squared_error(y_test, y_pred, squared=False)})
 
-                # set the rank
-                mlflow.set_tag("rank", rank)
-
-        # For the best estimator (xbg_model)
-        # let's log the parameters for the best model and
-        # its metric artifacts
-        mlflow.log_params(grid_search.best_params_)
-        mlflow.log_metrics({"RMSE": mean_squared_error(y_test, y_pred, squared=False)})
-
-        mlflow.xgboost.log_model(model_name, model)
+    mlflow.xgboost.log_model(model_name, model)
