@@ -19,12 +19,10 @@ logging.basicConfig(level=logging.DEBUG)
 target_dataset = os.getenv("TARGET_DATASET")
 target_table = os.getenv("TARGET_TABLE")
 mlflow_tracking_server = os.getenv("TRACKING_SERVICE", "mlflow-service")
-print("before setting uri")
 mlflow.set_tracking_uri(
     f"http://{mlflow_tracking_server}.default.svc.cluster.local:5000"
 )
 mlflow_experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "taxi-fare-prediction-v2")
-print("after setting uri")
 target_column = os.getenv("TARGET_COLUMN", "fare_amount")
 mlflow_bucket = os.getenv("MLFLOW_BUCKET", "mlflow-cacfcc1b69")
 cross_validations = int(os.getenv("CROSS_VALIDATIONS", 1))  # type: ignore
@@ -35,7 +33,7 @@ model_name = "xgboost-fare-predictor"
 exp = mlflow.set_experiment(mlflow_experiment_name)
 exp_id = exp.experiment_id
 print(exp_id)
-df = load_data(target_dataset, target_table, 1)  # type: ignore
+df = load_data(target_dataset, target_table, sample_size=20)  # type: ignore
 print("splitting data")
 y = df[target_column]
 X = df.drop([target_column], axis=1)
