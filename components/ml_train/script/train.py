@@ -36,7 +36,9 @@ print(exp_id)
 df = load_data(target_dataset, target_table, sample_size=20)  # type: ignore
 print("splitting data")
 y = df[target_column]
+
 X = df.drop([target_column], axis=1)
+print(f"shape y is {len(X)}")
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.3)
 print("done splitting data")
 # param = {
