@@ -9,7 +9,9 @@ import mlflow
 import os
 from helpers import *
 
+import logging
 
+logging.basicConfig(level=logging.DEBUG)
 # http://michael-harmon.com/blog/GreenBuildings3.html
 
 
