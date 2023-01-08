@@ -1,3 +1,5 @@
+import os
+
 yellow_schema_mapping = {
     "VendorID": "integer",
     "tpep_pickup_datetime": "timestamp",
@@ -68,5 +70,8 @@ options = {
         "mapping": yellow_schema_mapping,
         "filter_conditions": yellow_filter_conditions,
         "summary_query": yellow_historical_transformation,
+        "historical_table": os.getenv("YELLOW_SUMMARY"),
+        "staging_table": os.getenv("YELLOW_STAGING"),
+        "triage_table": os.getenv("YELLOW_TRIAGE"),
     }
 }

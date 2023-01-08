@@ -23,9 +23,9 @@ if __name__ == "__main__":
     MAPPING = options[CATEGORY]["mapping"]
     SUMMARY_QUERY = options[CATEGORY]["summary_query"]
     FILTERS = options[CATEGORY]["filter_conditions"]
-    HIST_TARGET = str(os.getenv("HISTORICAL_TARGET"))
-    STAGING_TARGET = str(os.getenv("STAGING_TARGET"))
-    TRIAGE_TAREGET = str(os.getenv("TRIAGE_TAREGET"))
+    HIST_TARGET = options[CATEGORY]["historical_table"]
+    STAGING_TARGET = options[CATEGORY]["staging_table"]
+    TRIAGE_TAREGET = options[CATEGORY]["triage_table"]
 
     blobs = get_gcs_files(SRC_BUCKET, SRC_FOLDER, SRC_FOLDER)
     blobs = list_files(blobs)

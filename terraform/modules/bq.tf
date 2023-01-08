@@ -25,11 +25,11 @@ resource "google_bigquery_dataset" "datasets" {
 }
 
 resource "google_bigquery_table" "tables" {
-  for_each   = { for idx, val in local.bigquery : idx => val if val.table_id != null }
-  dataset_id = each.value.dataset_id
-  table_id   = each.value.table_id
-  clustering = each.value.clustering_fields
-
+  for_each            = { for idx, val in local.bigquery : idx => val if val.table_id != null }
+  dataset_id          = each.value.dataset_id
+  table_id            = each.value.table_id
+  clustering          = each.value.clustering_fields
+  deletion_protection = false
   dynamic "time_partitioning" {
     for_each = each.value.time_partitioning == null ? [] : [each.value.time_partitioning]
     content {
