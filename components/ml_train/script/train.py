@@ -44,7 +44,6 @@ param = {
     "min_child_weight": [3, 5, 7],
     "gamma": [0.3, 0.5, 0.7],
     "subsample": [0.4, 0.6, 0.8],
-    "loss": ["ls", "lad"],
 }
 
 
