@@ -12,9 +12,15 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 default_args = {
-    "owner": "me",
+    "owner": "airflow",
     "start_date": days_ago(2),
     "depends_on_past": False,
+    "retries": 0,
+    "concurrency": 1,
+    "max_active_runs": 1,
+    "in_cluster": True,
+    "random_name_postfix_length": 2,
+    "name_prefix": "",
 }
 
 

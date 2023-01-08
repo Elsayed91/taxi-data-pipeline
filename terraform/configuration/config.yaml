@@ -41,27 +41,28 @@ GCP:
   #     title: "LambdaRole"
   #     permissions: ["container.clusters.update", "container.operations.get"]
 ########################################
-  datasets: ~
-    # - dataset_id: "${STAGING_DATASET}"
-    #   tables:
-    #     - table_id: "${YELLOW_STAGING_TABLE}"
-    #       time_partitioning:
-    #         type: "DAY"
-    #         field: "tpep_pickup_datetime"
-    #         expiration_ms: 15778800000
-    #       clustering_fields: ["PULocationID", "VendorID", "payment_type"]
-    #       schema: "files/bq_schemas/stg_yellow.json"
-    # - dataset_id: "${TRIAGE_DATASET}"
-    # - dataset_id: "${HISTORICAL_DATASET}"
-    #   tables:
-    #     - table_id: "${YELLOW_SUMMARY_TABLE}"
-    #       time_partitioning:
-    #         type: "MONTH"
-    #         field: "first_day_of_month"
-    #       clustering_fields: ["pickup_zone", "payment_type"]
-    #       schema: "files/bq_schemas/yellow_summary.json"
-    # - dataset_id: "${ML_DATASET}"
-    # - dataset_id: "${SEEDS_DATASET}"
+  datasets: 
+    - dataset_id: "${STAGING_DATASET}"
+      tables:
+        - table_id: "${YELLOW_STAGING_TABLE}"
+          time_partitioning:
+            type: "MONTH"
+            field: "tpep_pickup_datetime"
+            expiration_ms: 15778800000
+          clustering_fields: ["PULocationID", "VendorID", "payment_type"]
+          schema: "files/bq_schemas/stg_yellow.json"
+    - dataset_id: "${TRIAGE_DATASET}"
+    - dataset_id: "${HISTORICAL_DATASET}"
+      tables:
+        - table_id: "${YELLOW_SUMMARY_TABLE}"
+          time_partitioning:
+            type: "MONTH"
+            field: "first_day_of_month"
+          clustering_fields: ["pickup_zone", "payment_type"]
+          schema: "files/bq_schemas/yellow_summary.json"
+    - dataset_id: "${ML_DATASET}"
+    - dataset_id: "${SEEDS_DATASET}"
+    - dataset_id: "${UNIT_TESTS_DATASET}"
 ########################################
   buckets:
     - bucket_name: "${STAGING_BUCKET}"
@@ -70,9 +71,9 @@ GCP:
     - bucket_name: "${DOCS_BUCKET}"
     - bucket_name: "${MLFLOW_BUCKET}"
   files:
-    - content_path: "../../components/great_expectations/expectations/"
+    - content_path: "../../components/data_validation/expectations/"
       hash_strategy: "folder"
-      gsutil_command: "gsutil -m rsync -r ./../components/great_expectations/expectations gs://${DOCS_BUCKET}/great_expectations/expectations/"
+      gsutil_command: "gsutil -m rsync -r ./../components/data_validation/expectations gs://${DOCS_BUCKET}/great_expectations/expectations/"
 ########################################
   clusters:
     - name: "${GKE_CLUSTER_NAME}"
@@ -88,9 +89,9 @@ GCP:
     - name: "${JOBS_NODE_POOL}"
       cluster: "${GKE_CLUSTER_NAME}"
       node_count: ~
-      # autoscaling: 
-      #   min_node_count: 0
-      #   max_node_count: 10
+      autoscaling: 
+        min_node_count: 0
+        max_node_count: 7
       management:
         auto_repair: true
         auto_upgrade: true

@@ -14,6 +14,10 @@ KubeResourceKind.register_global_kind(SparkApplication)
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
+module_path = os.path.dirname(__file__)
+POD_TEMPALTE = os.path.join(module_path, "templates", "pod_template.yaml")
+SPARK_POD_TEMPLATE = os.path.join(module_path, "templates", "spark_pod_template.yaml")
+
 
 default_args = {
     "owner": "airflow",
@@ -107,7 +111,7 @@ with DAG(
 
     t3 = KubernetesJobOperator(
         task_id="etl-batch",
-        body_filepath=f"{TEMPLATES_PATH}/spark_pod_template.yaml",
+        body_filepath=SPARK_POD_TEMPLATE,
         jinja_job_args={
             "project": GOOGLE_CLOUD_PROJECT,
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",

@@ -1,6 +1,5 @@
 import os
 from datetime import datetime, timedelta
-
 import pendulum
 from airflow import DAG
 from airflow_kubernetes_job_operator.kubernetes_job_operator import (
@@ -9,14 +8,6 @@ from airflow_kubernetes_job_operator.kubernetes_job_operator import (
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
 from addons.parse_state import SparkApplication
 
-KubeResourceKind.register_global_kind(SparkApplication)
-
-
-today = datetime.today().strftime("%Y-%m-%d")
-
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
 
 default_args = {
     "owner": "airflow",
@@ -31,6 +22,11 @@ default_args = {
     "name_prefix": "",
 }
 
+KubeResourceKind.register_global_kind(SparkApplication)
+today = datetime.today().strftime("%Y-%m-%d")
+module_path = os.path.dirname(__file__)
+POD_TEMPALTE = os.path.join(module_path, "templates", "pod_template.yaml")
+SPARK_POD_TEMPLATE = os.path.join(module_path, "templates", "spark_pod_template.yaml")
 
 with DAG(
     dag_id="full-refresh",
@@ -39,20 +35,18 @@ with DAG(
     catchup=False,
     tags=["full-refresh"],
     description="initial load/full refresh data pipeline",
-    template_searchpath=["/git/repo/components/airflow/dags"],
 ) as dag:
     GKE_CLUSTER_NAME = os.getenv("GKE_CLUSTER_NAME")
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
     STAGING_BUCKET = os.getenv("STAGING_BUCKET")
     BASE = "/git/repo/components"
-    TEMPLATES_PATH = f"{BASE}/airflow/dags/templates"
     SCRIPTS_PATH = f"{BASE}/airflow/dags/scripts"
     JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
 
     t1 = KubernetesJobOperator(
         task_id="aws_to_gcs",
-        body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
+        body_filepath=POD_TEMPALTE,
         command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
         arguments=[
             "--data-source",
@@ -71,7 +65,7 @@ with DAG(
             "image": "google/cloud-sdk:alpine",
             "name": "from-aws-to-gcs",
             "gitsync": True,
-            "nodeSelector": JOBS_NODE_POOL,
+            "nodeSelector": BASE_NODE_POOL,
             "volumes": [
                 {
                     "name": "aws-creds",
@@ -88,15 +82,15 @@ with DAG(
     STAGING_TARGET = (
         f"{os.getenv('STAGING_DATASET')}.{os.getenv('YELLOW_STAGING_TABLE')}"
     )
-    TRIAGE_TARGET = f"{os.getenv('TRIAGE_DATASET')}.{os.getenv('YELLOW_TRIAGE_TABLE')}"
+    TRIAGE_TARGET = f"{os.getenv('TRIAGE_DATASET')}.init_3_months"
 
     t2 = KubernetesJobOperator(
         task_id="etl",
-        body_filepath=f"{TEMPLATES_PATH}/spark_pod_template.yaml",
+        body_filepath=SPARK_POD_TEMPLATE,
         jinja_job_args={
             "project": GOOGLE_CLOUD_PROJECT,
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-            "mainApplicationFile": f"local://{BASE}/spark/scripts/main_init.py",
+            "mainApplicationFile": f"local://{BASE}/spark/scripts/initial_load.py",
             "name": "spark-k8s-init",
             "instances": 7,
             "gitsync": True,
@@ -115,7 +109,7 @@ with DAG(
 
     t3 = KubernetesJobOperator(
         task_id="dbt",
-        body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
+        body_filepath=POD_TEMPALTE,
         command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
         arguments=[
             "--deps",

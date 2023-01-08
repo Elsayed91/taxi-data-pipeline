@@ -177,36 +177,42 @@ def write_to_bigquery(
 
 def create_temptable(
     spark: SparkSession,
-    uri: str,
+    uri: Union[str, list[str]],
     mapping: dict[str, str],
     temp_table_name: str = "temp_table",
+    date_filter: bool = False,
 ) -> None:
     """Create a temporary table from data stored in a parquet file.
 
     Args:
         spark: A SparkSession object.
-        uri: The URI of the parquet file to read from.
+        uri: The URI(s) of the parquet file(s) to read from.
 
     Returns:
         None
     """
-    df = spark.read.parquet(uri)
+    if isinstance(uri, str):
+        df = spark.read.parquet(uri)
+    elif isinstance(uri, list):
+        df = spark.read.parquet(*uri)
+    else:
+        raise ValueError("Invalid URI type")
 
     # Cast the columns to the correct data types
     df = cast_columns(df, mapping)  # type: ignore
-
+    if date_filter:
+        df = df.filter(
+            F.col("tpep_pickup_datetime")
+            > F.current_timestamp() - F.expr("INTERVAL 6 MONTH")
+        )
     # Create the temporary table
     df.createOrReplaceTempView(temp_table_name)
 
 
-def process_current(
-    spark, summary_query, filter_conditions, temp_table_name: str = "temp_table"
-):
-    df_hist = spark.sql(summary_query)
+def process_current(spark, filter_conditions, temp_table_name: str = "temp_table"):
 
     df_clean = spark.sql(f"SELECT * FROM {temp_table_name} WHERE {filter_conditions}")
     df_triage = spark.sql(
         f"SELECT * FROM {temp_table_name} WHERE NOT ({filter_conditions})"
     )
-
-    return df_hist, df_clean, df_triage
+    return df_clean, df_triage

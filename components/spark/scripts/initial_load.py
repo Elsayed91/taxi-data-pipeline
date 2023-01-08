@@ -22,8 +22,8 @@ if __name__ == "__main__":
     CATEGORY = str(os.getenv("CATEGORY"))
     MAPPING = options[CATEGORY]["mapping"]
     TRANSFORMATION_QUERY = options[CATEGORY]["transformation_query"]
-    FILTER_CONDITIONS = options[CATEGORY]["filter_conditions"]
-    HISTORICAL_TARGET = str(os.getenv("HISTORICAL_TARGET"))
+    FILTERS = options[CATEGORY]["filter_conditions"]
+    HIST_TARGET = str(os.getenv("HISTORICAL_TARGET"))
     STAGING_TARGET = str(os.getenv("STAGING_TARGET"))
     TRIAGE_TAREGET = str(os.getenv("TRIAGE_TAREGET"))
 
@@ -33,25 +33,10 @@ if __name__ == "__main__":
     lists = schema_groups(df)
     for l in lists:
         idx = lists.index(l)
-        df = spark.read.parquet(*l)
-        df = cast_columns(df, MAPPING)  # type: ignore
-        df_view = df.createOrReplaceTempView("df_view")
-        df_historical = spark.sql(TRANSFORMATION_QUERY)
-        df_historical.write.mode("append").format("bigquery").option(
-            "bigQueryJobLabel.spark", f"etl-hist-{idx}"
-        ).save(HISTORICAL_TARGET)
-        df_current = df.filter(
-            F.col("tpep_pickup_datetime")
-            > F.current_timestamp() - F.expr("INTERVAL 6 MONTH")
-        )
-        df_view = df_current.createOrReplaceTempView("view")
-        df_current_clean = spark.sql(f"SELECT * FROM view WHERE {FILTER_CONDITIONS}")
-        df_current_trash = spark.sql(
-            f"SELECT * FROM view WHERE NOT ({FILTER_CONDITIONS})"
-        )
-        df_current_clean.write.mode("append").format("bigquery").option(
-            "bigQueryJobLabel.spark", f"etl-clean-{idx}"
-        ).save(STAGING_TARGET)
-        df_current_trash.write.mode("append").format("bigquery").option(
-            "bigQueryJobLabel.spark", f"etl-triage{idx}"
-        ).save(TRIAGE_TAREGET)
+        create_temptable(spark, l, MAPPING)
+        df_hist = spark.sql(TRANSFORMATION_QUERY)
+        write_to_bigquery(df_hist, HIST_TARGET, f"hist-{idx}")
+        create_temptable(spark, l, MAPPING, date_filter=True)
+        df_clean, df_triage = process_current(spark, FILTERS)
+        write_to_bigquery(df_clean, STAGING_TARGET, f"clean-{idx}")
+        write_to_bigquery(df_triage, f"{TRIAGE_TAREGET}", f"triage-{idx}")
