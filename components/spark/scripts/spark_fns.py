@@ -162,12 +162,11 @@ def reformat_date(date_string: str, output_format: str) -> str:
 def process(
     spark: SparkSession,
     uri: str,
-    mapping: dict[str, str],
     partition_filter: str,
     **kwargs,
 ):
     df = spark.read.parquet(uri)
-    df = cast_columns(df, mapping)
+    df = cast_columns(df, kwargs["mapping"])
     start_timestamp = to_timestamp(partition_filter + "01", "YYYYMMdd")
     end_timestamp = start_timestamp + F.expr("INTERVAL 1 MONTH")
     df = df.filter(
