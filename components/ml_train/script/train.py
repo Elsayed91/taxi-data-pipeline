@@ -28,6 +28,9 @@ if __name__ == "__main__":
 
     exp = mlflow.set_experiment(mlflow_experiment_name)
     exp_id = exp.experiment_id
+    mlflow.set_tracking_uri(
+        f"http://{mlflow_tracking_server}.default.svc.cluster.local:5000"
+    )
 
     df = load_data(target_dataset, target_table, 50)  # type: ignore
 
