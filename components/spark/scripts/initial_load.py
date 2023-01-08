@@ -39,4 +39,4 @@ if __name__ == "__main__":
         create_temptable(spark, l, MAPPING, date_filter=True)
         df_clean, df_triage = process_current(spark, FILTERS)
         write_to_bigquery(df_clean, STAGING_TARGET, f"clean-{idx}")
-        write_to_bigquery(df_triage, f"{TRIAGE_TAREGET}", f"triage-{idx}")
+        write_to_bigquery(df_triage, TRIAGE_TAREGET, f"triage-{idx}")

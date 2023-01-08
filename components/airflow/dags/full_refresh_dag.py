@@ -135,4 +135,5 @@ with DAG(
         envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app", "RUN_DATE": today},
     )
 
-    t1 >> t2 >> t3  # type: ignore
+    t2 >> t3  # type: ignore
+    # t1 >> t2 >> t3  # type: ignore
