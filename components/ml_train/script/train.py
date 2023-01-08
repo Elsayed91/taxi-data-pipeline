@@ -19,12 +19,13 @@ if __name__ == "__main__":
     target_dataset = os.getenv("TARGET_DATASET")
     target_table = os.getenv("TARGET_TABLE")
     mlflow_tracking_server = os.getenv("TRACKING_SERVICE", "mlflow-service")
-    mlflow_experiment_name = os.getenv(
-        "MLFLOW_EXPERIMENT_NAME", "taxi-fare-prediction-v2"
-    )
     mlflow.set_tracking_uri(
         f"http://{mlflow_tracking_server}.default.svc.cluster.local:5000"
     )
+    mlflow_experiment_name = os.getenv(
+        "MLFLOW_EXPERIMENT_NAME", "taxi-fare-prediction-v2"
+    )
+
     target_column = os.getenv("TARGET_COLUMN", "fare_amount")
     mlflow_bucket = os.getenv("MLFLOW_BUCKET", "mlflow-cacfcc1b69")
     cross_validations = int(os.getenv("CROSS_VALIDATIONS", 1))  # type: ignore
