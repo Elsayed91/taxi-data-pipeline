@@ -9,7 +9,7 @@ gcloud components install gke-gcloud-auth-plugin
 # Loop through the changed components and build their images
 for component in "${CHANGED_COMPONENTS[@]}"; do
   echo "Building image for $component..."
-  cd ${PWD}/$component/docker
+  cd ${PWD}/components/$component/docker
   echo $PWD
   ls
   cat Dockerfile
