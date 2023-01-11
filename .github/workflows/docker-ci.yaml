@@ -39,8 +39,8 @@ jobs:
           project_id: ${{ env.PROJECT }}
           image_name: airflow
           image_tag: latest,v1
-          dockerfile: ${{ env.WORKDIR }}/components/airflow/docker/Dockerfile
-          context: ${{ env.WORKDIR }}/components/airflow/docker
+          dockerfile: /home/runner/work/taxi-pls/taxi-pls/components/airflow/docker/Dockerfile
+          context: /home/runner/work/taxi-pls/taxi-pls/components/airflow/docker
 # jobs:
 #   create_env_file:
 #     runs-on: ubuntu-latest
