@@ -27,17 +27,18 @@ jobs:
       run: |
         for path in $(git diff-tree --no-commit-id --name-only -r ${{ github.sha }}  | grep -E "components/.+/docker" | awk -F '/' '{print $2}'); do
           echo $path="RUN" >> $GITHUB_ENV
+          echo $path
         done
         echo "${{ env.airflow }}"
-    - name: Build and push Airflow image
-      uses: docker://gcr.io/kaniko-project/executor:v1.1.0
-      if: contains(env.airflow, 'RUN')
-      with:
-        args: >-
-          --context=dir:///github/workspace/components/airflow/docker
-          --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
-        dockerfile: components/airflow/docker/Dockerfile
-        service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+    # - name: Build and push Airflow image
+    #   uses: docker://gcr.io/kaniko-project/executor:v1.1.0
+    #   if: contains(env.airflow, 'RUN')
+    #   with:
+    #     args: >-
+    #       --context=dir:///github/workspace/components/airflow/docker
+    #       --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
+    #     dockerfile: components/airflow/docker/Dockerfile
+    #     service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 # jobs:
 #   create_env_file:
 #     runs-on: ubuntu-latest
