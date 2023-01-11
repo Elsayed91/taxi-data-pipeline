@@ -2,10 +2,11 @@
 
 set -e
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-echo $PWD
+echo $CHANGED_COMPONENTS
+
 gcloud components install gke-gcloud-auth-plugin
 # Get the changed components and set them as env variable
-echo $CHANGED_COMPONENTS
+
 # Loop through the changed components and build their images
 for component in "${CHANGED_COMPONENTS[@]}"; do
   echo "Building image for $component..."
@@ -17,7 +18,7 @@ steps:
     name: "gcr.io/kaniko-project/executor:latest"
     args:
       [
-        "--context=dir://components/$component/docker",
+        "--context=dir://$PWD/$component/docker",
         "--cache=true",
         "--cache-ttl=6h",
         "--destination=eu.gcr.io/${PROJECT}/$component",
