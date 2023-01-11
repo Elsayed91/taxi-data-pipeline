@@ -14,8 +14,6 @@ jobs:
     steps:
       - id: files
         uses: Ana06/get-changed-files@v2.2.0
-        with:
-          filter: 'components/*/docker'
       - run: |
           echo ${{ steps.files.outputs.all }}
 
