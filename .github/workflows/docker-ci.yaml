@@ -1,4 +1,4 @@
-name: CI
+name: Components-CD
 
 
 on:
@@ -11,28 +11,39 @@ on:
 jobs:
   setup-envs:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        component: ["AIRFLOW", "POSTGRES", "MLFLOW"]
     steps:
       - uses: actions/checkout@v2
-      - name: 'Create env file and checks which components were modified'
-        id: files
+      - run: |
+          echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
+      - id: files
         uses: Ana06/get-changed-files@v2.2.0
       - run: |
           echo "${{ steps.files.outputs.all }}"  | xargs -n1 | grep -E "components/.+/docker" | awk -F '/' '{print $2}' | tr '[:lower:]' '[:upper:]' | while read c; do
               echo $c="RUN" >> $GITHUB_ENV
           done
-          echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
-
-
       - uses: RafikFarhad/push-to-gcr-github-action@v5-beta
+        if: contains(env.{{ matrix.component }}, 'RUN')
         with:
           gcloud_service_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          build_args: DOCKER_BUILDKIT=1
           registry: eu.gcr.io
           project_id: ${{ env.PROJECT }}
           image_name: airflow
-          image_tag: latest,v1
-          dockerfile: ${{ github.workspace }}/components/airflow/docker/Dockerfile
-          context: ${{ github.workspace }}/components/airflow/docker
+          image_tag: latest,v1 #${{ github.sha }}
+          dockerfile: ${{ github.workspace }}/components/${{ matrix.component }}/docker/Dockerfile
+          context: ${{ github.workspace }}/components/${{ matrix.component }}/docker
+      - name: kubectl - Google Cloud GKE cluster.
+        if: contains(env.{{ matrix.version }}, 'RUN')
+        uses: ameydev/gke-kubectl-action@master
+        env:
+          PROJECT_ID: ${{ env.PROJECT }}
+          APPLICATION_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          CLUSTER_NAME: ${{ env.GKE_CLUSTER_NAME }}
+          ZONE_NAME: ${{ env.GCP_ZONE }}
+        with:
+          args: rollout restart deployment ${{ matrix.component }}
 # jobs:
 #   create_env_file:
 #     runs-on: ubuntu-latest
