@@ -20,7 +20,7 @@ steps:
     name: "gcr.io/kaniko-project/executor:latest"
     args:
       [
-        "--context=.,
+        "--context=.",
         "--cache=true",
         "--cache-ttl=6h",
         "--destination=eu.gcr.io/${PROJECT}/$component",
