@@ -26,7 +26,7 @@ jobs:
     - name: Detect changed directories
       run: |
         changed_dirs=()
-        for path in $(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -e ".*/docker"); do
+        for path in $(git diff-tree --no-commit-id --name-only -r ${{ github.sha }}  | grep -E "components/.+/docker" | awk -F '/' '{print $2}'; do
           echo $path
           changed_dirs+=($path)
         done
@@ -34,7 +34,7 @@ jobs:
         echo "${{ env.changed_dirs }}"
     - name: Build and push Airflow image
       uses: docker://gcr.io/kaniko-project/executor:v1.1.0
-      if: contains(env.changed_dirs, 'airflow/docker')
+      if: contains(env.changed_dirs, 'airflow')
       with:
         args: >-
           --context=dir:///github/workspace/components/airflow/docker
