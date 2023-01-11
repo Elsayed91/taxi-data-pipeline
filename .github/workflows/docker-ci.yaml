@@ -22,14 +22,14 @@ jobs:
           done
           echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
           cat ${{ github.workspace }}/components/airflow/docker/Dockerfile
-      # - name: Build and push Airflow image
-      #   uses: docker://gcr.io/kaniko-project/executor:v1.1.0
-      #   if: contains(env.AIRFLOW, 'RUN')
-      #   with:
-      #     args: >-
-      #       --context=dir://${{ github.workspace }}/components/airflow/docker
-      #       --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
-      #     service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      - name: Build and push Airflow image
+        uses: docker://gcr.io/kaniko-project/executor:v1.1.0
+        if: contains(env.AIRFLOW, 'RUN')
+        with:
+          args: >-
+            --context=dir://${{ github.workspace }}/components/airflow/docker
+            --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
+          service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
       # - uses: RafikFarhad/push-to-gcr-github-action@v5-beta
       #   with:
       #     gcloud_service_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
@@ -48,19 +48,20 @@ jobs:
 #           echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
 #       - run: |
 #           echo ${{ env.PROJECT }}
-#   # build-airflow-image:
-#   #   runs-on: ubuntu-latest
-#   #   if: startsWith(github.event.head_commit.modified, 'airflow/docker/')
-#   #   steps:
-#   #     - uses: actions/checkout@v2
-#   #     - name: Build and push Airflow image
-#   #       uses: docker://gcr.io/kaniko-project/executor:v1.1.0
-#   #       with:
-#   #         args: >-
-#   #           --context=dir:///github/workspace/airflow/docker
-#   #           --destination=eu.gcr.io/<your-project-id>/airflow:latest
-#   #         dockerfile: airflow/docker/Dockerfile
-#   #         service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+  build-airflow-image:
+    runs-on: ubuntu-latest
+    needs: setup-envs
+    if: contains(env.AIRFLOW, 'RUN')
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build and push Airflow image
+        id: build
+        uses: docker://gcr.io/kaniko-project/executor:v1.1.0
+        with:
+          args: >-
+            --context=dir://${{ github.workspace }}/components/airflow/docker
+            --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
+          service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
 #   build-postgres-image:
 #     runs-on: ubuntu-latest
