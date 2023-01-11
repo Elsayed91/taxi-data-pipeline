@@ -20,6 +20,7 @@ jobs:
               echo $c="RUN" >> $GITHUB_ENV
           done
           echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
+          echo WORKDIR="${{ github.workspace }}" >> $GITHUB_ENV
       - run: |
           echo ${{ env.PROJECT }} && echo ${{ env.AIRFLOW }}
       - name: Build and push Airflow image
@@ -27,7 +28,7 @@ jobs:
         if: contains(env.AIRFLOW, 'RUN')
         with:
           args: >-
-            --context=dir://${{ github.workspace }}/components/airflow/docker
+            --context=dir://${{ env.WORKDIR }}/components/airflow/docker
             --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
           dockerfile: components/airflow/docker/Dockerfile
           service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
