@@ -12,6 +12,7 @@ jobs:
   setup-envs:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: 'Create env file and checks which components were modified'
         id: files
         uses: Ana06/get-changed-files@v2.2.0
@@ -20,23 +21,14 @@ jobs:
               echo $c="RUN" >> $GITHUB_ENV
           done
           echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
-          echo WORKDIR="${{ github.workspace }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v2
-      - working-directory: components/airflow/docker
-        run: |
-          echo ${{ env.PROJECT }} && echo ${{ env.AIRFLOW }}
-          echo ${PWD}
-          ls -a
-
-      # - name: Build and push Airflow image
-      #   uses: docker://gcr.io/kaniko-project/executor:v1.1.0
-      #   if: contains(env.AIRFLOW, 'RUN')
-      #   with:
-      #     args: >-
-      #       --context=dir://${{ env.WORKDIR }}/components/airflow/docker
-      #       --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
-      #       --dockerfile=Dockerfile
-      #     service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      - name: Build and push Airflow image
+        uses: docker://gcr.io/kaniko-project/executor:v1.1.0
+        if: contains(env.AIRFLOW, 'RUN')
+        with:
+          args: >-
+            --context=dir://${{ github.workspace }}/components/airflow/docker
+            --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
+          service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
       # - uses: RafikFarhad/push-to-gcr-github-action@v5-beta
       #   with:
       #     gcloud_service_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
