@@ -25,7 +25,7 @@ jobs:
               echo $c="RUN" >> $GITHUB_ENV
           done
       - uses: RafikFarhad/push-to-gcr-github-action@v5-beta
-        if: contains(env.{{ matrix.component }}, 'RUN')
+        if: contains(matrix.component, 'RUN')
         with:
           gcloud_service_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
           registry: eu.gcr.io
@@ -35,7 +35,7 @@ jobs:
           dockerfile: ${{ github.workspace }}/components/${{ matrix.component }}/docker/Dockerfile
           context: ${{ github.workspace }}/components/${{ matrix.component }}/docker
       - name: kubectl - Google Cloud GKE cluster.
-        if: contains(env.{{ matrix.version }}, 'RUN')
+        if: contains(matrix.component, 'RUN')
         uses: ameydev/gke-kubectl-action@master
         env:
           PROJECT_ID: ${{ env.PROJECT }}
