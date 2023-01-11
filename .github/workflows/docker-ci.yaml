@@ -20,6 +20,8 @@ jobs:
           done
       - run: |
           echo ${{ env.AIRFLOW }}
+          echo ${{ env.POSTGRES }}
+          echo ${{ env.MLFLOW }}
   # create_env_file:
   #   runs-on: ubuntu-latest
   #   steps:
