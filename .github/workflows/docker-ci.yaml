@@ -13,8 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          for path in $(git diff-tree --no-commit-id --name-only -r ${{ github.sha }}  | grep -E "components/.+/docker" | awk -F '/' '{print $2}' | tr '[:lower:]' '[:upper:]'); do
-              echo "$path=RUN" >> $GITHUB_ENV
+          for comp in "$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }}  | grep -E "components/.+/docker" | awk -F '/' '{print $2}' | tr '[:lower:]' '[:upper:]')"; do
+              echo "$comp=RUN" >> $GITHUB_ENV
           done
       - run: |
           echo ${{ env.AIRFLOW }}
