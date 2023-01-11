@@ -12,12 +12,15 @@ jobs:
   checkchanges:
     runs-on: ubuntu-latest
     steps:
+      - id: files
+        uses: Ana06/get-changed-files@v2.2.0
+        with:
+          filter: 'components/*/docker'
       - run: |
-          for comp in "$(git diff-tree --no-commit-id --name-only -r ${{ github.sha }}  | grep -E "components/.+/docker" | awk -F '/' '{print $2}' | tr '[:lower:]' '[:upper:]')"; do
-              echo "$comp=RUN" >> $GITHUB_ENV
+          for changed_file in ${{ steps.files.outputs.all }}; do
+            echo "$changed_file"
           done
-      - run: |
-          echo ${{ env.AIRFLOW }}
+
   # create_env_file:
   #   runs-on: ubuntu-latest
   #   steps:
