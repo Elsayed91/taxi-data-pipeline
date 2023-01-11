@@ -24,7 +24,7 @@ jobs:
       - run: |
           echo ${{ env.PROJECT }} && echo ${{ env.AIRFLOW }}
           echo ${PWD}
-          cat ${PWD}/components/airflow/docker/Dockerfile
+          ls -a
       # - name: Build and push Airflow image
       #   uses: docker://gcr.io/kaniko-project/executor:v1.1.0
       #   if: contains(env.AIRFLOW, 'RUN')
