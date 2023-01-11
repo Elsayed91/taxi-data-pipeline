@@ -29,10 +29,10 @@ jobs:
       - run: |
           echo CHANGED_COMPONENTS=$(echo "${{ steps.files.outputs.all }}"  | xargs -n1 | grep -E "components/.+/docker" | awk -F '/' '{print $2}' | tr '[:lower:]' '[:upper:]') >> $GITHUB_ENV
       - name: Run script file
-        working-directory: scripts
+        working-directory: .
         run: |
-          chmod +x docker.sh
-          ./docker.sh
+          chmod +x scripts/docker.sh
+          ./scripts/docker.sh
         shell: bash
       # - uses: RafikFarhad/push-to-gcr-github-action@v5-beta
       #   if: contains(matrix.component, 'RUN')
