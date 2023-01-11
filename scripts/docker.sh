@@ -2,7 +2,7 @@
 
 set -e
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-echo $pwd
+echo $PWD
 gcloud components install gke-gcloud-auth-plugin
 # Get the changed components and set them as env variable
 echo $CHANGED_COMPONENTS
