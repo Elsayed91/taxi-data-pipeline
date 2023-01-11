@@ -9,6 +9,14 @@ on:
 
 
 jobs:
+  create_env_file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Create env file'
+        run: |
+          echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
+      - run: |
+          echo ${{ env.PROJECT }}
   airflow-job:
     runs-on: ubuntu-latest
     steps:
@@ -20,14 +28,15 @@ jobs:
         for path in $(git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep -e ".*/docker$"); do
           changed_dirs+=($path)
         done
-        echo changed_dirs=$chaned_dirs >> $GITHUB_ENV
+        echo changed_dirs=$changed_dirs >> $GITHUB_ENV
+        echo /${{ env.changed_dirs }}
     - name: Build and push Airflow image
       uses: docker://gcr.io/kaniko-project/executor:v1.1.0
       if: contains(env.changed_dirs, 'airflow/docker')
       with:
         args: >-
           --context=dir:///github/workspace/components/airflow/docker
-          --destination=eu.gcr.io/<your-project-id>/airflow:latest
+          --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
         dockerfile: components/airflow/docker/Dockerfile
         service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 # jobs:
