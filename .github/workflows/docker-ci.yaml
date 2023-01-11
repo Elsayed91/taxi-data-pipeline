@@ -22,23 +22,24 @@ jobs:
           done
           echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
           cat ${{ github.workspace }}/components/airflow/docker/Dockerfile
-      # - name: Build and push Airflow image
-      #   uses: docker://gcr.io/kaniko-project/executor:v1.1.0
-      #   if: contains(env.AIRFLOW, 'RUN')
-      #   with:
-      #     args: >-
-      #       --context=dir://${{ github.workspace }}/components/airflow/docker
-      #       --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
-      #     service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-      - uses: RafikFarhad/push-to-gcr-github-action@v5-beta
+      - name: Build and push Airflow image
+        uses: docker://gcr.io/kaniko-project/executor:v1.1.0
+        if: contains(env.AIRFLOW, 'RUN')
         with:
-          gcloud_service_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          registry: eu.gcr.io
-          project_id: ${{ env.PROJECT }}
-          image_name: airflow
-          image_tag: latest,v1
-          dockerfile: ${{ github.workspace }}/components/airflow/docker/Dockerfile
-          context: ${{ github.workspace }}/components/airflow/docker
+          args: >-
+            --context=dir://${{ github.workspace }}/components/airflow/docker
+            --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
+            --dockerfile /${{ github.workspace }}/components/airflow/docker/Dockerfile
+          service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      # - uses: RafikFarhad/push-to-gcr-github-action@v5-beta
+      #   with:
+      #     gcloud_service_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      #     registry: eu.gcr.io
+      #     project_id: ${{ env.PROJECT }}
+      #     image_name: airflow
+      #     image_tag: latest,v1
+      #     dockerfile: ${{ github.workspace }}/components/airflow/docker/Dockerfile
+      #     context: ${{ github.workspace }}/components/airflow/docker
 # jobs:
 #   create_env_file:
 #     runs-on: ubuntu-latest
