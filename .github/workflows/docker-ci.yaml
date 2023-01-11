@@ -22,31 +22,32 @@ jobs:
           done
           echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
 
-      # - name: Login to gcloud registry
-      #   id: gcloud
-      #   uses: elgohr/gcloud-login-action@v2
-      #   with:
-      #     account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-      # - name: Kaniko build
-      #   uses: aevea/action-kaniko@master
-
-      #   with:
-      #     image: aevea/kaniko
-      #     username: ${{ steps.gcloud.outputs.username }}
-      #     password: ${{ steps.gcloud.outputs.password }}
-      #     cache: true
-      #     cache_registry: aevea/cache
-
-      - uses: RafikFarhad/push-to-gcr-github-action@v5-beta
+      - name: Login to gcloud registry
+        id: gcloud
+        uses: elgohr/gcloud-login-action@v2
         with:
-          gcloud_service_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          build_args: DOCKER_BUILDKIT=1
+          account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      - name: Kaniko build
+        uses: aevea/action-kaniko@master
+        with:
+          image: aevea/kaniko
           registry: eu.gcr.io
-          project_id: ${{ env.PROJECT }}
-          image_name: airflow
-          image_tag: latest,v1
-          dockerfile: ${{ github.workspace }}/components/airflow/docker/Dockerfile
-          context: ${{ github.workspace }}/components/airflow/docker
+          username: ${{ steps.gcloud.outputs.username }}
+          password: ${{ steps.gcloud.outputs.password }}
+          cache: true
+          cache_registry: aevea/cache
+          path: ${{ github.workspace }}/components/airflow/docker
+
+      # - uses: RafikFarhad/push-to-gcr-github-action@v5-beta
+      #   with:
+      #     gcloud_service_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      #     build_args: DOCKER_BUILDKIT=1
+      #     registry: eu.gcr.io
+      #     project_id: ${{ env.PROJECT }}
+      #     image_name: airflow
+      #     image_tag: latest,v1
+      #     dockerfile: ${{ github.workspace }}/components/airflow/docker/Dockerfile
+      #     context: ${{ github.workspace }}/components/airflow/docker
 # jobs:
 #   create_env_file:
 #     runs-on: ubuntu-latest
