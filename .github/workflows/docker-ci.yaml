@@ -9,53 +9,34 @@ on:
 
 
 jobs:
-  checkchanges:
+  setup-envs:
     runs-on: ubuntu-latest
     steps:
-      - id: files
+      - name: 'Create env file and checks which components were modified'
+        id: files
         uses: Ana06/get-changed-files@v2.2.0
       - run: |
           echo "${{ steps.files.outputs.all }}"  | xargs -n1 | grep -E "components/.+/docker" | awk -F '/' '{print $2}' | tr '[:lower:]' '[:upper:]' | while read c; do
               echo $c="RUN" >> $GITHUB_ENV
           done
+          echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
       - run: |
-          echo ${{ env.AIRFLOW }}
-          echo ${{ env.POSTGRES }}
-          echo ${{ env.MLFLOW }}
-  # create_env_file:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: 'Create env file'
-  #       run: |
-  #         echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
-  #     - run: |
-  #         for path in $(git diff-tree --no-commit-id --name-only -r ${{ github.sha }}  | grep -E "components/.+/docker" | awk -F '/' '{print $2}' | tr '[:lower:]' '[:upper:]'); do
-  #             echo "$path=RUN" >> $GITHUB_ENV
-  #         done
-  #     - run: |
-  #         echo ${{ env.PROJECT }} && echo ${{ env.AIRFLOW }}
-  # airflow-job:
-  #   runs-on: ubuntu-latest
-  #   needs: create_env_file
-  #   steps:
-  #   - name: Checkout code
-  #     uses: actions/checkout@v2
-  #   - name: Detect changed directories
-  #     run: |
-  #       for path in $(git diff-tree --no-commit-id --name-only -r ${{ github.sha }}  | grep -E "components/.+/docker" | awk -F '/' '{print $2}'); do
-  #         echo $path="RUN" >> $GITHUB_ENV
-  #         echo $path
-  #       done
-  #       echo "${{ env.airflow }}"
-    # - name: Build and push Airflow image
-    #   uses: docker://gcr.io/kaniko-project/executor:v1.1.0
-    #   if: contains(env.airflow, 'RUN')
-    #   with:
-    #     args: >-
-    #       --context=dir:///github/workspace/components/airflow/docker
-    #       --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
-    #     dockerfile: components/airflow/docker/Dockerfile
-    #     service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          echo ${{ env.PROJECT }} && echo ${{ env.AIRFLOW }}
+  airflow-job:
+    runs-on: ubuntu-latest
+    needs: setup-envs
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build and push Airflow image
+      uses: docker://gcr.io/kaniko-project/executor:v1.1.0
+      if: contains(env.AIRFLOW, 'RUN')
+      with:
+        args: >-
+          --context=dir:///github/workspace/components/airflow/docker
+          --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
+        dockerfile: components/airflow/docker/Dockerfile
+        service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 # jobs:
 #   create_env_file:
 #     runs-on: ubuntu-latest
