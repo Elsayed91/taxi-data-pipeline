@@ -29,6 +29,7 @@ jobs:
         with:
           args: >-
             --context=dir://${{ env.WORKDIR }}/components/airflow/docker
+            --dockerfile=Dockerfile
             --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
           dockerfile: components/airflow/docker/Dockerfile
           service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
