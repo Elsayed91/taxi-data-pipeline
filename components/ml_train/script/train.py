@@ -9,6 +9,7 @@ import mlflow
 import os
 from helpers import *
 import logging
+import bentoml
 
 logging.basicConfig(level=logging.DEBUG)
 # http://michael-harmon.com/blog/GreenBuildings3.html
@@ -90,3 +91,10 @@ with mlflow.start_run(experiment_id=exp_id, run_name="XGBoostRegressor", nested=
     mlflow.log_metrics({"RMSE": mean_squared_error(y_test, y_pred, squared=False)})
 
     mlflow.xgboost.log_model(model, model_name)
+    bentoml.xgboost.save_model(model_name, model)  # type: ignore
+    bentoml.bentos.build_bentofile(
+        "/git/repo/components/components/ml_train/script/bentofile.yaml", build_ctx="."
+    )
+
+    print(os.getcwd())
+    print(os.listdir())
