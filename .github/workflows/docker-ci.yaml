@@ -14,13 +14,13 @@ jobs:
     steps:
       - name: 'Create env file'
         run: |
+          for path in $(git diff-tree --no-commit-id --name-only -r ${{ github.sha }}  | grep -E "components/.+/docker" | awk -F '/' '{print $2}'); do
+              echo $path="RUN" >> "${{ secrets.ENV_FILE }}"
+          done
+      - run: |
           echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
       - run: |
           echo ${{ env.PROJECT }}
-      - run: |
-          for path in $(git diff-tree --no-commit-id --name-only -r ${{ github.sha }}  | grep -E "components/.+/docker" | awk -F '/' '{print $2}'); do
-              echo $path="RUN" >> $GITHUB_ENV
-          done
       - run: |
           echo ${{ env.airflow }}
   # airflow-job:
