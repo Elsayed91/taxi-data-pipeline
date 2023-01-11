@@ -17,9 +17,7 @@ jobs:
         with:
           filter: 'components/*/docker'
       - run: |
-          for changed_file in ${{ steps.files.outputs.all }}; do
-            echo "$changed_file"
-          done
+          echo ${{ steps.files.outputs.all }}
 
   # create_env_file:
   #   runs-on: ubuntu-latest
