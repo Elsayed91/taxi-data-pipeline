@@ -25,7 +25,7 @@ for component in "${CHANGED_COMPONENTS[@]}"; do
   # EOL
 
   # Submit the build to Google Cloud Build
-  gcloud builds submit .
+  # gcloud builds submit .
 
   echo "Image for $component built and pushed to registry."
   if [[ -d ${PWD}/components/$component/manifests ]]; then
