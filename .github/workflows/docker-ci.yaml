@@ -22,21 +22,15 @@ jobs:
           echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
       - run: |
           echo ${{ env.PROJECT }} && echo ${{ env.AIRFLOW }}
-  airflow-job:
-    runs-on: ubuntu-latest
-    needs: setup-envs
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Build and push Airflow image
-      uses: docker://gcr.io/kaniko-project/executor:v1.1.0
-      if: contains(env.AIRFLOW, 'RUN')
-      with:
-        args: >-
-          --context=dir:///github/workspace/components/airflow/docker
-          --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
-        dockerfile: components/airflow/docker/Dockerfile
-        service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      - name: Build and push Airflow image
+        uses: docker://gcr.io/kaniko-project/executor:v1.1.0
+        if: contains(env.AIRFLOW, 'RUN')
+        with:
+          args: >-
+            --context=dir:///${{ GITHUB_WORKSPACE }}/components/airflow/docker
+            --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
+          dockerfile: components/airflow/docker/Dockerfile
+          service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 # jobs:
 #   create_env_file:
 #     runs-on: ubuntu-latest
