@@ -26,7 +26,7 @@ jobs:
     - name: Detect changed directories
       run: |
         changed_dirs=()
-        for path in $(git diff-tree --no-commit-id --name-only -r ${{ github.sha }}  | grep -E "components/.+/docker" | awk -F '/' '{print $2}'; do
+        for path in $(git diff-tree --no-commit-id --name-only -r ${{ github.sha }}  | grep -E "components/.+/docker" | awk -F '/' '{print $2}'); do
           echo $path
           changed_dirs+=($path)
         done
