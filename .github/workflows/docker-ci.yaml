@@ -11,15 +11,17 @@ on:
 jobs:
   setup-envs:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        component: ["AIRFLOW", "POSTGRES", "MLFLOW"]
+    # strategy:
+    #   matrix:
+    #     component: ["AIRFLOW", "POSTGRES", "MLFLOW"]
     steps:
       - uses: actions/checkout@v2
       - id: 'auth'
         uses: 'google-github-actions/auth@v1'
         with:
           credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
       - run: |
           echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
       - id: files
@@ -31,7 +33,7 @@ jobs:
       - name: Run script file
         run: |
           chmod +x ${{ github.workspace }}/scripts/docker.sh
-          ./${{ github.workspace }}/scripts/docker.sh
+          .${{ github.workspace }}/scripts/docker.sh
         shell: bash
       # - uses: RafikFarhad/push-to-gcr-github-action@v5-beta
       #   if: contains(matrix.component, 'RUN')
