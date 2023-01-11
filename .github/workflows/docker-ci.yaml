@@ -21,11 +21,13 @@ jobs:
           done
           echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
           echo WORKDIR="${{ github.workspace }}" >> $GITHUB_ENV
+      - uses: actions/checkout@v2
       - working-directory: components/airflow/docker
         run: |
           echo ${{ env.PROJECT }} && echo ${{ env.AIRFLOW }}
           echo ${PWD}
           ls -a
+
       # - name: Build and push Airflow image
       #   uses: docker://gcr.io/kaniko-project/executor:v1.1.0
       #   if: contains(env.AIRFLOW, 'RUN')
