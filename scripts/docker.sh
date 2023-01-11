@@ -4,11 +4,9 @@
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 COMONENTS_DIR=${SCRIPT_DIR}/../components
 # Get the changed components and set them as env variable
-CHANGED_COMPONENTS=$(git diff --name-only HEAD HEAD~1 | grep -E "components/.+/docker" | awk -F '/' '{print $2}')
-export CHANGED_COMPONENTS
-
+echo $CHANGED_COMPONENTS
 # Loop through the changed components and build their images
-for component in $CHANGED_COMPONENTS; do
+for component in "${CHANGED_COMPONENTS[@]}"; do
   echo "Building image for $component..."
 
   # Build cloudbuild.yaml for each component
