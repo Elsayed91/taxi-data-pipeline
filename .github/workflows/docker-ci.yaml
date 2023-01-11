@@ -31,9 +31,10 @@ jobs:
               echo $c="RUN" >> $GITHUB_ENV
           done
       - name: Run script file
+        working-directory: scripts
         run: |
-          chmod +x ${{ github.workspace }}/scripts/docker.sh
-          .${{ github.workspace }}/scripts/docker.sh
+          chmod +x docker.sh
+          ./docker.sh
         shell: bash
       # - uses: RafikFarhad/push-to-gcr-github-action@v5-beta
       #   if: contains(matrix.component, 'RUN')
