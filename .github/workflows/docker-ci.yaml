@@ -21,7 +21,7 @@ jobs:
               echo $c="RUN" >> $GITHUB_ENV
           done
           echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
-          cat ${{ github.workspace }}/components/airflow/docker/Dockerfile
+          export DOCKER_BUILDKIT=1
       # - name: Login to gcloud registry
       #   id: gcloud
       #   uses: elgohr/gcloud-login-action@v2
