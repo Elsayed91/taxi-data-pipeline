@@ -22,14 +22,29 @@ jobs:
           done
           echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
           cat ${{ github.workspace }}/components/airflow/docker/Dockerfile
-      - name: Build and push Airflow image
-        uses: docker://gcr.io/kaniko-project/executor:v1.1.0
-        if: contains(env.AIRFLOW, 'RUN')
+      - name: Login to gcloud registry
+        id: gcloud
+        uses: elgohr/gcloud-login-action@v2
         with:
-          args: >-
-            --context=${{ github.workspace }}/components/airflow/docker
-            --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
-          service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      - name: Kaniko build
+        uses: aevea/action-kaniko@master
+        working-directory: components/airflow/docker
+        with:
+          image: aevea/kaniko
+          username: ${{ steps.gcloud.outputs.username }}
+          password: ${{ steps.gcloud.outputs.password }}
+          cache: true
+          cache_registry: aevea/cache
+
+      # - name: Build and push Airflow image
+      #   uses: docker://gcr.io/kaniko-project/executor:v1.1.0
+      #   if: contains(env.AIRFLOW, 'RUN')
+      #   with:
+      #     args: >-
+      #       --context=${{ github.workspace }}/components/airflow/docker
+      #       --destination=eu.gcr.io/${{ env.PROJECT }}/airflow:${{ github.sha }}
+      #     service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
       # - uses: RafikFarhad/push-to-gcr-github-action@v5-beta
       #   with:
       #     gcloud_service_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
