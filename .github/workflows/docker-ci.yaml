@@ -17,7 +17,8 @@ jobs:
       - run: |
           comp="${{ steps.files.outputs.all }}"
           for c in $(comp | grep -E "components/.+/docker" | awk -F '/' '{print $2}' | tr '[:lower:]' '[:upper:]'); do
-          echo "$c=RUN" >> $GITHUB_ENV
+            echo "$c=RUN" >> $GITHUB_ENV
+          done
       - run: |
           echo ${{ env.AIRFLOW }}
   # create_env_file:
