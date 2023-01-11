@@ -2,6 +2,8 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: git-env
+  annotations:
+    reloader.stakater.com/match: "true"
 data:
   GIT_SYNC_REV: "HEAD"
   GIT_SYNC_BRANCH: "main"

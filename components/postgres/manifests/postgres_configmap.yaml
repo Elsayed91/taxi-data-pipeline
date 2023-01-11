@@ -4,6 +4,8 @@ metadata:
   name: postgres-db-config
   labels:
     app: postgresql
+  annotations:
+    reloader.stakater.com/match: "true"
 data:
   PGDATA: "/var/lib/postgresql/data/"
   POSTGRESQL_PORT_NUMBER: "5432"

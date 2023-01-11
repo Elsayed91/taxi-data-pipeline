@@ -2,6 +2,8 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: prometheus-postgres-exporter-cm
+  annotations:
+    reloader.stakater.com/match: "true"
 data:
   allow-snippet-annotations: "false"
   config.yaml: |

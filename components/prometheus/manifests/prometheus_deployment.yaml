@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus
+  annotations:
+    reloader.stakater.com/auto: "true"
   labels:
     app: prometheus
 spec:

@@ -4,6 +4,8 @@ metadata:
   name: prometheus-server-conf
   labels:
     name: prometheus-server-conf
+  annotations:
+    reloader.stakater.com/match: "true"
 data:
   prometheus.yml: |-
     global:

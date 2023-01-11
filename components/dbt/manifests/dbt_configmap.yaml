@@ -2,6 +2,8 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: dbt-env
+  annotations:
+    reloader.stakater.com/match: "true"
 data:
   PROJECT: ${PROJECT}
   GCP_REGION: ${GCP_REGION}

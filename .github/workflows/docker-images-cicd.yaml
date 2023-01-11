@@ -1,0 +1,30 @@
+name: docker-images-cicd
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'components/*/docker/**'
+
+jobs:
+  build-docker-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+      - run: |
+          echo "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
+      - id: files
+        uses: Ana06/get-changed-files@v2.2.0
+      - run: |
+          echo CHANGED_COMPONENTS=$(echo "${{ steps.files.outputs.all }}"  | xargs -n1 | grep -E "components/.+/docker" | awk -F '/' '{print $2}') >> $GITHUB_ENV
+      - name: Run script file
+        working-directory: .
+        run: |
+          chmod +x scripts/docker_cicd.sh
+          ./scripts/docker_cicd.sh
+        shell: bash
