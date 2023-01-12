@@ -42,7 +42,7 @@ fi
 if [[ -n ${CHANGED_K8S_COMPONENTS} ]]; then
   sudo apt-get update
   sudo apt-get install -y gettext-base
-  for component in "${CHANGED_K8S_COMPONENTS[@]}"; do
+  for component in "${CHANGED_K8S_COMPONENTS}"; do
     cat $component | envsubst | kubectl apply -f -
 
   done
