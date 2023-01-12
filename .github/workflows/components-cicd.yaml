@@ -18,8 +18,8 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v1'
       - name: Install envsubst
         run: |
-          apt-get update
-          apt-get install -y gettext-base
+          sudo apt-get update
+          sudo apt-get install -y gettext 
       - run: |
           echo -n "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
       - id: files
