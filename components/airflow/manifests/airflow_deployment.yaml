@@ -8,10 +8,12 @@ spec:
   selector:
     matchLabels:
       app: airflow
+      svc: external-lb
   template:
     metadata:
       labels:
         app: airflow
+        svc: external-lb
     spec:
       securityContext:
         runAsUser: 50000

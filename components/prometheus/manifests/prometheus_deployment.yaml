@@ -6,10 +6,12 @@ metadata:
     reloader.stakater.com/auto: "true"
   labels:
     app: prometheus
+    svc: external-lb
 spec:
   selector:
     matchLabels:
       app: prometheus
+      svc: external-lb
   strategy:
     type: Recreate
   template:

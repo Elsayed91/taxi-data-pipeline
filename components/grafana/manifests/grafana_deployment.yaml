@@ -6,14 +6,17 @@ metadata:
     reloader.stakater.com/auto: "true"
   labels:
     app: grafana
+    svc: external-lb
 spec:
   selector:
     matchLabels:
       app: grafana
+      svc: external-lb
   template:
     metadata:
       labels:
         app: grafana
+        svc: external-lb
     spec:
       containers:
         - name: grafana
