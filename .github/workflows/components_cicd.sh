@@ -41,7 +41,7 @@ fi
 
 if [[ -n ${CHANGED_K8S_COMPONENTS} ]]; then
   for component in "${CHANGED_K8S_COMPONENTS[@]}"; do
-    echo $component
+    cat $component | envsusbt | kubectl apply -f -
 
   done
 fi
