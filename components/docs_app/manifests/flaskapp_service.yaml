@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: flaskapp-service
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
     - name: flask-port
       port: 5000
