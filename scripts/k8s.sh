@@ -10,7 +10,8 @@ source ${SCRIPT_DIR}/functions.sh
 # kubectl patch serviceaccount $CLUSTER_KSA -p '{"imagePullSecrets": [{"name": "gcr-json-key"}]}'
 # kubectl create clusterrolebinding admin-role --clusterrole=cluster-admin --serviceaccount=default:default
 # kubectl create configmap scripts --from-file=components/k8s_common/scripts
-#
+#kubectl apply -f https://raw.githubusercontent.com/stakater/Reloader/master/deployments/kubernetes/reloader.yaml
+
 # mass_kubectl "components/*/manifests/*_service.yaml"
 # mass_kubectl "components/*/manifests/*_configmap.yaml"
 # mass_kubectl "components/*/manifests/*_secrets.yaml"
