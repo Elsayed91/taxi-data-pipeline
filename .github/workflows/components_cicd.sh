@@ -2,8 +2,8 @@
 
 set -e
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-# gcloud components install gke-gcloud-auth-plugin
-# gcloud container clusters get-credentials $GKE_CLUSTER_NAME --project=$PROJECT --region=$GCP_ZONE
+gcloud components install gke-gcloud-auth-plugin
+gcloud container clusters get-credentials $GKE_CLUSTER_NAME --project=$PROJECT --region=$GCP_ZONE
 
 if [[ -n ${CHANGED_DOCKER_COMPONENTS} ]]; then
   echo $CHANGED_DOCKER_COMPONENTS
@@ -12,26 +12,26 @@ if [[ -n ${CHANGED_DOCKER_COMPONENTS} ]]; then
     echo "Building image for $component..."
     cd ${PWD}/components/$component/docker
     # Build cloudbuild.yaml for each component
-    #     cat >cloudbuild.yaml <<EOL
-    # steps:
-    #   - id: "$component"
-    #     name: "gcr.io/kaniko-project/executor:latest"
-    #     args:
-    #       [
-    #         "--context=.",
-    #         "--cache=true",
-    #         "--cache-ttl=6h",
-    #         "--destination=eu.gcr.io/${PROJECT}/$component",
-    #       ]
-    # EOL
+    cat >cloudbuild.yaml <<EOL
+steps:
+  - id: "$component"
+    name: "gcr.io/kaniko-project/executor:latest"
+    args:
+      [
+        "--context=.",
+        "--cache=true",
+        "--cache-ttl=6h",
+        "--destination=eu.gcr.io/${PROJECT}/$component",
+      ]
+EOL
 
-    #     # Submit the build to Google Cloud Build
-    #     gcloud builds submit .
+    # Submit the build to Google Cloud Build
+    gcloud builds submit .
     echo "Image for $component built and pushed to registry."
 
     if [[ $(find ${PWD}/components/$component/manifests -name "*_deployment.yaml" | wc -l) -gt 0 ]]; then
       echo "Rolling out deployment for $component..."
-      # kubectl rollout restart deployment $component
+      kubectl rollout restart deployment $component
       echo "Deployment for $component rolled out."
     else
       echo "No Attached Kubernetes Deployment to restart. "
@@ -40,6 +40,8 @@ if [[ -n ${CHANGED_DOCKER_COMPONENTS} ]]; then
 fi
 
 if [[ -n ${CHANGED_K8S_COMPONENTS} ]]; then
+  sudo apt-get update
+  sudo apt-get install -y gettext-base
   for component in "${CHANGED_K8S_COMPONENTS[@]}"; do
     cat $component | envsusbt | kubectl apply -f -
 
