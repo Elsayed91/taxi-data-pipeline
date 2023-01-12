@@ -6,7 +6,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 gcloud components install gke-gcloud-auth-plugin
 gcloud container clusters get-credentials $GKE_CLUSTER_NAME --project=$PROJECT --region=$GCP_ZONE
 
-if [[ -z ${CHANGED_DOCKER_COMPONENTS} ]]; then
+if [[ -n ${CHANGED_DOCKER_COMPONENTS} ]]; then
   # Loop through the changed components and build their images
   for component in "${CHANGED_DOCKER_COMPONENTS[@]}"; do
     echo "Building image for $component..."
@@ -39,7 +39,7 @@ EOL
   done
 fi
 
-if [[ -z ${CHANGED_K8S_COMPONENTS} ]]; then
+if [[ -n ${CHANGED_K8S_COMPONENTS} ]]; then
   for component in "${CHANGED_K8S_COMPONENTS[@]}"; do
     echo $component
 
