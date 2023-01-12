@@ -5,7 +5,7 @@ metadata:
   labels:
     app: airflow
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: airflow
   ports:

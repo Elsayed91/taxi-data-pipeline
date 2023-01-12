@@ -4,6 +4,8 @@ metadata:
   name: my-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.allow-http: "true"
 spec:
   rules:
   - host: example.com
@@ -11,7 +13,6 @@ spec:
       paths:
       - path: /mlflow
         pathType: Prefix
-        pathRewrite: /
         backend:
           service:
             name: mlflow-service
@@ -22,7 +23,6 @@ spec:
       paths:
       - path: /prometheus
         pathType: Prefix
-        pathRewrite: /
         backend:
           service:
             name: prometheus
@@ -33,7 +33,6 @@ spec:
       paths:
       - path: /grafana
         pathType: Prefix
-        pathRewrite: /
         backend:
           service:
             name: grafana
@@ -44,7 +43,6 @@ spec:
       paths:
       - path: /airflow
         pathType: Prefix
-        pathRewrite: /
         backend:
           service:
             name: airflow-webserver
@@ -55,7 +53,6 @@ spec:
       paths:
       - path: /docs
         pathType: Prefix
-        pathRewrite: /
         backend:
           service:
             name: flaskapp-service
