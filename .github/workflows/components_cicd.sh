@@ -2,7 +2,7 @@
 
 set -e
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-
+apt-get install gettext-base
 gcloud components install gke-gcloud-auth-plugin
 gcloud container clusters get-credentials $GKE_CLUSTER_NAME --project=$PROJECT --region=$GCP_ZONE
 

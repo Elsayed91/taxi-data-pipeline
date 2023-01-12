@@ -21,8 +21,8 @@ jobs:
       - id: files
         uses: Ana06/get-changed-files@v2.2.0
       - run: |
-          echo CHANGED_DOCKER_COMPONENTS=$(echo "${{ steps.files.outputs.all }}"  | xargs -n1 | grep -E "components/.+/docker" | awk -F '/' '{print $2}') >> $GITHUB_ENV
-          echo CHANGED_K8S_COMPONENTS=$(echo "${{ steps.files.outputs.all }}"  | xargs -n1 | grep -E "components/.+/manifests") >> $GITHUB_ENV
+          echo -n CHANGED_DOCKER_COMPONENTS=$(echo "${{ steps.files.outputs.all }}"  | xargs -n1 | grep -E "components/.+/docker" | awk -F '/' '{print $2}') >> $GITHUB_ENV
+          echo -n CHANGED_K8S_COMPONENTS=$(echo "${{ steps.files.outputs.all }}"  | xargs -n1 | grep -E "components/.+/manifests") >> $GITHUB_ENV
       - name: Run script file
         working-directory: .
         run: |
