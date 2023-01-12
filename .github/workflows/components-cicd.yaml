@@ -1,10 +1,10 @@
-name: docker-images-cicd
+name: components-cicd
 on:
   push:
     branches: [ "main" ]
     paths:
       - 'components/*/docker/**'
-
+      - 'components/*/manifests/**'
 jobs:
   build-docker-images:
     runs-on: ubuntu-latest
@@ -21,10 +21,11 @@ jobs:
       - id: files
         uses: Ana06/get-changed-files@v2.2.0
       - run: |
-          echo CHANGED_COMPONENTS=$(echo "${{ steps.files.outputs.all }}"  | xargs -n1 | grep -E "components/.+/docker" | awk -F '/' '{print $2}') >> $GITHUB_ENV
+          echo CHANGED_DOCKER_COMPONENTS=$(echo "${{ steps.files.outputs.all }}"  | xargs -n1 | grep -E "components/.+/docker" | awk -F '/' '{print $2}') >> $GITHUB_ENV
+          echo CHANGED_K8S_COMPONENTS=$(echo "${{ steps.files.outputs.all }}"  | xargs -n1 | grep -E "components/.+/manifests") >> $GITHUB_ENV
       - name: Run script file
         working-directory: .
         run: |
-          chmod +x scripts/docker_cicd.sh
-          ./scripts/docker_cicd.sh
+          chmod +x .github/workflows/docker_cicd.sh
+          ./.github/workflows/docker_cicd.sh
         shell: bash
