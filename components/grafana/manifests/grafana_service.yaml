@@ -15,5 +15,3 @@ spec:
     - name: grafana-port
       port: 3000
       targetPort: 3000
-
-      

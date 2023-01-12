@@ -12,4 +12,3 @@ spec:
     - name: airflow-ui
       port: 8080
 
-      

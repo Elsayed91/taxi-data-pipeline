@@ -6,9 +6,9 @@ gcloud components install gke-gcloud-auth-plugin
 gcloud container clusters get-credentials $GKE_CLUSTER_NAME --project=$PROJECT --region=$GCP_ZONE
 
 if [[ -n ${CHANGED_DOCKER_COMPONENTS} ]]; then
-  echo $CHANGED_DOCKER_COMPONENTS
   # Loop through the changed components and build their images
-  for component in "${CHANGED_DOCKER_COMPONENTS}"; do
+  IFS=' ' read -r -a array <<<"$CHANGED_DOCKER_COMPONENTS"
+  for component in "${array[@]}"; do
     echo "Building image for $component..."
     cd ${PWD}/components/$component/docker
     # Build cloudbuild.yaml for each component
@@ -42,8 +42,8 @@ fi
 if [[ -n ${CHANGED_K8S_COMPONENTS} ]]; then
   sudo apt-get update
   sudo apt-get install -y gettext-base
-  for component in "${CHANGED_K8S_COMPONENTS}"; do
+  IFS=' ' read -r -a array <<<"$CHANGED_K8S_COMPONENTS"
+  for component in "${array[@]}"; do
     cat $component | envsubst | kubectl apply -f -
-
   done
 fi
