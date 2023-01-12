@@ -23,6 +23,18 @@ spec:
           env:
             - name: DOCS_BUCKET
               value: $DOCS_BUCKET
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 15
       nodeSelector:
         cloud.google.com/gke-nodepool: ${BASE_NODE_POOL}
         iam.gke.io/gke-metadata-server-enabled: "true"
