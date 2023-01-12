@@ -16,10 +16,6 @@ jobs:
           credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v1'
-      - name: Install envsubst
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gettext 
       - run: |
           echo -n "${{ secrets.ENV_FILE }}" >> $GITHUB_ENV
       - id: files
