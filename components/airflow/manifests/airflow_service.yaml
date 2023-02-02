@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: airflow-webserver
+  labels:
+    app: airflow
+spec:
+  type: NodePort
+  selector:
+    app: airflow
+  ports:
+    - name: airflow-ui
+      port: 8080
+

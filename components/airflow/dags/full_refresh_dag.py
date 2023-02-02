@@ -6,7 +6,10 @@ from airflow_kubernetes_job_operator.kubernetes_job_operator import (
     KubernetesJobOperator,
 )
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
-from dags.addons.parse_state import SparkApplication
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "addons"))
+from addons.parse_state import SparkApplication
 
 
 default_args = {
