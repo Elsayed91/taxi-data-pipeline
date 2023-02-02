@@ -9,7 +9,7 @@ from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "addons"))
-from addons.parse_state import SparkApplication
+from parse_state import SparkApplication
 
 
 default_args = {
