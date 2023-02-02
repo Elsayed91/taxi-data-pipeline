@@ -8,9 +8,9 @@
 # --exclude-prefixes: A list of prefixes to exclude from the transfer. Optional.
 # --include-prefixes: A list of prefixes to include in the transfer. Optional.
 # --check-exists:     Check if the file already exists in the destination before
-#   starting the transfer. Optional. --fail-if-exists:   Fail the script if the
-#   file already exists in the destination. Only applicable if --check-exists is
-#   set. Optional.
+#   starting the transfer. Optional.
+# --fail-if-exists:   Fail the script if the file already exists in the destination. Only
+#   applicable if --check-exists is set. Optional.
 # Notes:
 # 1. If --include-prefixes is not set and the file name is not '*',
 #   --include-prefixes is set to the file name, to transfer the exact file.

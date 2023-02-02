@@ -1,3 +1,7 @@
+"""
+This module creates the needed definitions to use Kind: SparkApplication with the
+KubernetesJobOperator.
+"""
 from airflow_kubernetes_job_operator.kube_api import (
     KubeResourceState,
     KubeApiConfiguration,

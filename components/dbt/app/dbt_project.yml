@@ -22,7 +22,7 @@ models:
     columns: true
   elementary:
     +schema: "elementary"
-    +enabled: false 
+    +enabled: true 
 
 
 
