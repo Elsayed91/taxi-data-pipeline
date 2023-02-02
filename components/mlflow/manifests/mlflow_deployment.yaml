@@ -45,7 +45,7 @@ spec:
                 key: MLFLOW_BUCKET
         ports:
         - name: mlflow
-          containerPort: 6000
+          containerPort: 5000
           protocol: TCP
       nodeSelector:
         cloud.google.com/gke-nodepool: ${BASE_NODE_POOL}

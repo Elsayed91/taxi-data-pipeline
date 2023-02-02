@@ -1,3 +1,21 @@
+"""
+A DAG for batch loading data. The DAG is trigged by AWS Lambda which sends over values
+that are parsed by airflow conf which are subsequently passed to the operators via jinja
+templating. 
+
+- `aws_to_gcs` transfers data from AWS to GCS and uses the pod_template.yaml for its
+  resource definition.
+
+- `data_validation` runs a Great Expectations data validation job using a Spark
+  application. It uses the spark_pod_template.yaml for its resource definition.
+
+- `etl-batch` ingests data from GCS into BigQuery using a Spark application. It also
+  applies some transformations and filters out data into clean & triage data. It uses the
+  spark_pod_template.yaml for its resource definition.
+
+- `dbt` runs DBT to update the models that are used for machine learning.
+"""
+
 import os
 
 import pendulum
@@ -53,56 +71,56 @@ with DAG(
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
     CATEGORY = "{{ dag_run.conf.category }}"
     URI = "{{ dag_run.conf.uri }}"
-    # t1 = KubernetesJobOperator(
-    #     task_id="aws_to_gcs",
-    #     body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
-    #     command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
-    #     arguments=[
-    #         "--data-source",
-    #         "{{ dag_run.conf.uri }}",
-    #         "--destination",
-    #         f"gs://{STAGING_BUCKET}/{{{{ dag_run.conf.category }}}}",
-    #         "--creds-file",
-    #         "/etc/aws/aws_creds.json",
-    #         "--check-exists",
-    #     ],
-    #     jinja_job_args={
-    #         "image": "google/cloud-sdk:alpine",
-    #         "name": "aws-to-gcs",
-    #         "gitsync": True,
-    #         "nodeSelector": BASE_NODE_POOL,
-    #         "volumes": [
-    #             {
-    #                 "name": "aws-creds",
-    #                 "type": "secret",
-    #                 "reference": "aws-creds",
-    #                 "mountPath": "/etc/aws",
-    #             }
-    #         ],
-    #     },
-    # )
+    t1 = KubernetesJobOperator(
+        task_id="aws_to_gcs",
+        body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
+        command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
+        arguments=[
+            "--data-source",
+            "{{ dag_run.conf.uri }}",
+            "--destination",
+            f"gs://{STAGING_BUCKET}/{{{{ dag_run.conf.category }}}}",
+            "--creds-file",
+            "/etc/aws/aws_creds.json",
+            "--check-exists",
+        ],
+        jinja_job_args={
+            "image": "google/cloud-sdk:alpine",
+            "name": "aws-to-gcs",
+            "gitsync": True,
+            "nodeSelector": BASE_NODE_POOL,
+            "volumes": [
+                {
+                    "name": "aws-creds",
+                    "type": "secret",
+                    "reference": "aws-creds",
+                    "mountPath": "/etc/aws",
+                }
+            ],
+        },
+    )
 
-    # t2 = KubernetesJobOperator(
-    #     task_id="data_validation",
-    #     body_filepath=f"{TEMPLATES_PATH}/spark_pod_template.yaml",
-    #     jinja_job_args={
-    #         "project": GOOGLE_CLOUD_PROJECT,
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-    #         "mainApplicationFile": f"local://{BASE}/data_validation/data_validation.py",
-    #         "name": "great-expectations",
-    #         "instances": 4,
-    #         "gitsync": True,
-    #         "nodeSelector": JOBS_NODE_POOL,
-    #         "executor_memory": "2048m",
-    #         "env": {
-    #             "GE_CONFIG_DIR": f"{BASE}/data_validation/config",
-    #             "PROJECT": GOOGLE_CLOUD_PROJECT,
-    #             "STAGING_BUCKET": STAGING_BUCKET,
-    #             "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
-    #             "VALIDATION_THRESHOLD": "10%",
-    #         },
-    #     },
-    # )
+    t2 = KubernetesJobOperator(
+        task_id="data_validation",
+        body_filepath=f"{TEMPLATES_PATH}/spark_pod_template.yaml",
+        jinja_job_args={
+            "project": GOOGLE_CLOUD_PROJECT,
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
+            "mainApplicationFile": f"local://{BASE}/data_validation/data_validation.py",
+            "name": "great-expectations",
+            "instances": 4,
+            "gitsync": True,
+            "nodeSelector": JOBS_NODE_POOL,
+            "executor_memory": "2048m",
+            "env": {
+                "GE_CONFIG_DIR": f"{BASE}/data_validation/config",
+                "PROJECT": GOOGLE_CLOUD_PROJECT,
+                "STAGING_BUCKET": STAGING_BUCKET,
+                "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
+                "VALIDATION_THRESHOLD": "10%",
+            },
+        },
+    )
 
     t3 = KubernetesJobOperator(
         task_id="etl-batch",
@@ -154,4 +172,4 @@ with DAG(
             "RUN_DATE": "{{ dag_run.conf.RUN_DATE }}",
         },
     )
-    t3  # type: ignore
+    t1 >> t2 >> t3 >> t4  # type: ignore

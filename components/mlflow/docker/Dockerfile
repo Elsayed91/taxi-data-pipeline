@@ -9,7 +9,7 @@ RUN pip install \
         google-cloud-storage
 
 COPY --chmod=0755 entrypoint.sh .
-EXPOSE 6000
+EXPOSE 5000
 
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
 
