@@ -110,6 +110,6 @@ GKE:
         min_node_count: 0
         max_node_count: 1
       node_config:
-        machine_type: "n2-highmem-16"
+        machine_type: "n2-highmem-8"
         disk_size_gb: 50
         service_account: "${CLUSTER_SA}@${PROJECT}.iam.gserviceaccount.com"

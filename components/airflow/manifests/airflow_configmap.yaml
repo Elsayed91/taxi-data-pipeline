@@ -69,7 +69,7 @@ data:
 
     [kubernetes_job_operator]
     # The task kube resources delete policy. Can be: Never, Always, IfFailed, IfSucceeded
-    delete_policy=Never
+    delete_policy=Always
     # The default object type to execute with (legacy, or image). Can be: Pod, Job
     default_execution_object=Pod
 
