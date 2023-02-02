@@ -6,7 +6,7 @@ from airflow_kubernetes_job_operator.kubernetes_job_operator import (
     KubernetesJobOperator,
 )
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
-from addons.parse_state import SparkApplication
+from dags.addons.parse_state import SparkApplication
 
 
 default_args = {
@@ -41,8 +41,9 @@ with DAG(
     STAGING_BUCKET = os.getenv("STAGING_BUCKET")
     BASE = "/git/repo/components"
     SCRIPTS_PATH = f"{BASE}/airflow/dags/scripts"
-    JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")
+    SPARK_JOBS_NODE_POOL = os.getenv("SPARK_JOBS_NODE_POOL")
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
+    TRAINING_NODE_POOL = os.getenv("TRAINING_NODE_POOL")
 
     t1 = KubernetesJobOperator(
         task_id="aws_to_gcs",
@@ -87,7 +88,7 @@ with DAG(
             "name": "spark-k8s-init",
             "instances": 7,
             "gitsync": True,
-            "nodeSelector": JOBS_NODE_POOL,
+            "nodeSelector": SPARK_JOBS_NODE_POOL,
             "executor_memory": "2048m",
             "env": {
                 "CATEGORY": "yellow",
@@ -114,6 +115,7 @@ with DAG(
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
             "name": "dbt",
             "gitsync": True,
+            "nodeSelector": BASE_NODE_POOL,
             "volumes": [
                 {
                     "name": "gcsfs-creds",
@@ -135,7 +137,7 @@ with DAG(
             "name": "xgb-model-training",
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/ml_train",
             "gitsync": True,
-            "nodeSelector": JOBS_NODE_POOL,
+            "nodeSelector": TRAINING_NODE_POOL,
         },
         envs={
             "TARGET_DATASET": os.getenv("ML_DATASET"),
@@ -143,7 +145,7 @@ with DAG(
             "TRACKING_SERVICE": "mlflow-service",
             "MLFLOW_EXPERIMENT_NAME": "taxi-fare-prediction-v3",
             "TARGET_COLUMN": "fare_amount",
-            "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET", "mlflow-cacfcc1b69"),
+            "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET"),
             "CROSS_VALIDATIONS": "2",
         },
     )

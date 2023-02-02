@@ -14,11 +14,11 @@ data:
       - name: Prometheus
         type: prometheus
         access: proxy
-        url: prometheus.default.svc.cluster.local:9090
-    # - name: Google Cloud Monitoring
-    #   # https://grafana.com/docs/grafana/latest/datasources/google-cloud-monitoring/
-    #   type: stackdriver
-    #   access: proxy
-    #   jsonData:
-    #     authenticationType: gce
-
+        url: http://prometheus.default.svc.cluster.local:9090
+      - name: BigQuery DS
+        type: grafana-bigquery-datasource
+        editable: true
+        enabled: true
+        defaultProject: ${PROJECT}
+        jsonData:
+          authenticationType: gce

@@ -16,9 +16,6 @@ spec:
     - name: mlflow
       port: 6000
       targetPort: 6000
-    - name: prometheus-port
-      port: 9090
-      targetPort: 9090
     - name: airflow-ui
       port: 8080
       targetPort: 8080
