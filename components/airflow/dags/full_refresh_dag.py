@@ -12,7 +12,6 @@ dags_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(dags_path)
 
 from addons.parse_state import SparkApplication
-from parse_state import SparkApplication
 
 
 default_args = {
