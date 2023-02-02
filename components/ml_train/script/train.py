@@ -31,7 +31,7 @@ model_name = os.getenv("MODEL_NAME", "xgboost-fare-predictor")
 
 exp = mlflow.set_experiment(mlflow_experiment_name)
 exp_id = exp.experiment_id
-df = load_data(target_dataset, target_table, "21")  # type: ignore
+df = load_data(target_dataset, target_table, 5)  # type: ignore
 print(f"df shape is {df.shape}")
 y = df[target_column]
 X = df.drop([target_column], axis=1)
@@ -53,6 +53,7 @@ grid_search = GridSearchCV(
     param_grid=param,
     scoring="neg_mean_squared_error",
     n_jobs=-1,
+    verbose=2,
 )
 
 print(grid_search)

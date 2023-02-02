@@ -17,7 +17,9 @@ spec:
           requests:
               cpu: {{ job.resources.cpu }}
               memory: {{ job.resources.memory }}
+              {% if job.resources.core is defined %}
               core: {{ job.resources.core }}
+              {% endif %}
       {% endif %}
       {% if job.volumes is defined or (job.gitsync is defined and job.gitsync) %}
       volumeMounts:

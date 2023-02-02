@@ -1,3 +1,20 @@
+"""
+A DAG for batch loading data. The DAG is trigged by AWS Lambda which sends over values
+that are parsed by airflow conf which are subsequently passed to the operators via jinja
+templating. 
+
+- `aws_to_gcs` transfers data from AWS to GCS and uses the pod_template.yaml for its
+  resource definition.
+
+- `spark-etl` ingests data from GCS into BigQuery using Spark. It also applies some
+  transformations and filters out data into clean & triage data. It uses the
+  spark_pod_template.yaml for its resource definition.
+
+- `dbt` runs DBT to update the models that are used for machine learning.
+
+- `train_model` trains an XGBOOST model on data from BigQuery. The model and metrics are
+  logged to mlflow.
+"""
 import os
 from datetime import datetime, timedelta
 import pendulum
@@ -142,6 +159,7 @@ with DAG(
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/ml_train",
             "gitsync": True,
             "nodeSelector": TRAINING_NODE_POOL,
+            "resources": {"memory": "61.5Gi", "cpu": "7.91"},
         },
         envs={
             "TARGET_DATASET": os.getenv("ML_DATASET"),
@@ -153,5 +171,5 @@ with DAG(
             "CROSS_VALIDATIONS": "2",
         },
     )
-    t4
+
     # t1 >> t2 >> t3 >> t4  # type: ignore

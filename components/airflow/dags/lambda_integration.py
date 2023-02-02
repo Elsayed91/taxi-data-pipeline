@@ -1,6 +1,15 @@
+"""
+This module is a part of a lambda function integration test. It consists of a
+PythonOperator that uses a function called get_conf.
+The purpose of the get_conf function is to verify that the values of the "URI",
+"FILENAME", "RUN_DATE", and "CATEGORY" keys in the DAG run configuration are equal to the
+expected values. If the values are empty, it raises an AssertionError with an appropriate
+message. If the values match the expected values, it returns "test successful".
+"""
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from airflow.utils.dates import days_ago
+import pendulum
 import logging
 
 logger = logging.getLogger(__name__)
@@ -13,7 +22,7 @@ logger.addHandler(ch)
 
 default_args = {
     "owner": "airflow",
-    "start_date": days_ago(2),
+    "start_date": pendulum.yesterday(),
     "depends_on_past": False,
     "retries": 0,
     "concurrency": 1,

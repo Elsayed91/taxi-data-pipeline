@@ -14,3 +14,4 @@ components/airflow/dags/__pycache__
 components/airflow/dags/addons/__pycache__
 tests/__pycache__
 .vscode
+tests/integration/lambda/__pycache__
