@@ -20,7 +20,7 @@ target_dataset = os.getenv("TARGET_DATASET")
 target_table = os.getenv("TARGET_TABLE")
 mlflow_tracking_server = os.getenv("TRACKING_SERVICE", "mlflow-service")
 mlflow.set_tracking_uri(
-    f"http://{mlflow_tracking_server}.default.svc.cluster.local:5000"
+    f"http://{mlflow_tracking_server}.default.svc.cluster.local:6000"
 )
 mlflow_experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "taxi-fare-prediction-v2")
 target_column = os.getenv("TARGET_COLUMN", "fare_amount")

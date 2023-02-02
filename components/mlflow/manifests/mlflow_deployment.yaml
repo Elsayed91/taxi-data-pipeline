@@ -8,12 +8,10 @@ spec:
   selector:
     matchLabels:
       app: mlflow
-      svc: external-lb
   template:
     metadata:
       labels:
         app: mlflow
-        svc: external-lb
     spec:
       containers:
       - name: mlflow
