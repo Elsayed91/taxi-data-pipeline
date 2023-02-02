@@ -15,18 +15,20 @@ References:
 """
 import os
 from tempfile import NamedTemporaryFile
-import kubernetes.client
+import json
 import base64
+import re
+from typing import Any
+
+import kubernetes.client
 import googleapiclient.discovery
+
 import kubernetes
 from kubernetes.stream import stream
 from google.oauth2.service_account import Credentials
 from aws_lambda_typing.context import Context as LambdaContext
 import boto3
 from botocore.exceptions import ClientError
-import json
-from typing import Optional, Any
-import re
 
 
 def extract_target_date(filename: str) -> str:
@@ -39,7 +41,7 @@ def extract_target_date(filename: str) -> str:
         string of date in YYYY-MM-01 format.
     """
     match = re.search(r"\d{4}-\d{2}", filename)
-    date_string = match.group(0)
+    date_string = match.group(0)  # pyright: ignore[reportOptionalMemberAccess]
     date_parts = date_string.split("-")
     formatted_date = f"{date_parts[0]}-{date_parts[1]}-01"
     return formatted_date
@@ -93,9 +95,13 @@ def token(credentials: Credentials, *scopes: str) -> str:
     Returns:
         A string representing the access token.
     """
-    scopes = [f"https://www.googleapis.com/auth/{s}" for s in scopes]
-    scoped = googleapiclient._auth.with_scopes(credentials, scopes)  # type: ignore
-    googleapiclient._auth.refresh_credentials(scoped)  # type: ignore
+    scopes = [f"https://www.googleapis.com/auth/{s}" for s in scopes]  # type: ignore
+    scoped = googleapiclient._auth.with_scopes(  # pylint: disable=protected-access
+        credentials, scopes
+    )
+    googleapiclient._auth.refresh_credentials(  # pylint: disable=protected-access
+        scoped
+    )
     return scoped.token
 
 
@@ -118,7 +124,7 @@ def get_cluster_info(
     """
     cluster_attributes = f"projects/{project}/locations/{zone}/clusters/{cluster_name}"
     gke = googleapiclient.discovery.build("container", "v1", credentials=credentials)
-    gke_clusters = gke.projects().locations().clusters()
+    gke_clusters = gke.projects().locations().clusters()  # pylint: disable=no-member
     gke_cluster = gke_clusters.get(name=cluster_attributes).execute()
     return gke_cluster
 
@@ -155,11 +161,7 @@ def kubernetes_api(
 
 
 def get_target_pod(
-    api: kubernetes.client.CoreV1Api,
-    target_namespace: str,
-    target_pod_substring: str,
-    cluster: dict[str, Any],
-    api_auth_token: str,
+    api: kubernetes.client.CoreV1Api, target_namespace: str, target_pod_substring: str
 ) -> str:
     """
     Returns the name of the first pod in the given namespace that has
@@ -225,7 +227,9 @@ def pod_exec(
     print("Response: " + resp)
 
 
-def lambda_handler(event: dict, context: LambdaContext) -> None:
+def lambda_handler(
+    event: dict, context: LambdaContext
+) -> None:  # pylint: disable=unused-argument
     """
     Handler for S3 Trigger Lambda.
     Uses the functions above to retrieve credentials, get an
@@ -253,11 +257,9 @@ def lambda_handler(event: dict, context: LambdaContext) -> None:
     #### processing
     credentials = get_credentials()
     api_auth_token = token(credentials, "cloud-platform")
-    gke_cluster = get_cluster_info(gcp_project, gcp_zone, gke_name, credentials)
+    gke_cluster = get_cluster_info(gcp_project, gcp_zone, gke_name, credentials)  # type: ignore
     api = kubernetes_api(gke_cluster, api_auth_token)
-    target_pod_name = get_target_pod(
-        api, target_namespace, target_pod_substring, gke_cluster, api_auth_token
-    )
+    target_pod_name = get_target_pod(api, target_namespace, target_pod_substring)  # type: ignore
     pod_exec(
-        api, target_namespace, target_pod_name, target_container, dag_trigger_command
+        api, target_namespace, target_pod_name, target_container, dag_trigger_command  # type: ignore
     )

@@ -121,34 +121,34 @@ with DAG(
         },
     )
 
-    # t4 = KubernetesJobOperator(
-    #     task_id="dbt",
-    #     body_filepath=POD_TEMPALTE,
-    #     command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
-    #     arguments=[
-    #         "--deps",
-    #         "--seed",
-    #         "--commands",
-    #         "dbt run",
-    #         "--generate-docs",
-    #     ],
-    #     jinja_job_args={
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
-    #         "name": "dbt",
-    #         "gitsync": True,
-    #         "volumes": [
-    #             {
-    #                 "name": "gcsfs-creds",
-    #                 "type": "secret",
-    #                 "reference": "gcsfs-creds",
-    #                 "mountPath": "/mnt/secrets",
-    #             }
-    #         ],
-    #         "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
-    #     },
-    #     envs={
-    #         "DBT_PROFILES_DIR": f"{BASE}/dbt/app",
-    #         "RUN_DATE": "{{ dag_run.conf.RUN_DATE }}",
-    #     },
-    # )
+    t4 = KubernetesJobOperator(
+        task_id="dbt",
+        body_filepath=POD_TEMPALTE,
+        command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
+        arguments=[
+            "--deps",
+            "--seed",
+            "--commands",
+            "dbt run",
+            "--generate-docs",
+        ],
+        jinja_job_args={
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
+            "name": "dbt",
+            "gitsync": True,
+            "volumes": [
+                {
+                    "name": "gcsfs-creds",
+                    "type": "secret",
+                    "reference": "gcsfs-creds",
+                    "mountPath": "/mnt/secrets",
+                }
+            ],
+            "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
+        },
+        envs={
+            "DBT_PROFILES_DIR": f"{BASE}/dbt/app",
+            "RUN_DATE": "{{ dag_run.conf.RUN_DATE }}",
+        },
+    )
     t3  # type: ignore

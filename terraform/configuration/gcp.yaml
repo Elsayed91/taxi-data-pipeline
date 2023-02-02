@@ -1,0 +1,114 @@
+common:
+  project: "${PROJECT}"
+  region: "${GCP_REGION}"
+  location: "${GCP_ZONE}"
+IAM:
+  service-accounts:
+    - service_account_name: "${CLUSTER_SA}"
+      generate_key: true
+      key_name: "files/gcp_key_spark.json"
+      iam_roles: ["roles/artifactregistry.reader", "roles/owner"]
+      iam_binding:
+        iam_binding_role: "roles/iam.workloadIdentityUser"
+        iam_binding_members:
+          [
+            "serviceAccount:${PROJECT}.svc.id.goog[default/default]",
+            "serviceAccount:${PROJECT}.svc.id.goog[default/spark-operator]"
+          ]
+    - service_account_name: "lambda-svc"
+      iam_roles: [ "roles/container.developer"]
+      iam_binding:
+        iam_binding_role: "projects/${PROJECT}/roles/lambdaRole"
+        iam_binding_members:
+          ["serviceAccount:lambda-svc@${PROJECT}.iam.gserviceaccount.com"]
+      generate_key: true
+      key_name: "files/lambda_key.json" #and path
+  custom_roles:
+    - role_id: "lambdaRole"
+      title: "LambdaRole"
+      permissions: ["container.clusters.update", "container.operations.get"]
+BIGQUERY:
+  datasets: 
+    - dataset_id: "${STAGING_DATASET}"
+      tables:
+        - table_id: "${YELLOW_STAGING_TABLE}"
+          time_partitioning:
+            type: "MONTH"
+            field: "tpep_pickup_datetime"
+            expiration_ms: 15778800000
+          clustering_fields: ["PULocationID", "VendorID", "payment_type"]
+          schema: "files/bq_schemas/stg_yellow.json"
+    - dataset_id: "${TRIAGE_DATASET}"
+      tables:
+        - table_id: "${YELLOW_TRIAGE_TABLE}"
+          time_partitioning:
+            type: "MONTH"
+            field: "tpep_pickup_datetime"
+            expiration_ms: 15778800000
+          clustering_fields: ["PULocationID", "VendorID", "payment_type"]
+          schema: "files/bq_schemas/stg_yellow.json"
+    - dataset_id: "${HISTORICAL_DATASET}"
+      tables:
+        - table_id: "${YELLOW_SUMMARY_TABLE}"
+          time_partitioning:
+            type: "MONTH"
+            field: "first_day_of_month"
+          clustering_fields: ["pickup_zone", "payment_type"]
+          schema: "files/bq_schemas/historical_yellow.json"
+    - dataset_id: "${ML_DATASET}"
+    - dataset_id: "${SEEDS_DATASET}"
+    - dataset_id: "${UNIT_TESTS_DATASET}"
+GCS:
+  buckets:
+    - bucket_name: "${STAGING_BUCKET}"
+    - bucket_name: "${SPARK_BUCKET}"
+    - bucket_name: "${CODE_BUCKET}"
+    - bucket_name: "${DOCS_BUCKET}"
+    - bucket_name: "${MLFLOW_BUCKET}"
+  files:
+    - content_path: "../../components/data_validation/expectations/"
+      hash_strategy: "folder"
+      gsutil_command: >
+        gsutil -m rsync -r ./../components/data_validation/expectations \
+          gs://${DOCS_BUCKET}/great_expectations/expectations/
+GKE:
+  clusters:
+    - name: "${GKE_CLUSTER_NAME}"
+      initial_node_count: 1
+      remove_default_node_pool: true
+      workload_identity_config:
+        workload_pool: "${PROJECT}.svc.id.goog"
+      addons_config:
+        horizontal_pod_autoscaling:
+          disabled: true
+  node_pools:
+    - name: "${SPARK_JOBS_NODE_POOL}"
+      cluster: "${GKE_CLUSTER_NAME}"
+      node_count: ~
+      autoscaling: 
+        min_node_count: 0
+        max_node_count: 7
+      node_config:
+        machine_type: "n2-standard-4"
+        disk_size_gb: 50
+        service_account: "${CLUSTER_SA}@${PROJECT}.iam.gserviceaccount.com"
+    - name: "${BASE_NODE_POOL}"
+      cluster: "${GKE_CLUSTER_NAME}"
+      node_count: ~
+      autoscaling: 
+        min_node_count: 0
+        max_node_count: 4
+      node_config:
+        machine_type: "e2-medium"
+        disk_size_gb: 15
+        service_account: "${CLUSTER_SA}@${PROJECT}.iam.gserviceaccount.com"
+    - name: "${TRAINING_NODE_POOL}"
+      cluster: "${GKE_CLUSTER_NAME}"
+      node_count: ~
+      autoscaling: 
+        min_node_count: 0
+        max_node_count: 1
+      node_config:
+        machine_type: "n2-highmem-16"
+        disk_size_gb: 50
+        service_account: "${CLUSTER_SA}@${PROJECT}.iam.gserviceaccount.com"

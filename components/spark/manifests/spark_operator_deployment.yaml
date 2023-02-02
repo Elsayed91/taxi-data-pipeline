@@ -129,7 +129,6 @@ spec:
     metadata:
       name: spark-operator-webhook-init
     spec:
-      ttlSecondsAfterFinished: 10
       serviceAccountName: spark-operator
       restartPolicy: OnFailure
       containers:

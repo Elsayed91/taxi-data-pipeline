@@ -1,0 +1,19 @@
+S3:
+  - name: ${AWS_DUMMY_BUCKET}
+    acl: "public-read"
+LAMBDA:
+  - name: "die-lambda"
+    dependencies_path: "files/lambda/dependencies.zip"
+    vars:
+      PROJECT: "${PROJECT}"
+      GCP_ZONE: "${GCP_ZONE}"
+      GKE_CLUSTER_NAME: "${GKE_CLUSTER_NAME}"
+      DAG_NAME: "lambda_integration_test"
+      TARGET_NAMESPACE: "default"
+    trigger_bucket: "${AWS_DUMMY_BUCKET}"
+    code_path: "./../../components/lambdafn"
+    memory_size: 128
+SECRETSMANAGER:
+  - name: "gcp_key"
+    type: "file"
+    secret_string: "files/lambda_key.json"

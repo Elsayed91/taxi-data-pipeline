@@ -1,7 +1,10 @@
 """
-This is a Flask app that provides routes for serving multiple static documentation pages from Google Cloud Storage. 
-The app has four routes, /dbt, /elementary, /ge, and a default error handler route for handling server errors.
-Any number of static docs can be served through this app by simply including one more load_index and route.
+- This is a Flask app that provides routes for serving multiple static documentation pages
+  from Google Cloud Storage. 
+- The app has four routes, /dbt, /elementary, /ge, and a default error handler route for
+  handling server errors.
+- Any number of static docs can be served through this app by simply including one more
+  load_index and route.
 """
 import os
 from flask import Flask, render_template, send_from_directory, send_file
@@ -21,7 +24,8 @@ def load_index(bucket: str, index_path: str) -> Union[bytes, str]:
     - index_path: the path to the index file in the bucket
 
     Returns:
-    - the contents of the index file as a bytes object, or a string resource if an error occurs
+    - the contents of the index file as a bytes object, or a string resource if an error
+    occurs
     """
     try:
         with gcsfs.GCSFileSystem().open(f"gs://{bucket}/{index_path}") as f:
@@ -37,7 +41,7 @@ DOCS_BUCKET = os.getenv("DOCS_BUCKET", "docs-bffa103539")
 
 @app.route("/dbt")
 def dbtdocs():
-    return load_index(DOCS_BUCKET, "dbt/dbt.html")  # change to index.html
+    return load_index(DOCS_BUCKET, "dbt/dbt.html")
 
 
 @app.route("/elementary")
@@ -45,20 +49,10 @@ def elementary():
     return load_index(DOCS_BUCKET, "elementary/index.html")
 
 
-@app.route("/ge", defaults={"path": "index.html"})
+@app.route("/", defaults={"path": "index.html"})
 @app.route("/<path:path>")
 def ge(path):
     return load_index(DOCS_BUCKET, f"great_expectations/docs/{path}")
-
-
-# @app.route("/ge/static/<path:filename>")
-# def serve_static(filename):
-#     return load_index(DOCS_BUCKET, f"great_expectations/docs/static/{filename}")
-
-
-# @app.route("/ge/validations/<path:filename>")
-# def serve_validations(filename):
-#     return load_index(DOCS_BUCKET, f"great_expectations/docs/validations/{filename}")
 
 
 @app.errorhandler(500)
@@ -71,8 +65,3 @@ def internal_error(error):
 def not_found_error(error):
     logging.exception("The page doesn't exist.")
     return render_template("404.html"), 404
-
-
-@app.route("/")
-def index():
-    return render_template("index.html")

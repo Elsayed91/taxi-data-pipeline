@@ -11,7 +11,7 @@ from pyspark.sql.functions import to_timestamp, to_date
 
 def get_gcs_files(bucket: str, folder: str, file_prefix: str) -> list[bytes]:
     """
-    Retrieve a list of blobs from the specified bucket with the given folder and file prefix.
+    Retrieves a list of blobs from the specified bucket with the given folder and file prefix.
 
     Args:
         bucket: The name of the bucket to list blobs from.
@@ -33,7 +33,7 @@ def get_gcs_files(bucket: str, folder: str, file_prefix: str) -> list[bytes]:
 
 def list_files(blobs: list[bytes]) -> list[str]:
     """
-    Extract the file names from a list of blobs and return a list of file names.
+    Extracts the file names from a list of blobs and return a list of file names.
     Expects Files with format gs://bucket/folder/file
     Args:
         blobs: A list of bytes representing the blobs to extract file names from.
@@ -53,15 +53,14 @@ def list_files(blobs: list[bytes]) -> list[str]:
 
 def get_schema_info(links: list[str]) -> pd.DataFrame:
     """
-    Read the schema of items in a list of GCS links by reading the metadata.
+    Reads the schema of items in a list of GCS links by reading the metadata.
 
-    Parameters:
-    - links: A list of strings representing the GCS links of the items.
+    Args: - links: A list of strings representing the GCS links of the items.
 
-    Returns:
-    A DataFrame containing the schema information for each item in `links`.
-    The DataFrame has a column `link` that contains the GCS link of each item,
-    and one column for each field in the schema of the item, where the column name is the field name and the column value is the field data type.
+    Returns: A DataFrame containing the schema information for each item in `links`. The
+    DataFrame has a column `link` that contains the GCS link of each item, and one column
+    for each field in the schema of the item, where the column name is the field name and
+    the column value is the field data type.
     """
     df_list = []
     for link in links:
@@ -84,13 +83,14 @@ def get_schema_info(links: list[str]) -> pd.DataFrame:
 
 def schema_groups(df: pd.DataFrame) -> list[list[str]]:
     """
-    Group GCS links in a DataFrame by shared schema.
+    Groups GCS links in a DataFrame by shared schema.
 
-    Parameters:
-    - df: A DataFrame containing a column `link` with GCS links and columns representing the fields in the schema of each link.
+    Args: - df: A DataFrame containing a column `link` with GCS links and columns
+    representing the fields in the schema of each link.
 
-    Returns:
-    A list of lists, where each inner list contains the GCS links that share the same schema. The schema is determined by the column names and values in `df` (excluding the `link` column).
+    Returns: A list of lists, where each inner list contains the GCS links that share the
+    same schema. The schema is determined by the column names and values in `df`
+    (excluding the `link` column).
     """
     columns = [value for value in list(df.columns) if value != "link"]
     df_groups = df.groupby(columns)["link"]
@@ -99,14 +99,15 @@ def schema_groups(df: pd.DataFrame) -> list[list[str]]:
 
 def cast_columns(df: DataFrame, mapping: dict[str, str]) -> DataFrame:
     """
-    Cast columns in a DataFrame to corresponding data types according to a mapping dict that is provided.
+    Casts columns in a DataFrame to corresponding data types according to a mapping dict
+    that is provided.
 
-    Parameters:
-    - df: The DataFrame whose columns should be cast.
-    - mapping: A dictionary where the keys are column names and the values are the new data types to which the columns should be cast.
+    Args: - df: The DataFrame whose columns should be cast. - mapping: A dictionary
+    where the keys are column names and the values are the new data types to which the
+    columns should be cast.
 
-    Returns:
-    df with columns that are included in the mapping and with the columns cast to appropriate dtype.
+    Returns: df with columns that are included in the mapping and with the columns cast to
+    appropriate dtype.
     """
     rest_cols = [F.col(cl) for cl in df.columns if cl not in mapping]
     conv_cols = [
@@ -143,7 +144,7 @@ def reformat_date(date_string: str, output_format: str) -> str:
     Reformats a date string in the format "YYYY-MM-DD" to a different format specified by
     the output_format parameter.
 
-    Parameters: - date_string (str): The date string to reformat. - output_format (str):
+    Args: - date_string (str): The date string to reformat. - output_format (str):
     The desired output format for the date. Can be "MONTH", "YEAR", or "DAY".
 
     Returns: - str: The date in the specified output format.
@@ -164,7 +165,29 @@ def process(
     uri: str,
     partition_filter: str,
     **kwargs,
-):
+) -> None:
+    """
+    Processes a parquet file located at uri and saves the results to bigquery.
+
+    Params:
+    spark (SparkSession): Spark session instance.
+    uri (str): URI of the parquet file.
+    partition_filter (str): Partition filter in 'yyyyMM' format.
+    kwargs (dict): Keyword arguments containing the following keys:
+    mapping (dict): Column casting mapping.
+    summary_query (str): SQL query to generate a summary of the data.
+    filters (str): SQL filter for data cleaning.
+    partition_col (str): Column used to filter the data.
+    partition_col_hist (str): Column used for partitioning historical data.
+    cf_hist (str): Clustered fields for historical data.
+    cf_current (str): Clustered fields for current data.
+    historical_table (str): BigQuery table for historical data.
+    staging_table (str): BigQuery table for cleaned data.
+    triage_table (str): BigQuery table for triaged data.
+
+    Returns:
+    None
+    """
     df = spark.read.parquet(uri)
     df = cast_columns(df, kwargs["mapping"])
     df = df.withColumn("run_date", to_date(F.lit(partition_filter + "01"), "yyyyMMdd"))
@@ -218,7 +241,26 @@ def process_initial_load(
     uri: Union[str, list[str]],
     idx: int,
     **kwargs,
-):
+) -> None:
+    """
+    Loads data from parquet file(s) into BigQuery and performs data
+    filtering and writing to specified tables.
+
+    Args: - spark: SparkSession object. - uri: A string or list of strings representing
+    file path(s) for parquet file(s). - idx: An integer index for labeling jobs. -
+    **kwargs: Keyword arguments for the following items: - mapping: A dictionary used to
+    cast columns to specified data types. - summary_query: A string representing the SQL
+    query for generating the historical data summary. - historical_table: A string
+    representing the BigQuery table name for storing the historical data summary. -
+    partition_col: A string representing the partition column name used for filtering
+    data. - filters: A string representing the filter condition for cleaning data. -
+    staging_table: A string representing the BigQuery table name for storing the cleaned
+    data. - triage_table: A string representing the BigQuery table name for storing the
+    triaged data.
+
+    Returns:
+    None
+    """
     df = spark.read.parquet(*uri)
     df = cast_columns(df, kwargs["mapping"])
     df.createOrReplaceTempView("temp_table")

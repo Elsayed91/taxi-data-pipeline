@@ -1,3 +1,13 @@
+# creates the following AWS resources:
+
+# - IAM role for AWS Lambda
+# - IAM policy for the Lambda role to access S3, SES, Secrets Manager
+# - Lambda function permissions to access an S3 bucket
+# - Package and zip code for the Lambda function
+# - Lambda function with specified name, code, role, runtime, and environment variables
+# - S3 bucket notification to trigger the Lambda function on object creation with a
+#   specific file suffix.
+
 resource "aws_iam_role" "lambda_role" {
   name = "iam_for_lambda_tf"
 
@@ -18,14 +28,6 @@ resource "aws_iam_role" "lambda_role" {
 EOF
 }
 
-# data "aws_iam_policy" "AmazonS3FullAccess" {
-#   arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-# }
-
-# resource "aws_iam_role_policy_attachment" "AmazonS3FullAccess-policy" {
-#   role       = aws_iam_role.lambda_role.id
-#   policy_arn = data.aws_iam_policy.AmazonS3FullAccess.arn
-# }
 
 resource "aws_iam_role_policy" "revoke_keys_role_policy" {
   name = "lambda-policy"
@@ -68,20 +70,15 @@ resource "null_resource" "pack-lambda" {
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command     = "chmod +x ${path.module}/files/package_fn_code.sh && ${path.module}/files/package_fn_code.sh lambda"
+    command     = "chmod +x ${path.module}/files/package_lambda.sh && ${path.module}/files/package_lambda.sh ${path.module}/${each.value.code_path}"
   }
-  depends_on = [
-    local_file.key_out
-  ]
+
 }
-
-
-
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "${path.module}/files/lambda/"
-  output_path = "${path.module}/files/dependencies.zip"
+  output_path = "${path.module}/files/lambda.zip"
   depends_on = [
     null_resource.pack-lambda
   ]
@@ -91,8 +88,8 @@ data "archive_file" "lambda_zip" {
 resource "aws_lambda_function" "lambda_func" {
   for_each         = { for idx, val in var.lambda : idx => val if val.trigger_bucket != null }
   function_name    = each.value.name
-  filename         = "${path.module}/files/dependencies.zip"
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256 #filebase64sha256("${path.module}/my-deployment-package.zip")
+  filename         = "${path.module}/files/lambda.zip"
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256 # filebase64sha256("${path.module}/files/lambda.zip")
   role             = aws_iam_role.lambda_role.arn
   runtime          = "python3.9"
   handler          = "main.lambda_handler"
@@ -103,7 +100,7 @@ resource "aws_lambda_function" "lambda_func" {
     variables = each.value.vars
   }
   depends_on = [
-    data.archive_file.lambda_zip
+    null_resource.pack-lambda
   ]
 }
 

@@ -1,8 +1,8 @@
 terraform {
-
-  backend "local" {
+  backend "gcs" {
+    bucket = "4e08a42ce7-bucket-tfstate"
+    prefix = "terraform/state"
   }
-
   required_providers {
     local = {
       source  = "hashicorp/local"
@@ -20,7 +20,6 @@ terraform {
       source = "hashicorp/random"
     }
   }
-
   required_version = ">= 1.0"
 }
 

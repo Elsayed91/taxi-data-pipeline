@@ -1,3 +1,22 @@
+# creates Google Cloud service accounts, custom IAM roles, IAM bindings, and private keys.
+
+# -   The `locals` block generates a list of IAM roles and associated service accounts.
+
+# -   The `google_project_iam_custom_role` resource creates custom IAM roles with
+#     specified permissions.
+
+# -   The `google_service_account` resource creates new service accounts.
+
+# -   The `google_project_iam_member` resource adds IAM roles to the service accounts.
+
+# -   The `google_service_account_iam_binding` resource creates IAM bindings for service
+#     accounts.
+
+# -   The `google_service_account_key` resource generates private keys for the service
+#     accounts.
+
+# -   The `local_file` resource writes the private keys to disk as files.
+
 locals {
 
   iam_roles = flatten([for idx, value in var.service_accounts :
@@ -5,7 +24,6 @@ locals {
       "role"                 = try(value.iam_roles[role_idx], null)
       "project"              = value.project == null ? var.project : value.project
       "service_account_name" = try(value.service_account_name, null)
-      "service_account_id"   = try(value.service_account_id, null)
     }]
     if try(value.iam_roles, null) != null
   ])
@@ -39,7 +57,7 @@ resource "google_project_iam_member" "grant_roles" {
 
 resource "google_service_account_iam_binding" "iam_binding" {
   for_each           = { for idx, sa in var.service_accounts : idx => sa if sa.iam_binding != null }
-  service_account_id = each.value.service_account_id
+  service_account_id = "projects/${var.project}/serviceAccounts/${each.value.service_account_name}@${var.project}.iam.gserviceaccount.com"
   role               = each.value.iam_binding.iam_binding_role
   members            = each.value.iam_binding.iam_binding_members
   depends_on = [
@@ -50,7 +68,7 @@ resource "google_service_account_iam_binding" "iam_binding" {
 
 resource "google_service_account_key" "key" {
   for_each           = { for idx, sa in var.service_accounts : idx => sa if sa.generate_key == true }
-  service_account_id = each.value.service_account_id
+  service_account_id = "projects/${var.project}/serviceAccounts/${each.value.service_account_name}@${var.project}.iam.gserviceaccount.com"
   public_key_type    = "TYPE_X509_PEM_FILE"
   depends_on = [
     google_service_account.service_account

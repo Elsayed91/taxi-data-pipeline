@@ -1,0 +1,24 @@
+name: tests-ci
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'components/docs_app/docker/app.py'
+      - 'components/airflow/dags/**'
+      - 'components/ml_train/script/**'
+      - 'components/spark/scripts/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+      - run: pip install pipenv && pipenv install --dev
+      - name: Run Unit tests
+        run: pipenv run pytest tests/
+      - name: Lint
+        run: pipenv run pylint --recursive=y .

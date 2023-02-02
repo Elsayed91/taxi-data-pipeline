@@ -14,8 +14,8 @@ spec:
       port: 3000
       targetPort: 3000
     - name: mlflow
-      port: 5000
-      targetPort: 5000
+      port: 6000
+      targetPort: 6000
     - name: prometheus-port
       port: 9090
       targetPort: 9090

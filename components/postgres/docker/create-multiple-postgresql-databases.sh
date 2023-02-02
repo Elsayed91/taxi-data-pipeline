@@ -16,7 +16,6 @@ function create_db() {
     local db_user=$2
     local db_password=$3
     local type=$4
-    echo "$db_name, $db_user, $db_password, $type"
     if [[ -z ${db_user} ]]; then
         db_user=$type
     fi

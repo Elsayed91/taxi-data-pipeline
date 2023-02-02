@@ -18,6 +18,7 @@ spec:
     metadata:
       labels:
         app: prometheus
+        svc: external-lb
     spec:
       containers:
         - image: prom/prometheus:latest

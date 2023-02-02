@@ -5,8 +5,8 @@ function generate_random_env() {
     # the key is the item for which a random value to be generated
     # expression is what kind of random value is to be generated
     # destination is where the key-value will be appended, like .env file
-    # it first looks up if a key-value pair exist, if so, it skips the record
-    # it a key exist but no value (key=) then it evaluates and add the outcome of the
+    # it first looks up if a key-value pair exist, if it does exist, it skips the record
+    # if a key exists but no value (key=) then it evaluates and add the outcome of the
     # expression as value
     # if it doesnt exist at all, it adds the key value pair
     # this section [ sed -i "/^$key=/s/=.*/=\"${value//\//\\/}\"/" "$destination" ]
@@ -69,12 +69,27 @@ kill_failed() {
     # kubectl get pods -n $namespace | grep ImagePullBackOff | cut -d' ' -f 1 | xargs kubectl delete pod
 }
 
-# wait_for_all_pods() {
-#     pods=$(kubectl get pods -o name)
-#     for pod in "${pods}"; do
-#         while [[ $(kubectl get pods ${pod#*2} -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
-#             echo "pod ${pod#*2} still not ready, sleeping 2 seconds"
-#             sleep 2
-#         done
-#     done
-# }
+clean_complete() {
+    local namespace=${1:-default}
+    local pods=$(kubectl get pods -n $namespace | grep -E "Completed" | cut -d' ' -f 1)
+    if [ -n "$pods" ]; then
+        kubectl delete pod $pods
+    fi
+}
+
+wait_for_all_pods() {
+    pods=$(kubectl get pods -o name)
+    while read -r pod; do
+        while true; do
+            status=$(kubectl get $pod -o 'jsonpath={..status.phase}')
+            echo "$pod is $status"
+            if [[ "$status" == "Running" || "$status" == "Completed" ]]; then
+                break
+            fi
+            echo "$pod still not ready, sleeping 2 seconds"
+            sleep 6
+        done
+
+    done <<<"$pods"
+    echo "all pods are ready."
+}

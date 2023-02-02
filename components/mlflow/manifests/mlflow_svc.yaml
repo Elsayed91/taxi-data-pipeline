@@ -1,0 +1,13 @@
+# disabled as it is being picked up by the load balancer
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: mlflow-service
+# spec:
+#   type: NodePort
+#   ports:
+#     - name: mlflow
+#       port: 5000
+#       targetPort: 5000
+#   selector:
+#     app: mlflow
