@@ -159,7 +159,7 @@ with DAG(
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/ml_train",
             "gitsync": True,
             "nodeSelector": TRAINING_NODE_POOL,
-            "resources": {"memory": "61.5Gi", "cpu": "7.91"},
+            "resources": {"memory": "40.5Gi", "cpu": "6"},
         },
         envs={
             "TARGET_DATASET": os.getenv("ML_DATASET"),
