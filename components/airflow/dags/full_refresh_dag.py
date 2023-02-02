@@ -8,8 +8,7 @@ from airflow_kubernetes_job_operator.kubernetes_job_operator import (
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
 import sys
 
-dags_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.append(dags_path)
+sys.path.insert(0, os.getcwd())
 
 from addons.parse_state import SparkApplication
 
