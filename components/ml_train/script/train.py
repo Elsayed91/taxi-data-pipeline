@@ -31,7 +31,7 @@ model_name = os.getenv("MODEL_NAME", "xgboost-fare-predictor")
 
 exp = mlflow.set_experiment(mlflow_experiment_name)
 exp_id = exp.experiment_id
-df = load_data(target_dataset, target_table, 5)  # type: ignore
+df = load_data(target_dataset, target_table, 6)  # type: ignore
 print(f"df shape is {df.shape}")
 y = df[target_column]
 X = df.drop([target_column], axis=1)
@@ -40,10 +40,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_s
 param = {
     "max_depth": [2, 4, 6],
     "n_estimators": [15, 25, 100],
-    "colsample_bytree": [0.2, 0.6, 0.8],
     "min_child_weight": [3, 5, 7],
-    "gamma": [0.3, 0.5, 0.7],
-    "subsample": [0.4, 0.6, 0.8],
 }
 
 
