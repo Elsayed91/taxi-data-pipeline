@@ -83,7 +83,7 @@ with DAG(
     # )
 
     # t2 = KubernetesJobOperator(
-    #     task_id="etl",
+    #     task_id="spark-etl",
     #     body_filepath=SPARK_POD_TEMPLATE,
     #     jinja_job_args={
     #         "project": GOOGLE_CLOUD_PROJECT,

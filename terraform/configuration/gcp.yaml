@@ -58,6 +58,7 @@ BIGQUERY:
     - dataset_id: "${ML_DATASET}"
     - dataset_id: "${SEEDS_DATASET}"
     - dataset_id: "${UNIT_TESTS_DATASET}"
+    - dataset_id: "elementary"
 GCS:
   buckets:
     - bucket_name: "${STAGING_BUCKET}"
