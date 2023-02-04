@@ -69,8 +69,9 @@ with DAG(
     BASE = "/git/repo/components"
     TEMPLATES_PATH = f"{BASE}/airflow/dags/templates"
     SCRIPTS_PATH = f"{BASE}/airflow/dags/scripts"
-    JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")
+    SPARK_JOBS_NODE_POOL = os.getenv("SPARK_JOBS_NODE_POOL")
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
+    TRAINING_NODE_POOL = os.getenv("TRAINING_NODE_POOL")
     t1 = KubernetesJobOperator(
         task_id="aws_to_gcs",
         body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
@@ -110,7 +111,7 @@ with DAG(
             "name": "great-expectations",
             "instances": 4,
             "gitsync": True,
-            "nodeSelector": JOBS_NODE_POOL,
+            "nodeSelector": SPARK_JOBS_NODE_POOL,
             "executor_memory": "2048m",
             "env": {
                 "GE_CONFIG_DIR": f"{BASE}/data_validation/config",
@@ -132,7 +133,7 @@ with DAG(
             "name": "spark-k8s",
             "instances": 5,
             "gitsync": True,
-            "nodeSelector": JOBS_NODE_POOL,
+            "nodeSelector": SPARK_JOBS_NODE_POOL,
             "executor_memory": "2048m",
             "env": {
                 "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
@@ -157,6 +158,7 @@ with DAG(
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
             "name": "dbt",
             "gitsync": True,
+            "nodeSelector": BASE_NODE_POOL,
             "volumes": [
                 {
                     "name": "gcsfs-creds",
