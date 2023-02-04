@@ -71,17 +71,15 @@ with DAG(
     SCRIPTS_PATH = f"{BASE}/airflow/dags/scripts"
     JOBS_NODE_POOL = os.getenv("JOBS_NODE_POOL")
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
-    CATEGORY = "{{ dag_run.conf.category }}"
-    URI = "{{ dag_run.conf.uri }}"
     t1 = KubernetesJobOperator(
         task_id="aws_to_gcs",
         body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
         command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
         arguments=[
             "--data-source",
-            "{{ dag_run.conf.uri }}",
+            "{{ dag_run.conf.URI }}",
             "--destination",
-            f"gs://{STAGING_BUCKET}/{{{{ dag_run.conf.category }}}}",
+            f"gs://{STAGING_BUCKET}/{{{{ dag_run.conf.CATEGORY }}}}",
             "--creds-file",
             "/etc/aws/aws_creds.json",
             "--check-exists",

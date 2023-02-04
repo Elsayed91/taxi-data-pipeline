@@ -47,7 +47,7 @@ def extract_target_date(filename: str) -> str:
     return formatted_date
 
 
-def get_credentials(secret_id: str = "gcp_key") -> Credentials:
+def get_credentials(secret_id: str = "gcp_service_key") -> Credentials:
     """
     Retrieves GCP service account credentials from AWS Secrets Manager.
     It will initially check if INTEGRATION_TEST env var is set, if true
@@ -263,6 +263,3 @@ def lambda_handler(
     pod_exec(
         api, target_namespace, target_pod_name, target_container, dag_trigger_command  # type: ignore
     )
-
-
-##x
