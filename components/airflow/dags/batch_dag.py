@@ -6,8 +6,10 @@ templating.
 - `aws_to_gcs` transfers data from AWS to GCS and uses the pod_template.yaml for its
   resource definition.
 
-- `data_validation` runs a Great Expectations data validation job using a Spark
-  application. It uses the spark_pod_template.yaml for its resource definition.
+- `data_validation` runs a Great Expectations data validation job using Spark. It uses the
+  spark_pod_template.yaml for its resource definition. the threshold value is defined in
+  the environmental variables and can be used to fail the pipeline if data validation is
+  lower than the threshold.
 
 - `etl-batch` ingests data from GCS into BigQuery using a Spark application. It also
   applies some transformations and filters out data into clean & triage data. It uses the

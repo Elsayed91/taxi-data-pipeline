@@ -205,6 +205,7 @@ information see the airflow scripts section.
 - `train.py` trains a model and tunes the hyperparameters, this is done for the initial load only.
 - `retrain.py` uses continuous training to extend the existing model.
 - `serve.py` serves the model as a flask app.
+For training a machine with higher ram is used. GPUs are not available for usage during GCP trial, and also because the training script only uses up about 9-10.5 gb of RAM, a 16GB machine is used for this scenario. Kindly note that this is enot optimal and when doing hyperparameter tuning it takes hours if the full dataset is loaded. 
 
 ### MLFlow
 MLFlow is used to log metrics and models to the MLFlow registry which is linked to GCS. 

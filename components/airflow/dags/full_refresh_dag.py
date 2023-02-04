@@ -66,89 +66,89 @@ with DAG(
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
     TRAINING_NODE_POOL = os.getenv("TRAINING_NODE_POOL")
 
-    # t1 = KubernetesJobOperator(
-    #     task_id="aws_to_gcs",
-    #     body_filepath=POD_TEMPALTE,
-    #     command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
-    #     arguments=[
-    #         "--data-source",
-    #         f"s3://{os.getenv('TARGET_S3_BUCKET')}/trip data/",
-    #         "--destination",
-    #         f"gs://{STAGING_BUCKET}/yellow",
-    #         "--creds-file",
-    #         "/etc/aws/aws_creds.json",
-    #         "--include-prefixes",
-    #         "yellow_tripdata_20",
-    #         "--exclude-prefixes",
-    #         "yellow_tripdata_2009,yellow_tripdata_2010",
-    #         "--check-exists",
-    #     ],
-    #     jinja_job_args={
-    #         "image": "google/cloud-sdk:alpine",
-    #         "name": "from-aws-to-gcs",
-    #         "gitsync": True,
-    #         "nodeSelector": BASE_NODE_POOL,
-    #         "volumes": [
-    #             {
-    #                 "name": "aws-creds",
-    #                 "type": "secret",
-    #                 "reference": "aws-creds",
-    #                 "mountPath": "/etc/aws",
-    #             }
-    #         ],
-    #     },
-    # )
+    t1 = KubernetesJobOperator(
+        task_id="aws_to_gcs",
+        body_filepath=POD_TEMPALTE,
+        command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
+        arguments=[
+            "--data-source",
+            f"s3://{os.getenv('TARGET_S3_BUCKET')}/trip data/",
+            "--destination",
+            f"gs://{STAGING_BUCKET}/yellow",
+            "--creds-file",
+            "/etc/aws/aws_creds.json",
+            "--include-prefixes",
+            "yellow_tripdata_20",
+            "--exclude-prefixes",
+            "yellow_tripdata_2009,yellow_tripdata_2010",
+            "--check-exists",
+        ],
+        jinja_job_args={
+            "image": "google/cloud-sdk:alpine",
+            "name": "from-aws-to-gcs",
+            "gitsync": True,
+            "nodeSelector": BASE_NODE_POOL,
+            "volumes": [
+                {
+                    "name": "aws-creds",
+                    "type": "secret",
+                    "reference": "aws-creds",
+                    "mountPath": "/etc/aws",
+                }
+            ],
+        },
+    )
 
-    # t2 = KubernetesJobOperator(
-    #     task_id="spark-etl",
-    #     body_filepath=SPARK_POD_TEMPLATE,
-    #     jinja_job_args={
-    #         "project": GOOGLE_CLOUD_PROJECT,
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-    #         "mainApplicationFile": f"local://{BASE}/spark/scripts/initial_load.py",
-    #         "name": "spark-k8s-init",
-    #         "instances": 7,
-    #         "gitsync": True,
-    #         "nodeSelector": SPARK_JOBS_NODE_POOL,
-    #         "executor_memory": "2048m",
-    #         "env": {
-    #             "CATEGORY": "yellow",
-    #             "URI": f"gs://{STAGING_BUCKET}/yellow/*",
-    #             "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
-    #         },
-    #         "envFrom": [{"type": "configMapRef", "name": "spark-env"}],
-    #     },
-    # )
+    t2 = KubernetesJobOperator(
+        task_id="spark-etl",
+        body_filepath=SPARK_POD_TEMPLATE,
+        jinja_job_args={
+            "project": GOOGLE_CLOUD_PROJECT,
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
+            "mainApplicationFile": f"local://{BASE}/spark/scripts/initial_load.py",
+            "name": "spark-k8s-init",
+            "instances": 7,
+            "gitsync": True,
+            "nodeSelector": SPARK_JOBS_NODE_POOL,
+            "executor_memory": "2048m",
+            "env": {
+                "CATEGORY": "yellow",
+                "URI": f"gs://{STAGING_BUCKET}/yellow/*",
+                "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
+            },
+            "envFrom": [{"type": "configMapRef", "name": "spark-env"}],
+        },
+    )
 
-    # t3 = KubernetesJobOperator(
-    #     task_id="dbt",
-    #     body_filepath=POD_TEMPALTE,
-    #     command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
-    #     arguments=[
-    #         "--deps",
-    #         "--seed",
-    #         "--commands",
-    #         "dbt run --full-refresh",
-    #         "--tests",
-    #         "--generate-docs",
-    #     ],
-    #     jinja_job_args={
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
-    #         "name": "dbt",
-    #         "gitsync": True,
-    #         "nodeSelector": BASE_NODE_POOL,
-    #         "volumes": [
-    #             {
-    #                 "name": "gcsfs-creds",
-    #                 "type": "secret",
-    #                 "reference": "gcsfs-creds",
-    #                 "mountPath": "/mnt/secrets",
-    #             }
-    #         ],
-    #         "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
-    #     },
-    #     envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app", "RUN_DATE": today},
-    # )
+    t3 = KubernetesJobOperator(
+        task_id="dbt",
+        body_filepath=POD_TEMPALTE,
+        command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
+        arguments=[
+            "--deps",
+            "--seed",
+            "--commands",
+            "dbt run --full-refresh",
+            "--tests",
+            "--generate-docs",
+        ],
+        jinja_job_args={
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
+            "name": "dbt",
+            "gitsync": True,
+            "nodeSelector": BASE_NODE_POOL,
+            "volumes": [
+                {
+                    "name": "gcsfs-creds",
+                    "type": "secret",
+                    "reference": "gcsfs-creds",
+                    "mountPath": "/mnt/secrets",
+                }
+            ],
+            "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
+        },
+        envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app", "RUN_DATE": today},
+    )
 
     t4 = KubernetesJobOperator(
         task_id="train_model",
@@ -172,4 +172,4 @@ with DAG(
         },
     )
 
-    # t1 >> t2 >> t3 >> t4  # type: ignore
+    t1 >> t2 >> t3 >> t4  # type: ignore

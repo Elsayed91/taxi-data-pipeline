@@ -21,16 +21,10 @@ r:
 gitex:
 	@bash -c 'source scripts/functions.sh; gitpush; kill_failed; sleep 6'
 
-k:
-	@bash x.sh
 
 schema:
 	@bq show --schema --format=prettyjson $$PROJECT:$$STAGING_DATASET.$$YELLOW_STAGING_TABLE > myschema.json
 
 
-lambda_test:
-	@aws s3 cp yellow_tripdata_2019-08.parquet s3://stella-9af1e2ce16
-# aws s3 cp "s3://nyc-tlc/trip data/yellow_tripdata_2022-10.parquet" s3://stella-9af1e2ce16
-
-py:
-	@python components/data_validation/data_validation.py
+trigger_batch_dag:
+	@aws s3 cp "s3://nyc-tlc/trip data/yellow_tripdata_2022-10.parquet" s3://$$AWS_DUMMY_BUCKET
