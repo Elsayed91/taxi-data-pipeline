@@ -135,8 +135,7 @@ with DAG(
         arguments=[
             "--deps",
             "--seed",
-            "--commands",
-            "dbt run --full-refresh",
+            "--test",
         ],
         jinja_job_args={
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",

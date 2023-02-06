@@ -11,8 +11,6 @@ models:
       airports.
     tests:
       - dbt_datamocktool.unit_test:
-          name: "YS"
-          description: "This test is a unit test"
           input_mapping:
             source('staging_data', 'yellow_staging'): ref('test_dbt__ml__yellow_fare')
           expected_output: ref('dbt__ml__yellow_fare_expected')
