@@ -296,5 +296,5 @@ sources:
           - name: total_duration_hours
             description: Total duration spent in rides in a given month.
           - name: busiest_hour_of_day
-            description: Hour of day with most trips in a given month.
+            description: Hour of day with most trips in a given month. 
 
