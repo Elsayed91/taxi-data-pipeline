@@ -66,38 +66,38 @@ with DAG(
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
     TRAINING_NODE_POOL = os.getenv("TRAINING_NODE_POOL")
 
-    t1 = KubernetesJobOperator(
-        task_id="aws_to_gcs",
-        body_filepath=POD_TEMPALTE,
-        command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
-        arguments=[
-            "--data-source",
-            f"s3://{os.getenv('TARGET_S3_BUCKET')}/trip data/",
-            "--destination",
-            f"gs://{STAGING_BUCKET}/yellow",
-            "--creds-file",
-            "/etc/aws/aws_creds.json",
-            "--include-prefixes",
-            "yellow_tripdata_20",
-            "--exclude-prefixes",
-            "yellow_tripdata_2009,yellow_tripdata_2010",
-            "--check-exists",
-        ],
-        jinja_job_args={
-            "image": "google/cloud-sdk:alpine",
-            "name": "from-aws-to-gcs",
-            "gitsync": True,
-            "nodeSelector": BASE_NODE_POOL,
-            "volumes": [
-                {
-                    "name": "aws-creds",
-                    "type": "secret",
-                    "reference": "aws-creds",
-                    "mountPath": "/etc/aws",
-                }
-            ],
-        },
-    )
+    # t1 = KubernetesJobOperator(
+    #     task_id="aws_to_gcs",
+    #     body_filepath=POD_TEMPALTE,
+    #     command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
+    #     arguments=[
+    #         "--data-source",
+    #         f"s3://{os.getenv('TARGET_S3_BUCKET')}/trip data/",
+    #         "--destination",
+    #         f"gs://{STAGING_BUCKET}/yellow",
+    #         "--creds-file",
+    #         "/etc/aws/aws_creds.json",
+    #         "--include-prefixes",
+    #         "yellow_tripdata_20",
+    #         "--exclude-prefixes",
+    #         "yellow_tripdata_2009,yellow_tripdata_2010",
+    #         "--check-exists",
+    #     ],
+    #     jinja_job_args={
+    #         "image": "google/cloud-sdk:alpine",
+    #         "name": "from-aws-to-gcs",
+    #         "gitsync": True,
+    #         "nodeSelector": BASE_NODE_POOL,
+    #         "volumes": [
+    #             {
+    #                 "name": "aws-creds",
+    #                 "type": "secret",
+    #                 "reference": "aws-creds",
+    #                 "mountPath": "/etc/aws",
+    #             }
+    #         ],
+    #     },
+    # )
 
     t2 = KubernetesJobOperator(
         task_id="spark-etl",
@@ -120,56 +120,56 @@ with DAG(
         },
     )
 
-    t3 = KubernetesJobOperator(
-        task_id="dbt",
-        body_filepath=POD_TEMPALTE,
-        command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
-        arguments=[
-            "--deps",
-            "--seed",
-            "--commands",
-            "dbt run --full-refresh",
-            "--tests",
-            "--generate-docs",
-        ],
-        jinja_job_args={
-            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
-            "name": "dbt",
-            "gitsync": True,
-            "nodeSelector": BASE_NODE_POOL,
-            "volumes": [
-                {
-                    "name": "gcsfs-creds",
-                    "type": "secret",
-                    "reference": "gcsfs-creds",
-                    "mountPath": "/mnt/secrets",
-                }
-            ],
-            "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
-        },
-        envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app", "RUN_DATE": today},
-    )
+    # t3 = KubernetesJobOperator(
+    #     task_id="dbt",
+    #     body_filepath=POD_TEMPALTE,
+    #     command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
+    #     arguments=[
+    #         "--deps",
+    #         "--seed",
+    #         "--commands",
+    #         "dbt run --full-refresh",
+    #         "--tests",
+    #         "--generate-docs",
+    #     ],
+    #     jinja_job_args={
+    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
+    #         "name": "dbt",
+    #         "gitsync": True,
+    #         "nodeSelector": BASE_NODE_POOL,
+    #         "volumes": [
+    #             {
+    #                 "name": "gcsfs-creds",
+    #                 "type": "secret",
+    #                 "reference": "gcsfs-creds",
+    #                 "mountPath": "/mnt/secrets",
+    #             }
+    #         ],
+    #         "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
+    #     },
+    #     envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app", "RUN_DATE": today},
+    # )
 
-    t4 = KubernetesJobOperator(
-        task_id="train_model",
-        body_filepath=POD_TEMPALTE,
-        command=["python", f"{BASE}/ml_train/script/train.py"],
-        jinja_job_args={
-            "name": "xgb-model-training",
-            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/ml_train",
-            "gitsync": True,
-            "nodeSelector": TRAINING_NODE_POOL,
-            "resources": {"memory": "40.5Gi", "cpu": "6"},
-        },
-        envs={
-            "TARGET_DATASET": os.getenv("ML_DATASET"),
-            "TARGET_TABLE": "dbt__ml__yellow_fare",
-            "TRACKING_SERVICE": "mlflow-service",
-            "MLFLOW_EXPERIMENT_NAME": "taxi-fare-prediction-v3",
-            "TARGET_COLUMN": "fare_amount",
-            "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET"),
-            "CROSS_VALIDATIONS": "2",
-        },
-    )
+    # t4 = KubernetesJobOperator(
+    #     task_id="train_model",
+    #     body_filepath=POD_TEMPALTE,
+    #     command=["python", f"{BASE}/ml_train/script/train.py"],
+    #     jinja_job_args={
+    #         "name": "xgb-model-training",
+    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/ml_train",
+    #         "gitsync": True,
+    #         "nodeSelector": TRAINING_NODE_POOL,
+    #         "resources": {"memory": "40.5Gi", "cpu": "6"},
+    #     },
+    #     envs={
+    #         "TARGET_DATASET": os.getenv("ML_DATASET"),
+    #         "TARGET_TABLE": "dbt__ml__yellow_fare",
+    #         "TRACKING_SERVICE": "mlflow-service",
+    #         "MLFLOW_EXPERIMENT_NAME": "taxi-fare-prediction-v3",
+    #         "TARGET_COLUMN": "fare_amount",
+    #         "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET"),
+    #         "CROSS_VALIDATIONS": "2",
+    #     },
+    # )
 
-    t1 >> t2 >> t3 >> t4  # type: ignore
+    # t1 >> t2 >> t3 >> t4  # type: ignore
