@@ -30,7 +30,7 @@ SELECT
   IFNULL(bt.monthly_airport_fee, 0) AS airport_trip, -- 1 = yes, 0 = no
   bt.monthly_airport_fee + bt.monthly_tolls_amount + bt.monthly_congestion_surcharge +
     bt.monthly_improvement_surcharge + bt.monthly_mta_tax + bt.monthly_extra_amount AS total_extras,
-  {{ payment_form(payment_type) }} AS payment_type
+  {{ payment_form('payment_type') }}  AS payment_type
 FROM {{ source("historical_data", "yellow_historical") }} bt
 left join {{ ref("seed_zones") }} z1 on bt.pickup_zone = z1.LocationID
 left join {{ ref("seed_zones") }} z2 on bt.dropoff_zone = z2.LocationID 
@@ -38,8 +38,6 @@ WHERE z1.LocationID IS NOT NULL AND z2.LocationID IS NOT NULL
 AND COALESCE(average_passenger_count, 1) <= 7
 AND EXTRACT(YEAR FROM bt.first_day_of_month) >= 2010 
 AND EXTRACT(YEAR FROM bt.first_day_of_month) <= EXTRACT(YEAR FROM CURRENT_DATE())
-
-
 
 
 
