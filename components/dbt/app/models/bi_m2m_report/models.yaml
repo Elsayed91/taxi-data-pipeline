@@ -7,7 +7,7 @@ models:
       The view provides data that is used to build the Grafana BI dashboard. 
     tests:
       - dbt_datamocktool.unit_test:
-          name: "YS"
+          name: "bi_ut"
           description: "This test is a unit test"
           input_mapping:
             source('historical_data', 'yellow_historical'): ref('test_dbt__bi__yellow_m2m')
