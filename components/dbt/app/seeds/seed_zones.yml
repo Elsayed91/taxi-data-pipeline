@@ -24,7 +24,7 @@ seeds:
     tests:
       - unique
       - not_null
-  - name: borough
+  - name: zone
     description: The name of the Zone.
     tests:
       - unique
