@@ -132,7 +132,7 @@ with DAG(
         #     "--tests",
         #     "--generate-docs",
         # ],
-        arguments=["--deps", "--seed" "--comands", "dbt run --select tag:view"],
+        arguments=["--deps", "--seed", "--comands", "dbt run --select tag:view"],
         jinja_job_args={
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
             "name": "dbt",
