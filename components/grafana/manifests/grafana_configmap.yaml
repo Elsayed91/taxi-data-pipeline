@@ -15,10 +15,52 @@ data:
         type: prometheus
         access: proxy
         url: http://prometheus.default.svc.cluster.local:9090
-      - name: BigQuery DS
+      - name: BigQuery
         type: grafana-bigquery-datasource
+        typeName: Google BigQuery
+        typeLogoUrl: public/plugins/grafana-bigquery-datasource/img/logo.png
+        url: ""
+        user: ""
+        database: ""
+        access: proxy
         editable: true
         enabled: true
-        defaultProject: ${PROJECT}
+        basicAuth: false
+        isDefault: false
         jsonData:
           authenticationType: gce
+          defaultProject:  ${PROJECT}
+          processingLocation: ${GCP_REGION}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+data:
+  dashboards.yaml: |-
+    apiVersion: 1
+    providers:
+      - name: "Kube State Metrics Dashboards"
+        orgId: 1
+        folder: ""
+        folderUid: ""
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: 10
+        allowUiUpdates: false
+        options:
+          path: /opt/grafana/dashboards/kube
+          foldersFromFilesStructure: true
+      - name: "Airflow Spark Metrics Dashboards"
+        orgId: 1
+        folder: ""
+        folderUid: ""
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: 10
+        allowUiUpdates: false
+        options:
+          path: /opt/grafana/dashboards/airflow_spark
+          foldersFromFilesStructure: true
+
+

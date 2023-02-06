@@ -163,6 +163,13 @@ to trigger the DAG.
 
 It can be extended to allow cluster resizing in case the cluster is downscaled to 0.
 
+### **Integration Test**
+The lambda comes with an integration test that can be found in tests/integration/lambda.
+the test packages the lambda function and uses localstack and terraform to create pseudo
+AWS infrastructure. the lambda function is run on it, with the result being a DAG trigger.
+the dag `lambda_integraton_test` receives input and validates it. To run the integration
+test simply use `make run_lambda_integration_test`
+
 
 ## <u>DBT</u>
 
@@ -177,9 +184,7 @@ tables, which would reduce the storage costs, but will not be as quick as native
 the 2nd purpose is to keep clear documentation of the content of the tables and enable
 easy testing for data quality and unit testing.
 
-While a lot of models can be created with the existing data, only the ML model is defined
-here. We have a historical data datasource as well, which can be used right away to create
-financial dashboards.
+While a lot of models can be created with the existing data, I've created 2 models, an ML model and a BI reporting model.
 
 ### Notable Packages in use
 - `elementary` is used to provide extra information regarding tests and processing
@@ -198,7 +203,10 @@ component.
 the docs are generated through a script which is passed through airflow. for more
 information see the airflow scripts section.
 
+### Table Materialization
+1. ML Model: Incremental Strategy. This table needs to be fast to query the whole dataset, additionally the whole purpose of the table is to allow the datascientists to skip the continuous pre-processing, that means the table will be queried often, so an incremental strategy is best here.
 
+2. BI Model: View. While A view is best for getting you from point A to point B, the data from this view will be used by a Grafana dashboard that will be refreshed once per month, since the data itself won't be queried and it is fairly static, a view will suffice and it will spare the costs of using BigQuery storage. Additionally the data is fairly small in size (> 2gb).
 
 ## <u>Machine Learning</u>
 ### ML train
@@ -240,6 +248,6 @@ the load balancer is used to expose multiple services that are intended to be ac
 the decision to use one load balancer for all of them is simply to reduce costs, as each external IP created via load balancers incurs significant costs.
 combining them all reduces this cost significantly while providing access to different application interfaces. 
 
-## <u>docs app</u>
+## <u>Static Docs App</u>
 A very simple flask app that allows serving of multiple static files that are located in GCS.
 In this iteration it hosts Great Expectations, DBT and Elementary docs. 

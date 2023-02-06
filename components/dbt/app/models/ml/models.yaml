@@ -3,11 +3,12 @@ version: 2
 models:
   - name: dbt__ml__yellow_fare
     description: >
-      This table contains data on taxi rides in New York City, including various features such as
-      the pickup and dropoff zones, trip distance, and fare amount. It also includes date and time
-      information such as the day of the month, month, year, day of the week, and hour of the day.
-      Additionally, it includes the distance between the pickup and dropoff locations, the distances
-      from each location to JFK, EWR, and LGA airports.
+      This table contains data on taxi rides in New York City, including various features
+      such as the pickup and dropoff zones, trip distance, and fare amount. It also
+      includes date and time information such as the day of the month, month, year, day of
+      the week, and hour of the day. Additionally, it includes the distance between the
+      pickup and dropoff locations, the distances from each location to JFK, EWR, and LGA
+      airports.
     tests:
       - dbt_datamocktool.unit_test:
           name: "YS"
@@ -48,7 +49,8 @@ models:
               min_value: 0.3  # (Optional)
               max_value: 1 # (Optional)
       - name: trip_duration
-        description: the duration of the trip. calculated by subtracting dropoff and pickup times.
+        description: >
+          the duration of the trip. calculated by subtracting dropoff and pickup times.
         type: float
         tests:
           - not_null

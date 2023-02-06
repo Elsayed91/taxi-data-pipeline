@@ -6,6 +6,7 @@ seeds:
     column_types: {
       LocationID: integer,
       borough:	string,
+      zone: string,
       longitude: float,
       latitude: float    
       }
@@ -19,7 +20,12 @@ seeds:
       - unique
       - not_null
   - name: borough
-    description: The name of the Zone/Borough.
+    description: The name of the Borough.
+    tests:
+      - unique
+      - not_null
+  - name: borough
+    description: The name of the Zone.
     tests:
       - unique
       - not_null

@@ -28,3 +28,6 @@ schema:
 
 trigger_batch_dag:
 	@aws s3 cp "s3://nyc-tlc/trip data/yellow_tripdata_2022-10.parquet" s3://$$AWS_DUMMY_BUCKET
+
+run_lambda_integration_test:
+	@bash tests/integration/lambda/run_integration_test.sh

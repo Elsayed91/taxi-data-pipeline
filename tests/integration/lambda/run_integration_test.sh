@@ -1,6 +1,9 @@
 #!/bin/bash
 # this integration test requires localstack, terraform and kubectl installed.
 # get localstack here python3 -m pip install localstack
+# this script creates pseudo-aws infrastructure to run a lambda function on for the
+# purposes of integration testing. It will check and validate results and will clean up
+# resources before exiting.
 
 set -e
 
@@ -14,7 +17,7 @@ SERVICES=lambda,iam,secretsmanager,s3,logs nohup localstack start &
 
 terraform init && terraform apply --auto-approve
 sleep 5
-aws --endpoint-url=http://localhost:4566 secretsmanager create-secret --name gcp_key \
+aws --endpoint-url=http://localhost:4566 secretsmanager create-secret --name gcp_service_key \
     --secret-string file://${SCRIPT_DIR}/../../../terraform/modules/files/lambda_key.json \
     --region eu-west-1
 touch yellow_tripdata_2019-08.parquet

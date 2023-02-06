@@ -29,6 +29,7 @@ resource "aws_s3_bucket_acl" "bucketacl" {
 
 
 
+
 resource "aws_iam_role" "lambda_role" {
   name = "test_lambda"
 
@@ -49,14 +50,38 @@ resource "aws_iam_role" "lambda_role" {
 EOF
 }
 
-data "aws_iam_policy" "AmazonS3FullAccess" {
-  arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+
+resource "aws_iam_role_policy" "revoke_keys_role_policy" {
+  name = "lambda-policy"
+  role = aws_iam_role.lambda_role.id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "s3:*",
+        "ses:*",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:ListSecretVersionIds"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
 }
 
-resource "aws_iam_role_policy_attachment" "AmazonS3FullAccess-policy" {
-  role       = aws_iam_role.lambda_role.id
-  policy_arn = data.aws_iam_policy.AmazonS3FullAccess.arn
-}
+# data "aws_iam_policy" "AmazonS3FullAccess" {
+#   arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+# }
+
+# resource "aws_iam_role_policy_attachment" "AmazonS3FullAccess-policy" {
+#   role       = aws_iam_role.lambda_role.id
+#   policy_arn = data.aws_iam_policy.AmazonS3FullAccess.arn
+# }
 
 resource "aws_lambda_permission" "allow_bucket" {
   statement_id  = "AllowExecutionFromS3Bucket"
@@ -87,8 +112,8 @@ resource "aws_lambda_function" "lambda_func" {
   memory_size = 128
   environment {
     variables = {
-      PROJECT          = "stellarismus"
-      GCP_ZONE         = "europe-west1-d"
+      PROJECT          = "stellarismusv2"
+      GCP_ZONE         = "europe-west4-b"
       GKE_CLUSTER_NAME = "gke"
       DAG_NAME         = "lambda_integration_test"
       TARGET_NAMESPACE = "default"

@@ -47,7 +47,7 @@ with DAG(
         **kwargs,
     ):
         """
-        Checks that the values of the URI and filename, run_date keys in
+        Checks that the values of the URI, filename, run_date and category keys in
         the DAG run configuration are equal to expected values.
 
         Args:

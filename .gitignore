@@ -15,3 +15,11 @@ components/airflow/dags/addons/__pycache__
 tests/__pycache__
 .vscode
 tests/integration/lambda/__pycache__
+tests/integration/lambda/files/*
+tests/integration/lambda/.terraform
+tests/integration/lambda/.terraform.lock.hcl
+tests/integration/lambda/nohup.out
+tests/integration/lambda/.terraform.tfstate.lock.info
+tests/integration/lambda/terraform.tfstate.backup
+tests/integration/lambda/yellow_tripdata_2019-08.parquet
+.pytest_cache

@@ -41,21 +41,17 @@ spec:
             - name: grafana-datasources
               mountPath: /etc/grafana/provisioning/datasources/
               readOnly: true
+            - name: grafana-dashboards
+              mountPath: /etc/grafana/provisioning/dashboards/
+              readOnly: true
+            - name: kube-state-dashboard
+              mountPath: /opt/grafana/dashboards/kube
+              readOnly: false
+            - name: airflow-spark-dashboard
+              mountPath: /opt/grafana/dashboards/airflow_spark
+              readOnly: false
           resources:
             {}
-            # - name: grafana-dashboards
-            #   mountPath: /etc/grafana/provisioning/dashboards/
-            #   readOnly: true
-            # - name: grafana-data-drift-dashboard
-            #   mountPath: /opt/grafana/dashboards/
-            #   readOnly: false
-          # resources:
-          #   requests:
-          #     memory: "32Mi"
-          #     cpu: "125m"
-          #   limits:
-          #     memory: "64Mi"
-          #     cpu: "250m"
       nodeSelector:
         cloud.google.com/gke-nodepool: ${BASE_NODE_POOL}
         iam.gke.io/gke-metadata-server-enabled: "true"
@@ -66,11 +62,15 @@ spec:
           configMap:
             defaultMode: 420
             name: grafana-datasources
-        # - name: grafana-dashboards
-        #   configMap:
-        #       defaultMode: 420
-        #       name: grafana-dashboards
-        # - name: grafana-data-drift-dashboard
-        #   configMap:
-        #       defaultMode: 420
-        #       name: grafana-data-drift-dashboard
+        - name: grafana-dashboards
+          configMap:
+              defaultMode: 420
+              name: grafana-dashboards
+        - name: airflow-spark-dashboard
+          configMap:
+              defaultMode: 420
+              name: airflow-spark-dashboard
+        - name: kube-state-dashboard
+          configMap:
+              defaultMode: 420
+              name: kube-state-dashboard

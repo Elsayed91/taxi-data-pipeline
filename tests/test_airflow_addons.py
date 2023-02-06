@@ -47,8 +47,14 @@ def test_get_conf(mocker):
 
     # Set the mock DAG run's conf attribute to a dictionary
     # containing the URI and file_name keys
-    dag_run.conf = {"URI": "x", "filename": "y", "run_date": "z"}
-    result = get_conf("x", "y", "z", dag_run=dag_run)
+    dag_run.conf = {"URI": "x", "FILENAME": "y", "RUN_DATE": "z", "CATEGORY": "w"}
+    result = get_conf(
+        assertion_result_1="x",
+        assertion_result_2="y",
+        assertion_result_3="z",
+        assertion_result_4="w",
+        dag_run=dag_run,
+    )
 
     # Assert that the result is "test successful"
     assert result == "test successful"
@@ -57,16 +63,16 @@ def test_get_conf(mocker):
         AssertionError,
         match="dag triggered but have not received correct data, test unsuccessful.",
     ):
-        get_conf("a", "b", "z", dag_run=dag_run)
+        get_conf("a", "b", "z", "w", dag_run=dag_run)
 
     with pytest.raises(
         AssertionError,
         match="dag triggered but have not received correct data, test unsuccessful.",
     ):
-        get_conf("x", "y", "c", dag_run=dag_run)
+        get_conf("x", "y", "c", "q", dag_run=dag_run)
 
     dag_run.conf = {}
     with pytest.raises(
         AssertionError, match="dag triggered but conf is empty. review lambda code"
     ):
-        get_conf("x", "y", "z", dag_run=dag_run)
+        get_conf("x", "y", "z", "w", dag_run=dag_run)

@@ -1,0 +1,89 @@
+version: 2
+
+models:
+  - name: dbt__bi__yellow_m2m
+    description: >
+      This view contains historical data on taxi rides in New York City, aggregated at a monthly level.
+      The view provides data that is used to build the Grafana BI dashboard. 
+    # tests:
+    #   - dbt_datamocktool.unit_test:
+    #       name: "YS"
+    #       description: "This test is a unit test"
+    #       input_mapping:
+    #         source('historical_data', 'yellow_historical'): ref('test_dbt__bi__yellow_m2m')
+    #       expected_output: ref('dbt__bi__yellow_m2m_expected')
+    #       depends_on:
+    #         - ref('seed_zones')
+    #       tags: ["unit-test"]
+    columns:
+        columns:
+          - name: vendors
+            type: string
+            description: >
+              Indicates the TPEP provider that provided the record. 
+              Options: 
+                - Creative Mobile Technologies, LLC  
+                - VeriFone Inc.
+                - Others
+          - name: year
+            type: integer
+            description: year of the record.
+          - name: month
+            type: integer
+            description: month of the record.
+          - name: pickup_borough
+            type: string
+            description: TLC Taxi borough in which the taximeter was engaged
+          - name: dropoff_borough
+            type: string
+            description: TLC Taxi borough in which the taximeter was disengaged
+          - name: pickup_zone
+            type: string
+            description: TLC Taxi Zone in which the taximeter was engaged
+          - name: dropoff_zone
+            type: string
+            description: TLC Taxi Zone in which the taximeter was disengaged
+          - name: average_passenger_count
+            type: float
+            description: The average number of passengers in the vehicle.
+          - name: average_trip_distance
+            type: float
+            description: The average trip distance for all trips in a month.
+          - name: monthly_fare_amount
+            type: float
+            description: The monthly sum of time-and-distance fare calculated by the meter.
+          - name: monthly_extra_amount
+            type: float
+            description: Monthly sum of miscellaneous extras and surcharges.
+          - name: monthly_mta_tax
+            type: float
+            description: Monthly sum of MTA tax that is automatically triggered based on the metered rate in use.
+          - name: monthly_tip_amount
+            type: float
+            description: Monthly sum of total tip amount.
+          - name: monthly_tolls_amount
+            type: float
+            description: Monthly sum of all tolls paid.
+          - name: monthly_improvement_surcharge
+            type: float
+            description: Monthly total of the improvement surcharge assessed trips.
+          - name: monthly_total_amount
+            type: float
+            description: The monthly total amount charged to all passengers. Does not include cash tips.
+          - name: payment_type
+            type: string
+            description: >
+              A code signifying how the passenger paid for the trip.
+              Options:
+                1. Credit card
+                2. Cash
+                3. No charge
+                4. Dispute
+                5. Unknown
+                6. Voided trip
+          - name: monthly_congestion_surcharge
+            type: float
+            description: Monthly total amount collected in trip for NYS congestion surcharge.
+          - name: airport_trip
+            type: integer
+            description: Indicates whether it was an airport trip or not. 1 for yes, 0 for no.

@@ -4,7 +4,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 source ${SCRIPT_DIR}/functions.sh
 
 ## generate environmental variables that include random values
-generate_random_env ${SCRIPT_DIR}/random_env.csv
+generate_random_env ${SCRIPT_DIR}/../data/random_env.csv
 
 # ## setup GCP
 # echo "Setting Up Google Cloud Components"
