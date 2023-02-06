@@ -42,8 +42,7 @@ yellow_historical_transformation = """
         avg(passenger_count) as average_passenger_count,
         avg(trip_distance) as average_trip_distance,
         count(*) as trip_count,
-        extract(HOUR FROM tpep_pickup_datetime) as 
-        avg(unix_timestamp(tpep_dropoff_datetime)-unix_timestamp(tpep_pickup_datetime))/(60) as avg_duration_minutes,
+        avg((unix_timestamp(tpep_dropoff_datetime) - unix_timestamp(tpep_pickup_datetime)) / 60) as avg_duration_minutes,
         sum(unix_timestamp(tpep_dropoff_datetime)-unix_timestamp(tpep_pickup_datetime)) as total_duration_hours,
         (
             SELECT
