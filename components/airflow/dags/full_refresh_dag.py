@@ -110,7 +110,7 @@ with DAG(
             "instances": 7,
             "gitsync": True,
             "nodeSelector": SPARK_JOBS_NODE_POOL,
-            "executor_memory": "8G",
+            "executor_memory": "2G",
             "env": {
                 "CATEGORY": "yellow",
                 "URI": f"gs://{STAGING_BUCKET}/yellow/*",
