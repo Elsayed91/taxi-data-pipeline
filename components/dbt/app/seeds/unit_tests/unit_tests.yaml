@@ -74,7 +74,11 @@ seeds:
         monthly_total_amount: FLOAT,
         payment_type: INTEGER,
         monthly_congestion_surcharge: FLOAT,
-        monthly_airport_fee: FLOAT
+        monthly_airport_fee: FLOAT,
+        trip_count: INTEGER,
+        avg_duration_minutes: FLOAT,
+        total_duration_hours: FLOAT,
+        busiest_hour_of_day: INTEGER
       }
 - name: dbt__bi__yellow_m2m_expected
   description: expected results for dbt__bi__yellow_m2m unit test.
@@ -100,5 +104,9 @@ seeds:
         dropoff_zone: STRING,
         airport_trip: FLOAT,
         total_extras: FLOAT,
-        payment_type: STRING
+        payment_type: STRING,
+        trip_count: INTEGER,
+        avg_duration_minutes: FLOAT,
+        total_duration_hours: FLOAT,
+        busiest_hour_of_day: INTEGER
       }

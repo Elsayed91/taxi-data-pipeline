@@ -99,9 +99,13 @@ models:
         description: Indicates whether it was an airport trip or not. 1 for yes, 0 for no.
       - name: trip_count
         description: Number of trips in a given month.
+        type: integer
       - name: avg_duration_minutes
         description: Average duration of a trip in a given month.
+        type: float
       - name: total_duration_hours
+        type: float
         description: Total duration spent in rides in a given month.
       - name: busiest_hour_of_day
+        type: integer
         description: Hour of day with most trips in a given month. 
