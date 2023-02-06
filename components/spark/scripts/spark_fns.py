@@ -246,17 +246,23 @@ def process_initial_load(
     Loads data from parquet file(s) into BigQuery and performs data
     filtering and writing to specified tables.
 
-    Args: - spark: SparkSession object. - uri: A string or list of strings representing
-    file path(s) for parquet file(s). - idx: An integer index for labeling jobs. -
-    **kwargs: Keyword arguments for the following items: - mapping: A dictionary used to
-    cast columns to specified data types. - summary_query: A string representing the SQL
-    query for generating the historical data summary. - historical_table: A string
-    representing the BigQuery table name for storing the historical data summary. -
-    partition_col: A string representing the partition column name used for filtering
-    data. - filters: A string representing the filter condition for cleaning data. -
-    staging_table: A string representing the BigQuery table name for storing the cleaned
-    data. - triage_table: A string representing the BigQuery table name for storing the
-    triaged data.
+    Args:
+    - spark: SparkSession object.
+    - uri: A string or list of strings representing file path(s) for parquet file(s).
+    - idx: An integer index for labeling jobs.
+    - **kwargs: Keyword arguments for the following items:
+        - mapping: A dictionary used to cast columns to specified data types.
+        - summary_query: A string representing the SQL query for generating the historical
+        data summary.
+        - historical_table: A string representing the BigQuery table name for storing the
+        historical data summary.
+        - partition_col: A string representing the partition column name used for
+        filtering data.
+        - filters: A string representing the filter condition for cleaning data.
+        - staging_table: A string representing the BigQuery table name for storing the
+        cleaned data.
+        - triage_table: A string representing the BigQuery table name for storing the
+        triaged data.
 
     Returns:
     None

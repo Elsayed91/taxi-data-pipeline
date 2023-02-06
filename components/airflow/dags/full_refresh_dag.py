@@ -99,56 +99,62 @@ with DAG(
     #     },
     # )
 
-    t2 = KubernetesJobOperator(
-        task_id="spark-etl",
-        body_filepath=SPARK_POD_TEMPLATE,
-        jinja_job_args={
-            "project": GOOGLE_CLOUD_PROJECT,
-            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-            "mainApplicationFile": f"local://{BASE}/spark/scripts/initial_load.py",
-            "name": "spark-k8s-init",
-            "instances": 7,
-            "gitsync": True,
-            "nodeSelector": SPARK_JOBS_NODE_POOL,
-            "executor_memory": "2G",
-            "env": {
-                "CATEGORY": "yellow",
-                "URI": f"gs://{STAGING_BUCKET}/yellow/*",
-                "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
-            },
-            "envFrom": [{"type": "configMapRef", "name": "spark-env"}],
-        },
-    )
-
-    # t3 = KubernetesJobOperator(
-    #     task_id="dbt",
-    #     body_filepath=POD_TEMPALTE,
-    #     command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
-    #     arguments=[
-    #         "--deps",
-    #         "--seed",
-    #         "--commands",
-    #         "dbt run --full-refresh",
-    #         "--tests",
-    #         "--generate-docs",
-    #     ],
+    # t2 = KubernetesJobOperator(
+    #     task_id="spark-etl",
+    #     body_filepath=SPARK_POD_TEMPLATE,
     #     jinja_job_args={
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
-    #         "name": "dbt",
+    #         "project": GOOGLE_CLOUD_PROJECT,
+    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
+    #         "mainApplicationFile": f"local://{BASE}/spark/scripts/initial_load.py",
+    #         "name": "spark-k8s-init",
+    #         "instances": 7,
     #         "gitsync": True,
-    #         "nodeSelector": BASE_NODE_POOL,
-    #         "volumes": [
-    #             {
-    #                 "name": "gcsfs-creds",
-    #                 "type": "secret",
-    #                 "reference": "gcsfs-creds",
-    #                 "mountPath": "/mnt/secrets",
-    #             }
-    #         ],
-    #         "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
+    #         "nodeSelector": SPARK_JOBS_NODE_POOL,
+    #         "executor_memory": "2G",
+    #         "env": {
+    #             "CATEGORY": "yellow",
+    #             "URI": f"gs://{STAGING_BUCKET}/yellow/*",
+    #             "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
+    #         },
+    #         "envFrom": [{"type": "configMapRef", "name": "spark-env"}],
     #     },
-    #     envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app", "RUN_DATE": today},
     # )
+
+    t3 = KubernetesJobOperator(
+        task_id="dbt",
+        body_filepath=POD_TEMPALTE,
+        command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
+        # arguments=[
+        #     "--deps",
+        #     "--seed",
+        #     "--commands",
+        #     "dbt run --full-refresh",
+        #     "--tests",
+        #     "--generate-docs",
+        # ],
+        arguments=[
+            "--deps",
+            "--seed",
+            "--commands",
+            "dbt run --full-refresh",
+        ],
+        jinja_job_args={
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
+            "name": "dbt",
+            "gitsync": True,
+            "nodeSelector": BASE_NODE_POOL,
+            "volumes": [
+                {
+                    "name": "gcsfs-creds",
+                    "type": "secret",
+                    "reference": "gcsfs-creds",
+                    "mountPath": "/mnt/secrets",
+                }
+            ],
+            "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
+        },
+        envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app", "RUN_DATE": today},
+    )
 
     # t4 = KubernetesJobOperator(
     #     task_id="train_model",
