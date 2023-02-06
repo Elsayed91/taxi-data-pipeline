@@ -40,7 +40,20 @@ yellow_historical_transformation = """
         sum(congestion_surcharge) as monthly_congestion_surcharge,
         sum(airport_fee) as monthly_airport_fee,
         avg(passenger_count) as average_passenger_count,
-        avg(trip_distance) as average_trip_distance
+        avg(trip_distance) as average_trip_distance,
+        count(*) as trip_count,
+        extract(HOUR FROM tpep_pickup_datetime) as 
+        avg(unix_timestamp(tpep_dropoff_datetime)-unix_timestamp(tpep_pickup_datetime))/(60) as avg_duration_minutes,
+        sum(unix_timestamp(tpep_dropoff_datetime)-unix_timestamp(tpep_pickup_datetime)) as total_duration_hours,
+        (
+            SELECT
+            extract(HOUR FROM tpep_pickup_datetime) AS pickup_hour
+            FROM temp_table
+            WHERE trunc(tpep_pickup_datetime, 'month') = first_day_of_month
+            GROUP BY pickup_hour
+            ORDER BY count(*) DESC
+            LIMIT 1
+        ) as busiest_hour_of_day
     FROM temp_table
     GROUP BY
         VendorID,

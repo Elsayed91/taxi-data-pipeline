@@ -83,5 +83,25 @@
         "name": "monthly_airport_fee",
         "type": "FLOAT",
         "mode": "NULLABLE"
+    },
+    {
+        "name": "trip_count",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "avg_duration_minutes",
+        "type": "FLOAT",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "total_duration_hours",
+        "type": "FLOAT",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "busiest_hour_of_day",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
     }
 ]

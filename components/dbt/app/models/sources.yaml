@@ -289,4 +289,12 @@ sources:
             description: Monthly total amount collected in trip for NYS congestion surcharge.
           - name: monthly_airport_fee
             description: Monthly total amount fee collected for airport trips.
+          - name: trip_count
+            description: Number of trips in a given month.
+          - name: avg_duration_minutes
+            description: Average duration of a trip in a given month.
+          - name: total_duration_hours
+            description: Total duration spent in rides in a given month.
+          - name: busiest_hour_of_day
+            description: Hour of day with most trips in a given month.
 
