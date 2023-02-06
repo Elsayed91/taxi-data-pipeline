@@ -1,0 +1,2 @@
+VendorID,first_day_of_month,pickup_zone,dropoff_zone,store_and_fwd_flag,monthly_fare_amount,average_passenger_count,average_trip_distance,monthly_extra_amount,monthly_mta_tax,monthly_tip_amount,monthly_tolls_amount,monthly_improvement_surcharge,monthly_total_amount,payment_type,monthly_congestion_surcharge,monthly_airport_fee
+2,2023-04-01,237,142,N,52.0,1.0,0.93000000715255737,0.0,0.5,14.140000343322754,0.0,0.30000001192092896,70.69000244140625,1,2.5,1.25

@@ -5,16 +5,16 @@ models:
     description: >
       This view contains historical data on taxi rides in New York City, aggregated at a monthly level.
       The view provides data that is used to build the Grafana BI dashboard. 
-    # tests:
-    #   - dbt_datamocktool.unit_test:
-    #       name: "YS"
-    #       description: "This test is a unit test"
-    #       input_mapping:
-    #         source('historical_data', 'yellow_historical'): ref('test_dbt__bi__yellow_m2m')
-    #       expected_output: ref('dbt__bi__yellow_m2m_expected')
-    #       depends_on:
-    #         - ref('seed_zones')
-    #       tags: ["unit-test"]
+    tests:
+      - dbt_datamocktool.unit_test:
+          name: "YS"
+          description: "This test is a unit test"
+          input_mapping:
+            source('historical_data', 'yellow_historical'): ref('test_dbt__bi__yellow_m2m')
+          expected_output: ref('dbt__bi__yellow_m2m_expected')
+          depends_on:
+            - ref('seed_zones')
+          tags: ["unit-test"]
     columns:
       - name: vendors
         type: string
@@ -80,6 +80,17 @@ models:
             4. Dispute
             5. Unknown
             6. Voided trip
+      - name: total_extras
+        type: float
+        description: >
+          a total for different extra fees and taxis.
+          this includes:
+            1. monthly_airport_fee
+            2. monthly_tolls_amount
+            3. monthly_congestion_surcharge
+            4. monthly_improvement_surcharge
+            5. monthly_mta_tax
+            6. monthly_extra_amount
       - name: monthly_congestion_surcharge
         type: float
         description: Monthly total amount collected in trip for NYS congestion surcharge.
