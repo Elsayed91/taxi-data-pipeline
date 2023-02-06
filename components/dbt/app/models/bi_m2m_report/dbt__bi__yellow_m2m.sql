@@ -27,6 +27,10 @@ SELECT
   z1.zone as pickup_zone,
   z2.borough as dropoff_borough,
   z2.zone as dropoff_zone,
+  bt.avg_duration_minutes,
+  bt.trip_count,
+  bt.total_duration_hours,
+  bt.busiest_hour_of_day,
   IFNULL(bt.monthly_airport_fee, 0) AS airport_trip, -- 1 = yes, 0 = no
   bt.monthly_airport_fee + bt.monthly_tolls_amount + bt.monthly_congestion_surcharge +
     bt.monthly_improvement_surcharge + bt.monthly_mta_tax + bt.monthly_extra_amount AS total_extras,
