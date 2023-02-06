@@ -48,11 +48,12 @@ yellow_historical_transformation = """
             SELECT
             extract(HOUR FROM tpep_pickup_datetime) AS pickup_hour
             FROM temp_table
-            WHERE trunc(tpep_pickup_datetime, 'month') = first_day_of_month
             GROUP BY pickup_hour
             ORDER BY count(*) DESC
             LIMIT 1
         ) as busiest_hour_of_day
+        
+        
     FROM temp_table
     GROUP BY
         VendorID,
