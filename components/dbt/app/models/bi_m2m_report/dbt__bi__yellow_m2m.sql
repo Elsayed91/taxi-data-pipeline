@@ -35,8 +35,9 @@ FROM {{ source("historical_data", "yellow_historical") }} bt
 left join {{ ref("seed_zones") }} z1 on bt.pickup_zone = z1.LocationID
 left join {{ ref("seed_zones") }} z2 on bt.dropoff_zone = z2.LocationID 
 WHERE z1.LocationID IS NOT NULL AND z2.LocationID IS NOT NULL
-AND COALESCE(average_passenger_count, 1) <= 7 AND
-AND year >= 2010 AND year <= EXTRACT(YEAR FROM CURRENT_DATE())
+AND COALESCE(average_passenger_count, 1) <= 7
+AND year >= 2010 
+AND year <= EXTRACT(YEAR FROM CURRENT_DATE())
 
 
 
