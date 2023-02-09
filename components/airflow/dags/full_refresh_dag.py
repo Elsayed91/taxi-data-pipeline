@@ -124,18 +124,13 @@ with DAG(
         task_id="dbt",
         body_filepath=POD_TEMPALTE,
         command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
-        # arguments=[
-        #     "--deps",
-        #     "--seed",
-        #     "--commands",
-        #     "dbt run --full-refresh",
-        #     "--tests",
-        #     "--generate-docs",
-        # ],
         arguments=[
             "--deps",
             "--seed",
-            "--test",
+            "--commands",
+            "dbt run --full-refresh",
+            "--tests",
+            "--generate-docs",
         ],
         jinja_job_args={
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",

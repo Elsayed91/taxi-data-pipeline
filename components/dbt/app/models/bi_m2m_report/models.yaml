@@ -79,17 +79,6 @@ models:
             4. Dispute
             5. Unknown
             6. Voided trip
-      - name: total_extras
-        type: float
-        description: >
-          a total for different extra fees and taxis.
-          this includes:
-            1. monthly_airport_fee
-            2. monthly_tolls_amount
-            3. monthly_congestion_surcharge
-            4. monthly_improvement_surcharge
-            5. monthly_mta_tax
-            6. monthly_extra_amount
       - name: monthly_congestion_surcharge
         type: float
         description: Monthly total amount collected in trip for NYS congestion surcharge.

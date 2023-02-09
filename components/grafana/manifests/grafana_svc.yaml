@@ -1,18 +1,18 @@
-# disabled as it is being picked up by the load balancer
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: grafana
-#   annotations:
-#     prometheus.io/scrape: 'true'
-#     prometheus.io/port:   '3000'
-#   labels:
-#     app: grafana
-# spec:
-#   selector: 
-#     app: grafana
-#   type: NodePort  
-#   ports:
-#     - name: grafana-port
-#       port: 3000
-#       targetPort: 3000
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/port:   '3000'
+  labels:
+    app: grafana
+spec:
+  selector: 
+    app: grafana
+  type: NodePort  
+  ports:
+    - name: grafana-port
+      port: 3000
+      targetPort: 3000

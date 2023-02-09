@@ -32,8 +32,6 @@ SELECT
   bt.total_duration_hours,
   bt.busiest_hour_of_day,
   IFNULL(bt.monthly_airport_fee, 0) AS airport_trip, -- 1 = yes, 0 = no
-  bt.monthly_airport_fee + bt.monthly_tolls_amount + bt.monthly_congestion_surcharge +
-    bt.monthly_improvement_surcharge + bt.monthly_mta_tax + bt.monthly_extra_amount AS total_extras,
   {{ payment_form('payment_type') }}  AS payment_type
 FROM {{ source("historical_data", "yellow_historical") }} bt
 left join {{ ref("seed_zones") }} z1 on bt.pickup_zone = z1.LocationID

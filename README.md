@@ -1,4 +1,5 @@
-
+https://www.catchr.io/templates/google-search-console-query-insight
+https://lookerstudio.google.com/reporting/ccd9e11f-b634-4fa2-9d26-cf4f7079389f
 
 
 ## **Testing**

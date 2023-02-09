@@ -35,7 +35,6 @@ spec:
               mountPath: "/opt/airflow/airflow.cfg"
               subPath: airflow.cfg
       containers:
-        # Always run the main scheduler container.
         - name: scheduler
           image: eu.gcr.io/${PROJECT}/airflow #apache/airflow:2.5.0
           imagePullPolicy: Always

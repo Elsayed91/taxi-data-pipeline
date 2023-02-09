@@ -103,7 +103,6 @@ seeds:
         dropoff_borough: STRING,
         dropoff_zone: STRING,
         airport_trip: FLOAT,
-        total_extras: FLOAT,
         payment_type: STRING,
         trip_count: INTEGER,
         avg_duration_minutes: FLOAT,
