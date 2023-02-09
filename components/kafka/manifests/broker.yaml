@@ -50,7 +50,7 @@ spec:
           - name: code
             mountPath: /git
       nodeSelector:
-        cloud.google.com/gke-nodepool: ${BASE_NODE_POOL}
+        cloud.google.com/gke-nodepool: ${TRAINING_NODE_POOL}
         iam.gke.io/gke-metadata-server-enabled: "true"
       volumes:
         - name: code
