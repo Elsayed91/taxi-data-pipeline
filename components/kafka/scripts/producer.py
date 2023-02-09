@@ -11,8 +11,6 @@ producer = KafkaProducer(bootstrap_servers=KAFKA_BROKER_URL)
 # read the data from the Parquet file
 table = pd.read_parquet(PARQUET_URL)
 
-# convert the data to a Pandas dataframe
-df = table.to_pandas()
 
 # stream the data one row at a time
 for index, row in df.iterrows():
