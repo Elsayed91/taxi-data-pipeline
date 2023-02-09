@@ -34,3 +34,9 @@ trigger_batch_dag:
 
 run_lambda_integration_test:
 	@bash tests/integration/lambda/run_integration_test.sh
+
+run_kafka:
+	@bash scripts/run_kafka.sh
+
+destory_kafka:
+	@bash scripts/run_kafka.sh --kill

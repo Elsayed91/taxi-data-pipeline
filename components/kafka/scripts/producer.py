@@ -41,7 +41,6 @@ logger.info("Converted timestamps to string type due to JSON serialization limit
 logger.info("Streaming the data.")
 
 for index, row in df.iterrows():
-    logger.info(f"{row.to_dict()} -> sent")
     producer.send(KAFKA_TOPIC, value=row.to_dict())
     logger.info(f"{row.to_dict()} -> sent")
     time.sleep(SLEEP_DURATION)
