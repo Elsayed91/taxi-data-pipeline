@@ -1,5 +1,4 @@
-import pyarrow as pa
-import pyarrow.parquet as pq
+import pandas as pd
 import time
 from kafka import KafkaProducer
 
@@ -10,7 +9,7 @@ PARQUET_URL = "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2
 producer = KafkaProducer(bootstrap_servers=KAFKA_BROKER_URL)
 
 # read the data from the Parquet file
-table = pq.read_table(PARQUET_URL)
+table = pd.read_parquet(PARQUET_URL)
 
 # convert the data to a Pandas dataframe
 df = table.to_pandas()
