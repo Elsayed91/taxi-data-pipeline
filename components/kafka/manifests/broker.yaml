@@ -43,7 +43,7 @@ spec:
           - name: code
             mountPath: /git
       - name: producer
-        image: eu.gcr.io/${PROJECT}/kafka_producer
+        image: eu.gcr.io/${PROJECT}/kafka
         imagePullPolicy: Always
         command: ["python3", "/git/repo/components/kafka/scripts/producer.py"]
         env:
@@ -51,6 +51,18 @@ spec:
           value: nytaxi_topic
         - name: SLEEP_DURATION
           value: "60"
+        volumeMounts:
+          - name: code
+            mountPath: /git
+      - name: consumer
+        image: eu.gcr.io/${PROJECT}/kafka
+        imagePullPolicy: Always
+        command: ["python3", "/git/repo/components/kafka/scripts/consumer.py"]
+        env:
+        - name: KAFKA_TOPIC
+          value: nytaxi_topic
+        - name: DESTINATION
+          value: "${PROJECT}.kafka_stream.kafka"
         volumeMounts:
           - name: code
             mountPath: /git

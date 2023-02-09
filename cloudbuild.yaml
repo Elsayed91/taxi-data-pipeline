@@ -96,5 +96,5 @@ substitutions:
   # _SPARK_IMAGE_NAME: spark
   # _AIRFLOW_IMAGE_NAME: airflow
   # _MLFLOW_IMAGE_NAME: mlflow
-  _KAFKA_IMAGE_NAME: kafka_producer
+  _KAFKA_IMAGE_NAME: kafka
   _COMPONENTS_PATH: "components"

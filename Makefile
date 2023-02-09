@@ -18,6 +18,9 @@ git:
 r:
 	@kubectl delete -f ${arg} && cat ${arg} | envsubst | kubectl apply -f -
 
+make rr: 
+	@cat ${arg} | envsubst | kubectl apply -f -
+
 gitex:
 	@bash -c 'source scripts/functions.sh; gitpush; kill_failed; sleep 6'
 
