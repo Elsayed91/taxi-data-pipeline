@@ -2,7 +2,7 @@ import pandas as pd
 import time
 from kafka import KafkaProducer
 
-KAFKA_BROKER_URL = "kafka-service:9092"  # replace with your Kafka broker URL
+KAFKA_BROKER_URL = "localhost:9092"  # replace with your Kafka broker URL
 KAFKA_TOPIC = "nytaxi_topic"  # replace with your Kafka topic name
 PARQUET_URL = "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2022-11.parquet"  # replace with your Parquet URL
 
