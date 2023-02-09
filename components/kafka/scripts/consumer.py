@@ -30,9 +30,9 @@ errors = []
 
 # Continuously poll for new messages from the Kafka Consumer
 for msg in consumer:
-    logger.info(f"reading {msg.value}")
     rows_to_insert = [msg.value]
     errors = client.insert_rows_json(table_id, rows_to_insert)  # Make an API request.
+    logger.info(f"attempted to insert {errors}")
     if errors != []:
         print("Encountered errors while inserting rows: {}".format(errors))
 
