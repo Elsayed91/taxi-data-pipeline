@@ -9,7 +9,7 @@ PARQUET_URL = "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2
 producer = KafkaProducer(bootstrap_servers=KAFKA_BROKER_URL)
 
 # read the data from the Parquet file
-table = pd.read_parquet(PARQUET_URL)
+df = pd.read_parquet(PARQUET_URL)
 
 
 # stream the data one row at a time
