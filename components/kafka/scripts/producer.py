@@ -14,6 +14,9 @@ producer = KafkaProducer(
 
 # read the data from the Parquet file
 df = pd.read_parquet(PARQUET_URL)
+df["tpep_pickup_datetime", "tpep_dropoff_datetime"] = df[
+    "tpep_pickup_datetime", "tpep_dropoff_datetime"
+].astype(str)
 
 
 # stream the data one row at a time
