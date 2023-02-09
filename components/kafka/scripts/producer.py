@@ -19,6 +19,7 @@ df = pd.read_parquet(PARQUET_URL)
 # stream the data one row at a time
 for index, row in df.iterrows():
     producer.send(KAFKA_TOPIC, value=row.to_dict())
+    print(f"{row.to_dict()} -> sent")
     time.sleep(60)  # wait for one minute
 
 producer.flush()
