@@ -36,7 +36,6 @@ errors = []
 for msg in consumer:
     rows_to_insert = [msg.value]
     errors = client.insert_rows_json(table_id, rows_to_insert)
-    logger.info(f"attempted to insert {errors}")
     if not errors:
         logger.info("New rows have been added.")
     else:
