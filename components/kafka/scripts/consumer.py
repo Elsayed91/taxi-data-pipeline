@@ -38,6 +38,6 @@ for msg in consumer:
     errors = client.insert_rows_json(table_id, rows_to_insert)
     logger.info(f"attempted to insert {errors}")
     if not errors:
-        print("New rows have been added.")
+        logger.info("New rows have been added.")
     else:
-        print(f"Encountered errors while inserting rows: {errors}")
+        logger.info(f"Encountered errors while inserting rows: {errors}")
