@@ -14,13 +14,15 @@ producer = KafkaProducer(
 
 # read the data from the Parquet file
 df = pd.read_parquet(PARQUET_URL)
+print(f"loaded dataframe (shape: {df.shape})into memory.")
 df[["tpep_pickup_datetime", "tpep_dropoff_datetime"]] = df[
     ["tpep_pickup_datetime", "tpep_dropoff_datetime"]
 ].astype(
     str
-)  # TypeError: Object of type Timestamp is not JSON serializable
+)  #
 
-
+print("Converted timestamps to string type due to serialization limitation.")
+print("Streaming the data.")
 # stream the data one row at a time
 for index, row in df.iterrows():
     producer.send(KAFKA_TOPIC, value=row.to_dict())
