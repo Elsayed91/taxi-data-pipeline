@@ -46,6 +46,11 @@ spec:
         image: eu.gcr.io/${PROJECT}/kafka_producer
         imagePullPolicy: Always
         command: ["python3", "/git/repo/components/kafka/scripts/producer.py"]
+        env:
+        - name: KAFKA_TOPIC
+          value: nytaxi_topic
+        - name: SLEEP_DURATION
+          value: "60"
         volumeMounts:
           - name: code
             mountPath: /git

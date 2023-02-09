@@ -1,8 +1,15 @@
+"""
+This module attempts to simulate a real-time streaming data source that can be consumed by
+other applications.
+The data is sent one record at a time, with a sleep interval between each record.
+Data here is read from a parquet file and sent to a kafka broker in JSON format. 
+"""
 import pandas as pd
 import time
 from kafka import KafkaProducer
 import json
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -12,32 +19,31 @@ formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(messag
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
-KAFKA_BROKER_URL = "localhost:9092"  # replace with your Kafka broker URL
-KAFKA_TOPIC = "nytaxi_topic"  # replace with your Kafka topic name
-PARQUET_URL = "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2022-11.parquet"  # replace with your Parquet URL
+
+KAFKA_BROKER_URL = "localhost:9092"
+KAFKA_TOPIC = os.getenv("KAFKA_TOPIC")
+PARQUET_URL = (
+    "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2022-11.parquet"
+)
+SLEEP_DURATION = int(os.getenv("SLEEP_DURATION"))
 
 producer = KafkaProducer(
     bootstrap_servers=KAFKA_BROKER_URL,
     value_serializer=lambda v: json.dumps(v).encode("utf-8"),
 )
 
-# read the data from the Parquet file
 df = pd.read_parquet(PARQUET_URL)
 logger.info(f"loaded dataframe (shape: {df.shape})into memory.")
 df[["tpep_pickup_datetime", "tpep_dropoff_datetime"]] = df[
     ["tpep_pickup_datetime", "tpep_dropoff_datetime"]
-].astype(
-    str
-)  #
-
-logger.info("Converted timestamps to string type due to serialization limitation.")
+].astype(str)
+logger.info("Converted timestamps to string type due to JSON serialization limitation.")
 logger.info("Streaming the data.")
-# stream the data one row at a time
+
 for index, row in df.iterrows():
     logger.info(f"{row.to_dict()} -> sent")
     producer.send(KAFKA_TOPIC, value=row.to_dict())
     logger.info(f"{row.to_dict()} -> sent")
-    time.sleep(2)  # wait for one minute
+    time.sleep(SLEEP_DURATION)
 
 producer.flush()
-json.dumps(msg).encode("utf-8")
