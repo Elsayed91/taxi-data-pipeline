@@ -1,8 +1,8 @@
 #!/bin/bash
 # Small quality of life script to easily deploy and destroy kafka
+# it iterates over the files in the kafka manifests directory to apply/destroy files
 # Using without arguments will create the needed deployments
 # to destroy simply run with --kill argument.
-# it iterates over the files in the kafka manifests directory
 
 DIRECTORY=components/kafka/manifests
 

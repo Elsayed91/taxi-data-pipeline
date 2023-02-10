@@ -26,7 +26,7 @@ gitex:
 
 
 schema:
-	@bq show --schema --format=prettyjson $$PROJECT:$$STAGING_DATASET.$$YELLOW_STAGING_TABLE > myschema.json
+	@bq show --schema --format=prettyjson $$PROJECT:$$ML_DATASET.dbt__ml__yellow_fare > myschema.json
 
 
 trigger_batch_dag:

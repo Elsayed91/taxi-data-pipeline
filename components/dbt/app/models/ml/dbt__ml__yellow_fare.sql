@@ -17,7 +17,6 @@ select
     DATE(bt.tpep_pickup_datetime) as date,
     TIMESTAMP_DIFF(bt.tpep_dropoff_datetime, bt.tpep_pickup_datetime, MINUTE) AS trip_duration,
     {{ extract_datetime_parts("bt.tpep_pickup_datetime") }},
-    {{ distance("z1.longitude", "z1.latitude", "z2.longitude", "z2.latitude") }} as geo_distance,
     {{
         distances_from_airports(
             "z1.longitude", "z1.latitude", "z2.longitude", "z2.latitude"

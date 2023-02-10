@@ -1,0 +1,103 @@
+[
+  {
+    "description": "The number of passengers in the taxi.",
+    "name": "passenger_count",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The distance of the taxi trip, in miles.",
+    "name": "trip_distance",
+    "type": "FLOAT"
+  },
+  {
+    "description": "The fare amount, in dollars.",
+    "name": "fare_amount",
+    "type": "FLOAT"
+  },
+  {
+    "name": "pickup_long",
+    "type": "FLOAT"
+  },
+  {
+    "name": "pickup_lat",
+    "type": "FLOAT"
+  },
+  {
+    "name": "dropoff_long",
+    "type": "FLOAT"
+  },
+  {
+    "name": "dropoff_lat",
+    "type": "FLOAT"
+  },
+  {
+    "description": "The date and time at which the taxi trip occurred.",
+    "name": "date",
+    "type": "DATE"
+  },
+  {
+    "description": "the duration of the trip. calculated by subtracting dropoff and pickup times.\n",
+    "name": "trip_duration",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The day of the month on which the taxi trip occurred.",
+    "name": "day_of_month",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The month in which the taxi trip occurred.",
+    "name": "month",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The year in which the taxi trip occurred.",
+    "name": "year",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The day of the week on which the taxi trip occurred.",
+    "name": "day_of_week",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The hour of the day at which the taxi trip occurred.",
+    "name": "hour_of_day",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The geographical distance between the pickup and dropoff locations.",
+    "name": "geo_distance",
+    "type": "FLOAT"
+  },
+  {
+    "description": "The geographical distance between the pickup location and JFK airport.",
+    "name": "pickup_jfk_distance",
+    "type": "FLOAT"
+  },
+  {
+    "description": "The geographical distance between the dropoff location and JFK airport.",
+    "name": "dropoff_jfk_distance",
+    "type": "FLOAT"
+  },
+  {
+    "description": "The geographical distance between the pickup location and EWR airport.",
+    "name": "pickup_ewr_distance",
+    "type": "FLOAT"
+  },
+  {
+    "description": "The geographical distance between the dropoff location and EWR airport.",
+    "name": "dropoff_ewr_distance",
+    "type": "FLOAT"
+  },
+  {
+    "description": "The geographical distance between the pickup location and LGA airport.",
+    "name": "pickup_lga_distance",
+    "type": "FLOAT"
+  },
+  {
+    "description": "The geographical distance between the dropoff location and LGA airport.",
+    "name": "dropoff_lga_distance",
+    "type": "FLOAT"
+  }
+]

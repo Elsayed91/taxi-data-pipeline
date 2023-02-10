@@ -31,7 +31,7 @@ model_name = os.getenv("MODEL_NAME", "xgboost-fare-predictor")
 
 exp = mlflow.set_experiment(mlflow_experiment_name)
 exp_id = exp.experiment_id
-df = load_data(target_dataset, target_table, 25)  # type: ignore
+df = load_data(target_dataset, target_table, 5)  # type: ignore
 print(f"df shape is {df.shape}")
 y = df[target_column]
 X = df.drop([target_column], axis=1)
@@ -53,7 +53,6 @@ grid_search = GridSearchCV(
     verbose=2,
 )
 
-print(grid_search)
 print("fitting model")
 xgb_model = grid_search.fit(X_train, y_train)
 y_pred = xgb_model.predict(X_test)
@@ -76,4 +75,6 @@ with mlflow.start_run(experiment_id=exp_id, run_name="XGBoostRegressor", nested=
     mlflow.log_params(grid_search.best_params_)
     mlflow.log_metrics({"RMSE": mean_squared_error(y_test, y_pred, squared=False)})
 
-    mlflow.xgboost.log_model(model, model_name)
+    mlflow.xgboost.log_model(
+        xgb_model=model, artifact_path="xgb-model", registered_model_name=model_name
+    )

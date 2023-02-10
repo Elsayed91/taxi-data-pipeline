@@ -150,26 +150,25 @@ with DAG(
         envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app", "RUN_DATE": today},
     )
 
-    # t4 = KubernetesJobOperator(
-    #     task_id="train_model",
-    #     body_filepath=POD_TEMPALTE,
-    #     command=["python", f"{BASE}/ml_train/script/train.py"],
-    #     jinja_job_args={
-    #         "name": "xgb-model-training",
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/ml_train",
-    #         "gitsync": True,
-    #         "nodeSelector": TRAINING_NODE_POOL,
-    #         "resources": {"memory": "40.5Gi", "cpu": "6"},
-    #     },
-    #     envs={
-    #         "TARGET_DATASET": os.getenv("ML_DATASET"),
-    #         "TARGET_TABLE": "dbt__ml__yellow_fare",
-    #         "TRACKING_SERVICE": "mlflow-service",
-    #         "MLFLOW_EXPERIMENT_NAME": "taxi-fare-prediction-v3",
-    #         "TARGET_COLUMN": "fare_amount",
-    #         "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET"),
-    #         "CROSS_VALIDATIONS": "2",
-    #     },
-    # )
-
+    t4 = KubernetesJobOperator(
+        task_id="train_model",
+        body_filepath=POD_TEMPALTE,
+        command=["python", f"{BASE}/ml_train/script/train.py"],
+        jinja_job_args={
+            "name": "xgb-model-training",
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/ml_train",
+            "gitsync": True,
+            "nodeSelector": TRAINING_NODE_POOL,
+            "resources": {"memory": "40.5Gi", "cpu": "6"},
+        },
+        envs={
+            "TARGET_DATASET": os.getenv("ML_DATASET"),
+            "TARGET_TABLE": "dbt__ml__yellow_fare",
+            "TRACKING_SERVICE": "mlflow-service",
+            "MLFLOW_EXPERIMENT_NAME": "taxi-fare-prediction-v3",
+            "TARGET_COLUMN": "fare_amount",
+            "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET"),
+        },
+    )
+    t3 >> t4
     # t1 >> t2 >> t3 >> t4  # type: ignore
