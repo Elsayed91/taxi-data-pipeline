@@ -15,11 +15,14 @@ spec:
     spec:
       containers:
         - name: ml_serve
-          image:  eu.gcr.io/{{ job.project }} /serving
+          image:  eu.gcr.io/${PROJECT}/serving
           imagePullPolicy: Always
           ports:
             - name: serving-port
               containerPort: 8501
+          envFrom:
+            - configMapRef:
+                name: pipeline-env
           readinessProbe:
             httpGet:
               path: /health
@@ -33,7 +36,7 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 15
       nodeSelector:
-        cloud.google.com/gke-nodepool: {{ job.nodeSelector }}
+        cloud.google.com/gke-nodepool: ${BASE_NODE_POOL}
         iam.gke.io/gke-metadata-server-enabled: "true"
 ---
 apiVersion: v1
