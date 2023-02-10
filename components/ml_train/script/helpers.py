@@ -10,14 +10,14 @@ def load_data(
     """
     given a dataset and table and optionally, a sample size, this function loads data from
     a big query table using pandas read_gbq. returns a pandas DataFrame.
+    pd.read_gbp is set to 800,000 due to a bug with TABLESAMPLE which causes it to return
+    inconsistent % of data.
     """
 
     query = f"""SELECT * EXCEPT(date) FROM 
             ( SELECT * FROM `{dataset}`.`{table}` 
             TABLESAMPLE SYSTEM ({sample_size} PERCENT) )"""
     df = pd.read_gbq(
-        query,
-        progress_bar_type="tqdm",
-        use_bqstorage_api=True,
+        query, progress_bar_type="tqdm", use_bqstorage_api=True, max_results=800000
     )
     return df
