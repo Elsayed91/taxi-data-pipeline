@@ -4,7 +4,6 @@ import json
 import os
 import requests
 import numpy as np
-from datetime import datetime
 
 
 class PredictionAssistant:
@@ -15,20 +14,16 @@ class PredictionAssistant:
     dropoff
     """
 
-    now = datetime.datetime.now()
-
     def __init__(self, inputs, zones_csv):
         self.inputs = inputs
         self.zones = pd.read_csv(zones_csv)
-        self.df1 = pd.DataFrame([self.inputs])
 
-    def merge_geo_data(self, df: pd.DataFrame, prefix: str) -> pd.DataFrame:
+    def merge_geo_data(self, inputs, prefix: str) -> pd.DataFrame:
         """
         Merges the input data with the zones data to add the longitude and latitude
         information.
 
         Args:
-        df (pd.DataFrame): The input data in a pandas dataframe format.
         prefix (str): The prefix for the columns in the input data (either "pickup" or
         "dropoff").
 
@@ -36,7 +31,11 @@ class PredictionAssistant:
         pd.DataFrame: The input data with the added longitude and latitude information.
         """
         df = pd.merge(
-            df, self.zones, how="left", left_on=[prefix + "_zone"], right_on=["zone"]
+            inputs,
+            self.zones,
+            how="left",
+            left_on=[prefix + "_zone"],
+            right_on=["zone"],
         )
         df.rename(
             columns={"longitude": prefix + "_long", "latitude": prefix + "_lat"},
@@ -128,8 +127,9 @@ class PredictionAssistant:
         Returns:
         pd.DataFrame: The prepared taxi ride data.
         """
-        df = merge_geo_data(df, zones, "pickup")
-        df = merge_geo_data(df, zones, "dropoff")
+        now = datetime.datetime.now()
+        df = self.merge_geo_data(self.inputs, "pickup")
+        df = self.merge_geo_data(df, "dropoff")
         df = df.drop(["LocationID_x", "borough_x", "LocationID_y", "borough_y"], axis=1)
         df["trip_duration"] = self.get_trip_duration(df)
         df["day"] = now.day
@@ -137,8 +137,8 @@ class PredictionAssistant:
         df["year"] = now.year
         df["day_of_week"] = now.weekday()
         df["hour"] = now.hour
-        df["trip_distance"] = self.get_distance(
+        df["trip_distance"] = self.haversine_distance(
             df.pickup_long, df.pickup_lat, df.dropoff_long, df.dropoff_lat
         )
-        df = self.add_distances_from_airport(df)
+        df = self.distance_from_airport(df)
         return df

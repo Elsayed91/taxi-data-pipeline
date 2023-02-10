@@ -1,5 +1,5 @@
 import unittest
-from components.ml_serve.scripts.helpers import PredictionAssistant
+from components.ml_serve.docker.helpers import PredictionAssistant
 import pandas as pd
 import numpy as np
 from unittest import mock
@@ -9,15 +9,16 @@ import requests
 
 class TestPredictionAssistant(unittest.TestCase):
     def test_merge_geo_data(self):
-        inputs = {
-            "passenger_count": 1,
-            "pickup_zone": "Arden Heights",
-            "dropoff_zone": "Newark Airport",
-        }
+        inputs = pd.DataFrame(
+            {
+                "passenger_count": [1],
+                "pickup_zone": "Arden Heights",
+                "dropoff_zone": "Newark Airport",
+            }
+        )
 
         pa = PredictionAssistant(inputs, "components/ml_serve/scripts/zones.csv")
-        df = pa.df1
-        result = pa.merge_geo_data(df, "pickup")
+        result = pa.merge_geo_data(inputs, "pickup")
         result = pa.merge_geo_data(result, "dropoff")
         result = result.drop(
             ["LocationID_x", "borough_x", "LocationID_y", "borough_y"], axis=1
@@ -125,10 +126,8 @@ class TestPredictionAssistant(unittest.TestCase):
         # Sample input
         data = {
             "passengers": [1],
-            "pickup_long": [-74.187558],
-            "pickup_lat": [40.550664],
-            "dropoff_long": [-74.171533],
-            "dropoff_lat": [40.689483],
+            "pickup_zone": "Arden Heights",
+            "dropoff_zone": "Newark Airport",
         }
         df = pd.DataFrame(data)
 
@@ -157,7 +156,7 @@ class TestPredictionAssistant(unittest.TestCase):
 
         # Call the prepare method
         result = PredictionAssistant(
-            data, "components/ml_serve/scripts/zones.csv"
+            df, "components/ml_serve/scripts/zones.csv"
         ).prepare()
 
         # Check if the result is equal to the expected output

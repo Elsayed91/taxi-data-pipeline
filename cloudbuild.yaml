@@ -77,16 +77,27 @@ steps:
   #       "--cache-ttl=6h",
   #       "--destination=eu.gcr.io/$PROJECT_ID/${_ML_TRAIN_IMAGE_NAME}:$COMMIT_SHA",
   #     ]
-  - id: build_kafka_producer
+  # - id: build_kafka_image
+  #   waitFor: ['-']
+  #   name: "gcr.io/kaniko-project/executor:latest"
+  #   args:
+  #     [
+  #       "--context=dir://${_COMPONENTS_PATH}/kafka/docker",
+  #       "--cache=true",
+  #       "--cache-ttl=6h",
+  #       "--destination=eu.gcr.io/$PROJECT_ID/${_KAFKA_IMAGE_NAME}:$COMMIT_SHA",
+  #     ]
+  - id: build_ml_serving
     waitFor: ['-']
     name: "gcr.io/kaniko-project/executor:latest"
     args:
       [
-        "--context=dir://${_COMPONENTS_PATH}/kafka/docker",
+        "--context=dir://${_COMPONENTS_PATH}/ml_serving/docker",
         "--cache=true",
         "--cache-ttl=6h",
-        "--destination=eu.gcr.io/$PROJECT_ID/${_KAFKA_IMAGE_NAME}:$COMMIT_SHA",
+        "--destination=eu.gcr.io/$PROJECT_ID/${_ML_SERVING_IMAGE_NAME}:$COMMIT_SHA",
       ]
+
 
 substitutions:
   # _POSTGRES_IMAGE_NAME: postgres
@@ -96,5 +107,6 @@ substitutions:
   # _SPARK_IMAGE_NAME: spark
   # _AIRFLOW_IMAGE_NAME: airflow
   # _MLFLOW_IMAGE_NAME: mlflow
-  _KAFKA_IMAGE_NAME: kafka
+  # _KAFKA_IMAGE_NAME: kafka
+  _ML_SERVING_IMAGE_NAME: serving
   _COMPONENTS_PATH: "components"
