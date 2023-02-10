@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ml_serve
+  name: ml-serve
   annotations:
     reloader.stakater.com/auto: "true"
 spec:
