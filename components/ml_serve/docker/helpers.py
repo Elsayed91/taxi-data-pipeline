@@ -8,10 +8,15 @@ import numpy as np
 
 class PredictionAssistant:
     """
-    data comes in form
-    passenger_count
-    pickup_zone
-    dropoff
+    A class that helps prepare data to be used by a model, by adding columns that are
+    needed to make a prediction.
+
+    Attributes
+    inputs : pandas.DataFrame
+        The input data with columns: "passenger_count", "pickup_zone", "dropoff_zone".
+    zones : pandas.DataFrame
+        The data from the CSV file with zone information.
+
     """
 
     def __init__(self, inputs, zones_csv):

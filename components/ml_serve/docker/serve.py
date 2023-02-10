@@ -5,16 +5,22 @@ import numpy as np
 from helpers import PredictionAssistant
 import os
 
+
 model_name = "xgboost-fare-predictor"
 mlflow.set_tracking_uri(f"http://mlflow-service.default.svc.cluster.local:5000")
-mlflow_experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "taxi-fare-prediction-v2")
-runs = client.search_runs(
-    mlflow_experiment_name, "", order_by=["metrics.RMSE DESC"], max_results=1
-)
-best_run = runs[0]
-logged_model = f"runs:/{best_run}/xgb-model"
+mlflow_experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "taxi-fare-prediction-v3")
+current_experiment = dict(mlflow.get_experiment_by_name(mlflow_experiment_name))
+experiment_id = current_experiment["experiment_id"]
+df = mlflow.search_runs([experiment_id], order_by=["metrics.rmse DESC"])
+if df.loc[0, "tags.mlflow.parentRunId"] is not None:
+    best_run_id = df.loc[0, "tags.mlflow.parentRunId"]
+else:
+    best_run_id = df.loc[0, "run_id"]
 
-model = mlflow.pyfunc.load_model(model_uri=logged_model)
+
+logged_model = f'runs:/{best_run_id}/xgb-model'
+
+model = mlflow.pyfunc.load_model(logged_model)
 
 
 def run():
@@ -49,9 +55,9 @@ def run():
     if st.button("Predict"):
         df = PredictionAssistant(input_df, "zones.csv").prepare()
         output = model.predict(df)
-        output = "$" + str(output)
+        output = "$" + str(output[0])
 
-    st.success(f"The output is {output}")
+    st.success(f"Estimated fare is {round(output,2}")
 
 
 if __name__ == "__main__":

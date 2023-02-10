@@ -2,7 +2,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 import numpy as np
 import xgboost as xgb
-from sklearn.model_selection import GridSearchCV
 from xgboost import XGBRegressor
 from sklearn.model_selection import GridSearchCV
 import mlflow
