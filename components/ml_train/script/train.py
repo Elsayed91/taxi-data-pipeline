@@ -25,7 +25,6 @@ mlflow.set_tracking_uri(
 mlflow_experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "taxi-fare-prediction-v2")
 target_column = os.getenv("TARGET_COLUMN", "fare_amount")
 mlflow_bucket = os.getenv("MLFLOW_BUCKET", "mlflow-cacfcc1b69")
-cross_validations = int(os.getenv("CROSS_VALIDATIONS", 1))  # type: ignore
 model_name = os.getenv("MODEL_NAME", "xgboost-fare-predictor")
 
 
