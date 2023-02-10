@@ -3,11 +3,18 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from helpers import PredictionAssistant
+import os
 
 model_name = "xgboost-fare-predictor"
-stage = "Staging"
 mlflow.set_tracking_uri(f"http://mlflow-service.default.svc.cluster.local:5000")
-model = mlflow.pyfunc.load_model(model_uri=f"models:/{model_name}/{stage}")
+mlflow_experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "taxi-fare-prediction-v2")
+runs = client.search_runs(
+    mlflow_experiment_name, "", order_by=["metrics.RMSE DESC"], max_results=1
+)
+best_run = runs[0]
+logged_model = f"runs:/{best_run}/xgb-model"
+
+model = mlflow.pyfunc.load_model(model_uri=logged_model)
 
 
 def run():
