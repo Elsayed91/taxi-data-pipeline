@@ -7,14 +7,14 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: ml_serve
+      app: ml-serve
   template:
     metadata:
       labels:
-        app: ml_serve
+        app: ml-serve
     spec:
       containers:
-        - name: ml_serve
+        - name: ml-serve
           image:  eu.gcr.io/stellarismus/serving
           imagePullPolicy: Always
           ports:
@@ -47,4 +47,4 @@ spec:
       port: 8501
       targetPort: 8501
   selector:
-    app: ml_serve
+    app: ml-serve
