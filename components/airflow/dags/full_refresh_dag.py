@@ -173,8 +173,8 @@ with DAG(
         task_id="serve_model",
         body_filepath=POD_TEMPALTE,
         command=[
-            "kubectl",
-            "apply -f /git/repo/components/ml_serve/manifests/serving.yaml",
+            "/bin/bash",
+            "kubectl apply -f /git/repo/components/ml_serve/manifests/serving.yaml",
         ],
         jinja_job_args={
             "name": "serve-model",
