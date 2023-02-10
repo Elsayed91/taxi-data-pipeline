@@ -170,5 +170,39 @@ with DAG(
             "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET"),
         },
     )
+
+    t4 = KubernetesJobOperator(
+        task_id="train_model",
+        body_filepath=POD_TEMPALTE,
+        command=["python", f"{BASE}/ml_train/script/train.py"],
+        jinja_job_args={
+            "name": "xgb-model-training",
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/ml_train",
+            "gitsync": True,
+            "nodeSelector": TRAINING_NODE_POOL,
+        },
+        envs={
+            "TARGET_DATASET": os.getenv("ML_DATASET"),
+            "TARGET_TABLE": "dbt__ml__yellow_fare",
+            "TRACKING_SERVICE": "mlflow-service",
+            "MLFLOW_EXPERIMENT_NAME": "taxi-fare-prediction-v3",
+            "TARGET_COLUMN": "fare_amount",
+            "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET"),
+        },
+    )
+    t5 = KubernetesJobOperator(
+        task_id="serve_model",
+        body_filepath=POD_TEMPALTE,
+        command=[
+            "kubectl",
+            "apply -f /git/repo/components/ml_serve/manifests/serving.yaml",
+        ],
+        jinja_job_args={
+            "name": "serve_model",
+            "image": f"bitnami/kubectl",
+            "gitsync": True,
+            "nodeSelector": BASE_NODE_POOL,
+        },
+    )
     t3 >> t4
     # t1 >> t2 >> t3 >> t4  # type: ignore

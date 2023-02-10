@@ -16,7 +16,7 @@ RUN pip install -r requirements.txt
 COPY . /app
 
 ENV PORT 8501
-CMD streamlit run app.py
+CMD streamlit run serve.py
 
 # streamlit-specific commands for config
 ENV LC_ALL=C.UTF-8

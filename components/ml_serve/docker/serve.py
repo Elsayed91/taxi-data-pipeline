@@ -6,14 +6,14 @@ from helpers import PredictionAssistant
 
 model_name = "xgboost-fare-predictor"
 stage = "Staging"
-
+mlflow.set_tracking_uri(f"http://mlflow-service.default.svc.cluster.local:5000")
 model = mlflow.pyfunc.load_model(model_uri=f"models:/{model_name}/{stage}")
 
 
 def run():
 
     st.title("New York Taxi Fare Predictor")
-
+    df = pd.read_csv("zones.csv")
     passengers = st.number_input("Passengers", min_value=1, max_value=7, value=1)
     borough_options = df["borough"].unique()
     borough_options = ["All"] + list(borough_options)
@@ -23,12 +23,12 @@ def run():
     if pickup_borough == "All":
         pickup_zone_options = df["zone"].unique()
     else:
-        pickup_zone_options = df[df["borough"] == borough]["zone"].unique()
+        pickup_zone_options = df[df["borough"] == pickup_borough]["zone"].unique()
     pickup_zone = st.selectbox("Pickup Zone", pickup_zone_options)
     if dropoff_borough == "All":
         dropoff_zone_options = df["zone"].unique()
     else:
-        dropoff_zone_options = df[df["borough"] == borough]["zone"].unique()
+        dropoff_zone_options = df[df["borough"] == dropoff_borough]["zone"].unique()
     dropoff_zone = st.selectbox("Dropoff Zone", dropoff_zone_options)
     output = ""
 
