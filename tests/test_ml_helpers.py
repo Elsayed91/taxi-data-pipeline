@@ -120,3 +120,45 @@ class TestPredictionAssistant(unittest.TestCase):
         np.testing.assert_allclose(
             result.values, expected_result.values, rtol=0.001, atol=0.001
         )
+
+    def test_prepare(self):
+        # Sample input
+        data = {
+            "passengers": [1],
+            "pickup_long": [-74.187558],
+            "pickup_lat": [40.550664],
+            "dropoff_long": [-74.171533],
+            "dropoff_lat": [40.689483],
+        }
+        df = pd.DataFrame(data)
+
+        # Expected output
+        expected = {
+            "passengers": [1],
+            "pickup_long": [-74.187558],
+            "pickup_lat": [40.550664],
+            "dropoff_long": [-74.171533],
+            "dropoff_lat": [40.689483],
+            "trip_duration": [26],
+            "day": [10],
+            "month": [2],
+            "year": [2023],
+            "day_of_week": [4],
+            "hour": [15],
+            "trip_distance": [2.83962],
+            "pickup_jfk_distance": [22.306055],
+            "dropoff_jfk_distance": [20.863664],
+            "pickup_ewr_distance": [9.850164],
+            "dropoff_ewr_distance": [0.258613],
+            "pickup_lga_distance": [22.749948],
+            "dropoff_lga_distance": [16.784075],
+        }
+        expected = pd.DataFrame(expected)
+
+        # Call the prepare method
+        result = PredictionAssistant(
+            data, "components/ml_serve/scripts/zones.csv"
+        ).prepare()
+
+        # Check if the result is equal to the expected output
+        pd.testing.assert_frame_equal(result, expected)

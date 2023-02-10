@@ -4,6 +4,7 @@ import json
 import os
 import requests
 import numpy as np
+from datetime import datetime
 
 
 class PredictionAssistant:
@@ -93,7 +94,7 @@ class PredictionAssistant:
         """
         Adds columns to a given dataframe with distances from JFK, EWR, and LGA airports
         to the pickup and dropoff locations.
-        
+
         Args:
         df (pd.DataFrame): The input dataframe.
 
@@ -117,18 +118,26 @@ class PredictionAssistant:
 
         return df
 
-    def add_exta_columns(self):
-        
-    def run(self):
-        df = self.merge_geo(self.df1, df2, "pickup_zone")
-        df = self.merge_geo(df, df2, "dropoff_zone")
+    def prepare(self) -> pd.DataFrame:
+        """
+        This method prepares the taxi ride data for analysis. It merges the pickup and
+        dropoff location data with the NYC taxi zone data, calculates the trip duration,
+        adds various date-time related features, calculates the trip distance, and adds
+        the distances from JFK, EWR and LGA airports to the pickup and dropoff locations.
+
+        Returns:
+        pd.DataFrame: The prepared taxi ride data.
+        """
+        df = merge_geo_data(df, zones, "pickup")
+        df = merge_geo_data(df, zones, "dropoff")
+        df = df.drop(["LocationID_x", "borough_x", "LocationID_y", "borough_y"], axis=1)
         df["trip_duration"] = self.get_trip_duration(df)
         df["day"] = now.day
         df["month"] = now.month
         df["year"] = now.year
         df["day_of_week"] = now.weekday()
         df["hour"] = now.hour
-        df["distance"] = self.get_distance(
+        df["trip_distance"] = self.get_distance(
             df.pickup_long, df.pickup_lat, df.dropoff_long, df.dropoff_lat
         )
         df = self.add_distances_from_airport(df)

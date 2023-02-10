@@ -2,7 +2,7 @@ import mlflow.pyfunc
 import streamlit as st
 import pandas as pd
 import numpy as np
-
+from helpers import PredictionAssistant
 
 model_name = "xgboost-fare-predictor"
 stage = "Staging"
@@ -40,7 +40,8 @@ def run():
     input_df = pd.DataFrame([input_dict])
 
     if st.button("Predict"):
-        output = model.predict(data)
+        df = PredictionAssistant(input_df, "zones.csv").prepare()
+        output = model.predict(df)
         output = "$" + str(output)
 
     st.success(f"The output is {output}")
