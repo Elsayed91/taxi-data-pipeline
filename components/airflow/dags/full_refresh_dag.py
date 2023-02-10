@@ -171,9 +171,15 @@ with DAG(
     # )
     t5 = KubernetesJobOperator(
         task_id="serve_model",
-        body_filepath="/git/repo/components/ml_serve/manifests/serving.yaml",
+        body_filepath=POD_TEMPALTE,
+        command=[
+            "/bin/bash",
+            "sleep infinity",
+        ],
         jinja_job_args={
-            "project": GOOGLE_CLOUD_PROJECT,
+            "name": "serve-model",
+            "image": f"bitnami/kubectl",
+            "gitsync": True,
             "nodeSelector": BASE_NODE_POOL,
         },
     )
