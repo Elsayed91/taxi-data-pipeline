@@ -45,7 +45,6 @@ seeds:
         year: INTEGER,
         day_of_week: INTEGER,
         hour_of_day: INTEGER,
-        geo_distance: FLOAT,
         pickup_jfk_distance: FLOAT,
         dropoff_jfk_distance: FLOAT,
         pickup_ewr_distance: FLOAT,
