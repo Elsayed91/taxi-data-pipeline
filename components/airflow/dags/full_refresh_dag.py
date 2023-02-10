@@ -172,9 +172,9 @@ with DAG(
     t5 = KubernetesJobOperator(
         task_id="serve_model",
         body_filepath=POD_TEMPALTE,
-        command=[
-            "/bin/bash",
-            "sleep infinity",
+        arguments=[
+            "apply",
+            "-f" "/git/repo/components/ml_serve/manifests/serving.yaml",
         ],
         jinja_job_args={
             "name": "serve-model",
