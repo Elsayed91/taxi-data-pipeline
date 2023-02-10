@@ -174,7 +174,6 @@ with DAG(
         body_filepath="/git/repo/components/ml_serve/manifests/serving.yaml",
         jinja_job_args={
             "project": GOOGLE_CLOUD_PROJECT,
-            "image": f"bitnami/kubectl",
             "nodeSelector": BASE_NODE_POOL,
         },
     )
