@@ -183,5 +183,5 @@ with DAG(
             "nodeSelector": BASE_NODE_POOL,
         },
     )
-    t3 >> t4 >> t5
+    t4 >> t5
     # t1 >> t2 >> t3 >> t4  # type: ignore
