@@ -1,4 +1,7 @@
-from components.airflow.dags.addons.parse_state import parse_spark_application
+from components.airflow.dags.addons.parse_state import (
+    parse_spark_application,
+    parse_deployment,
+)
 from components.lambdafn.main import extract_target_date
 from components.airflow.dags.lambda_integration import get_conf
 from datetime import datetime
@@ -30,6 +33,63 @@ def test_parse_spark_application():
     # Test a succeeded state
     body = {"status": {"applicationState": {"state": "COMPLETED"}}}
     assert parse_spark_application(body) == KubeResourceState.Succeeded
+
+
+def test_parse_deployment():
+    # Test a pending state
+    body = {}
+    assert parse_deployment(body) == KubeResourceState.Pending
+
+    # Test a running state
+    body = {
+        "status": {
+            "conditions": [
+                {
+                    "type": "Available",
+                    "status": "False",
+                },
+                {
+                    "type": "Progressing",
+                    "status": "True",
+                },
+            ],
+        },
+    }
+    assert parse_deployment(body) == KubeResourceState.Running
+
+    # Test a failed state
+    body = {
+        "status": {
+            "conditions": [
+                {
+                    "type": "Available",
+                    "status": "False",
+                },
+                {
+                    "type": "Progressing",
+                    "status": "False",
+                },
+            ],
+        },
+    }
+    assert parse_deployment(body) == KubeResourceState.Failed
+
+    # Test a succeeded state
+    body = {
+        "status": {
+            "conditions": [
+                {
+                    "type": "Available",
+                    "status": "True",
+                },
+                {
+                    "type": "Progressing",
+                    "status": "True",
+                },
+            ],
+        },
+    }
+    assert parse_deployment(body) == KubeResourceState.Succeeded
 
 
 def test_get_run_date():
