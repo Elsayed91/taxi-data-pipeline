@@ -27,10 +27,7 @@ def parse_spark_application(body) -> KubeResourceState:
 
 
 def parse_deployment(body) -> KubeResourceState:
-    if "status" not in body:
-        return KubeResourceState.Pending
-
-    conditions = body["status"].get("conditions", [])
+    conditions = body.get("status", {}).get("conditions", [])
     available_condition = next(
         (c for c in conditions if c["type"] == "Available"), None
     )
@@ -38,15 +35,10 @@ def parse_deployment(body) -> KubeResourceState:
         (c for c in conditions if c["type"] == "Progressing"), None
     )
 
-    if (
-        available_condition is not None
-        and available_condition["status"] == "True"
-        and progressing_condition is not None
-        and progressing_condition["status"] == "True"
-    ):
+    if available_condition is not None and available_condition["status"] == "True":
         return KubeResourceState.Succeeded
     elif available_condition is not None and available_condition["status"] == "False":
-        return KubeResourceState.Running
+        return KubeResourceState.Failed
     elif (
         progressing_condition is not None and progressing_condition["status"] == "True"
     ):
