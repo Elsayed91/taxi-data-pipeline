@@ -27,7 +27,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-from addons.parse_state import SparkApplication, Deployment
+from addons.parse_state import *
 
 
 default_args = {
@@ -43,8 +43,7 @@ default_args = {
     "name_prefix": "",
 }
 
-KubeResourceKind.register_global_kind(SparkApplication)
-KubeResourceKind.register_global_kind(Deployment)
+
 today = datetime.today().strftime("%Y-%m-%d")
 module_path = os.path.dirname(__file__)
 POD_TEMPALTE = os.path.join(module_path, "templates", "pod_template.yaml")
