@@ -62,10 +62,6 @@ def test_parse_deployment():
         "status": {
             "conditions": [
                 {
-                    "type": "Available",
-                    "status": "False",
-                },
-                {
                     "type": "Progressing",
                     "status": "False",
                 },
