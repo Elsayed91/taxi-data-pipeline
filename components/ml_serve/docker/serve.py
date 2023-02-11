@@ -4,9 +4,9 @@ import pandas as pd
 import numpy as np
 from helpers import PredictionAssistant
 import os
+import time
 
 
-model_name = "xgboost-fare-predictor"
 mlflow.set_tracking_uri(f"http://mlflow-service.default.svc.cluster.local:5000")
 mlflow_experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "taxi-fare-prediction-v3")
 current_experiment = dict(mlflow.get_experiment_by_name(mlflow_experiment_name))
@@ -18,7 +18,7 @@ else:
     best_run_id = df.loc[0, "run_id"]
 
 
-logged_model = f'runs:/{best_run_id}/xgb-model'
+logged_model = f"runs:/{best_run_id}/xgb-model"
 
 model = mlflow.pyfunc.load_model(logged_model)
 
@@ -55,9 +55,9 @@ def run():
     if st.button("Predict"):
         df = PredictionAssistant(input_df, "zones.csv").prepare()
         output = model.predict(df)
-        output = "$" + str(output[0])
+        output = "$" + str(round(output[0], 2))
 
-    st.success(f"Estimated fare is {round(output,2}")
+    st.success(f"Estimated fare is {output}")
 
 
 if __name__ == "__main__":

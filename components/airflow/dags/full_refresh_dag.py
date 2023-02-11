@@ -169,19 +169,23 @@ with DAG(
     #         "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET"),
     #     },
     # )
+    # t5 = KubernetesJobOperator(
+    #     task_id="serve_model",
+    #     body_filepath=POD_TEMPALTE,
+    #     arguments=[
+    #         "apply",
+    #         "-f" "/git/repo/components/ml_serve/manifests/serving.yaml",
+    #     ],
+    #     jinja_job_args={
+    #         "name": "serve-model",
+    #         "image": f"bitnami/kubectl",
+    #         "gitsync": True,
+    #         "nodeSelector": BASE_NODE_POOL,
+    #     },
+    # )
     t5 = KubernetesJobOperator(
         task_id="serve_model",
-        body_filepath=POD_TEMPALTE,
-        arguments=[
-            "apply",
-            "-f" "/git/repo/components/ml_serve/manifests/serving.yaml",
-        ],
-        jinja_job_args={
-            "name": "serve-model",
-            "image": f"bitnami/kubectl",
-            "gitsync": True,
-            "nodeSelector": BASE_NODE_POOL,
-        },
+        body_filepath="/git/repo/components/ml_serve/manifests/serving.yaml",
     )
     t5
     # t1 >> t2 >> t3 >> t4  # type: ignore

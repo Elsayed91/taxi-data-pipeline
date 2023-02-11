@@ -24,6 +24,28 @@ def parse_spark_application(body) -> KubeResourceState:
     return KubeResourceState.Running
 
 
+def parse_deployment(body) -> KubeResourceState:
+    FAILURE_STATES = ("FAILED", "UNKNOWN", "DELETED")
+    SUCCESS_STATES = ("AVAILABLE", "PROGRESSING")
+    if "status" not in body:
+        return KubeResourceState.Pending
+    deployment_state = body["status"]["conditions"]
+
+    for condition in deployment_state:
+        if condition["type"] == "Available" and condition["status"] == "True":
+            return KubeResourceState.Succeeded
+        if condition["type"] == "Progressing" and condition["status"] == "False":
+            return KubeResourceState.Failed
+
+    return KubeResourceState.Running
+
+
+Deployment = KubeApiConfiguration.register_kind(
+    name="Deployment",
+    api_version="apps/v1",
+    parse_kind_state=parse_deployment,
+)
+
 SparkApplication = KubeApiConfiguration.register_kind(
     name="SparkApplication",
     api_version="sparkoperator.k8s.io/v1beta2",
