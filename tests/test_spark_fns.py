@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
 from components.spark.scripts.spark_fns import *
-import mock
+from unittest import mock
 import pyarrow.parquet as pq
 import google.cloud.storage as storage
 from components.spark.scripts.configs import *
