@@ -9,6 +9,9 @@ from datetime import datetime
 import pytest
 
 from airflow_kubernetes_job_operator.kube_api import KubeResourceState
+import os
+
+os.environ["ML_SERVING_MANIFEST"] = "components/ml_serve/manifests/serving.yaml"
 
 
 def test_parse_spark_application():

@@ -65,7 +65,9 @@ with DAG(
     SPARK_JOBS_NODE_POOL = os.getenv("SPARK_JOBS_NODE_POOL")
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
     TRAINING_NODE_POOL = os.getenv("TRAINING_NODE_POOL")
-
+    ML_SERVING_MANIFEST = os.getenv(
+        "ML_SERVING_MANIFEST", "/git/repo/components/ml_serve/manifests/serving.yaml"
+    )
     # t1 = KubernetesJobOperator(
     #     task_id="aws_to_gcs",
     #     body_filepath=POD_TEMPALTE,
@@ -186,7 +188,7 @@ with DAG(
     # )
     t5 = KubernetesJobOperator(
         task_id="serve_model",
-        body_filepath="/git/repo/components/ml_serve/manifests/serving.yaml",
+        body_filepath=ML_SERVING_MANIFEST,
         random_name_postfix_length=0,
         jinja_job_args={
             "project": GOOGLE_CLOUD_PROJECT,
