@@ -69,9 +69,8 @@ jobs:
           pipenv install --dev --verbose
       - name: Run tests
         run: |
-          pipenv run python -m pytest tests/ -sxv
+          pipenv run python -m pytest tests/ -sv
           # # s for print statements
-          # # x to fail fast
           # # v to increase verbosity
       - name: Lint
         run: pipenv run python -m pylint --recursive=y .
