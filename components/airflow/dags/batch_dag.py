@@ -202,7 +202,6 @@ with DAG(
         jinja_job_args={
             "name": "refresh-streamlit-model",
             "image": f"bitnami/kubectl",
-            "gitsync": True,
             "nodeSelector": BASE_NODE_POOL,
         },
     )
