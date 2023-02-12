@@ -31,7 +31,7 @@ jobs:
         with:
           terraform_version: 1.3.3
       - run: |
-          echo -n "${{ secrets.ENV_FILE }}" >> ./../.env
+          echo -n "${{ secrets.ENV_FILE }}" >> $PWD/../.env
       - name: Terraform init
         id: init
         run: terraform init
@@ -43,8 +43,9 @@ jobs:
       - name: Terraform validate
         id: validate
         run: |
-          cat ../.env
-          ls ../.
+          echo $PWD
+          cat $PWD/../.env
+          ls $PWD/..
           terraform validate
   
       - name: Terraform plan
