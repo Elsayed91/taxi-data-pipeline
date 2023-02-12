@@ -153,6 +153,36 @@ class PredictionAssistant:
         return df
 
 
+def load_model(mlflow_uri: str, mlflow_experiment_name: str) -> Optional[Any]:
+    """
+    Loads the best model from a specified MLflow experiment.
+
+    Args:
+    mlflow_uri (str): The URI of the MLflow server.
+    mlflow_experiment_name (str): The name of the MLflow experiment.
+
+    Returns:
+    The best model from the specified experiment, or None if an exception is raised.
+    """
+    try:
+        mlflow.set_tracking_uri(mlflow_uri)
+        current_experiment = dict(mlflow.get_experiment_by_name(mlflow_experiment_name))
+        experiment_id = current_experiment["experiment_id"]
+        df = mlflow.search_runs([experiment_id], order_by=["metrics.rmse DESC"])
+        best_run_id = (
+            df.loc[0, "tags.mlflow.parentRunId"]
+            if df.loc[0, "tags.mlflow.parentRunId"] is not None
+            else df.loc[0, "run_id"]
+        )
+
+        logged_model = f"runs:/{best_run_id}/xgb-model"
+
+        return mlflow.pyfunc.load_model(logged_model)
+    except Exception as e:
+        print(f"Failed to load model: {e}")
+        return None
+
+
 def check_connection(
     url: str, timeout_connect: float = 10.0, timeout_read: Optional[float] = None
 ) -> bool:
@@ -188,32 +218,3 @@ def check_connection(
     ) as e:
         logging.error(f"Failed to establish connection: {e}")
         return False
-
-
-def load_model(mlflow_uri: str, mlflow_experiment_name: str) -> Optional[Any]:
-    """
-    Loads the best model from a specified MLflow experiment.
-
-    Args:
-    mlflow_uri (str): The URI of the MLflow server.
-    mlflow_experiment_name (str): The name of the MLflow experiment.
-
-    Returns:
-    The best model from the specified experiment, or None if a connection failed.
-    """
-    if check_connection(mlflow_uri):
-        mlflow.set_tracking_uri(mlflow_uri)
-        current_experiment = dict(mlflow.get_experiment_by_name(mlflow_experiment_name))
-        experiment_id = current_experiment["experiment_id"]
-        df = mlflow.search_runs([experiment_id], order_by=["metrics.rmse DESC"])
-        best_run_id = (
-            df.loc[0, "tags.mlflow.parentRunId"]
-            if df.loc[0, "tags.mlflow.parentRunId"] is not None
-            else df.loc[0, "run_id"]
-        )
-
-        logged_model = f"runs:/{best_run_id}/xgb-model"
-
-        return mlflow.pyfunc.load_model(logged_model)
-    else:
-        return None

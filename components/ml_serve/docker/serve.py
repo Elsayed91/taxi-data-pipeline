@@ -3,6 +3,12 @@ This module is for a New York taxi fare prediction application that uses Streaml
 user interface and Mlflow for model deployment. The main function `run` accepts two
 parameters and starts the app by loading the zones data and creating the UI, then it runs
 prediction on the inputted parameters when the Predict button is clicked.
+
+The Streamlit app has implemented model caching and error handling to ensure a smooth user
+experience. If there's a problem with the server connection, the app can be reloaded, but
+once it's connected, the cached model will be available for use even if Streamlit re-reads
+the entire app when an element is updated. This remains the case even if there's a
+connection issue later on.
 """
 import streamlit as st
 import pandas as pd
@@ -66,7 +72,8 @@ def run(mlflow_uri: str, mlflow_experiment_name: str) -> None:
 
 @st.cache_resource
 def cached_model(mlflow_uri, mlflow_experiment_name):
-    return load_model(mlflow_uri, mlflow_experiment_name)
+    if check_connection(mlflow_uri):
+        return load_model(mlflow_uri, mlflow_experiment_name)
 
 
 if __name__ == "__main__":

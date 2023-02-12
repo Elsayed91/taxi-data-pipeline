@@ -171,7 +171,6 @@ import mock
 import pandas as pd
 
 
-@mock.patch("__main__.load_model.check_connection", return_value=True)
 def test_load_model():
     mlflow_uri = "sqlite:///mlruns.db"
     mlflow_experiment_name = "test_experiment"
@@ -185,19 +184,15 @@ def test_load_model():
         "mlflow.search_runs"
     ) as mock_search_runs, mock.patch(
         "mlflow.pyfunc.load_model"
-    ) as mock_load_model, mock.patch(
-        "components.ml_serve.docker.serve_utils.load_model.check_connection"
-    ) as mock_check_connection:
+    ) as mock_load_model:
         mock_get_experiment_by_name.return_value = {"experiment_id": experiment_id}
         mock_search_runs.return_value = pd.DataFrame(
             {"run_id": [best_run_id], "tags.mlflow.parentRunId": [None]}
         )
         mock_load_model.return_value = "loaded_model"
-        mock_check_connection.return_value = True
 
         result = load_model(mlflow_uri, mlflow_experiment_name)
 
-        mock_check_connection.assert_called_once_with(mlflow_uri)
         mock_get_experiment_by_name.assert_called_once_with(mlflow_experiment_name)
         mock_search_runs.assert_called_once_with(
             [experiment_id], order_by=["metrics.rmse DESC"]
