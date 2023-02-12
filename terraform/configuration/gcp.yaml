@@ -117,4 +117,3 @@ GKE:
         machine_type: "n2-standard-4"
         disk_size_gb: 50
         service_account: "${CLUSTER_SA}@${PROJECT}.iam.gserviceaccount.com"
-##
