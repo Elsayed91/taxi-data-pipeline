@@ -56,9 +56,13 @@ jobs:
         run: |
           sed -i "s|spark_home =.*|spark_home = /home/runner/work/${{ github.event.repository.name }}|g" pytest.ini
           echo "import sys" > sys_path_append.py
+          echo "import os" >> sys_path_append.py
           echo "sys.path.append('/home/runner/work/${{ github.event.repository.name }}/spark/python')" >> sys_path_append.py
           echo "sys.path.append('/home/runner/work/${{ github.event.repository.name }}/spark/python/lib/py4j-0.10.9-src.zip')" >> sys_path_append.py
+          echo "os.environ['PYSPARK_PYTHON'] = sys.executable" >> sys_path_append.py
+          echo "os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable" >> sys_path_append.py
           python sys_path_append.py
+
       # - name: Cache Dependencies
       #   uses: actions/cache@v2
       #   id: cache-dependencies
