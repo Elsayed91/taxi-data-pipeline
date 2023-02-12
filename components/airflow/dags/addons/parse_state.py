@@ -1,6 +1,11 @@
 """
-This module creates the needed definitions to use Kind: SparkApplication with the
-KubernetesJobOperator.
+This module provides definitions for using the Kind: SparkApplication & Deployment with
+the KubernetesJobOperator in Apache Airflow. It includes two main functions,
+parse_spark_application and parse_deployment, which parse the status of a SparkApplication
+and Deployment respectively, and return the state of the resource. The module also
+includes two classes, SparkApplication and Deployment, which extend the
+KubeApiConfiguration class and are registered as global kinds for the KubeResourceKind.
+Reference: https://github.com/LamaAni/KubernetesJobOperator/blob/master/docs/custom_kinds.md
 """
 from airflow_kubernetes_job_operator.kube_api import (
     KubeResourceState,

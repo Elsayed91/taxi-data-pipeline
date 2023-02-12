@@ -15,13 +15,19 @@ spec:
     spec:
       containers:
         - name: ml-serve
-          image:  eu.gcr.io/stellarismusv2/serving
+          image:  eu.gcr.io/{{ job.project }}/serving
           imagePullPolicy: Always
           ports:
             - name: serving-port
               containerPort: 8501
+          env:
+            - name: MLFLOW_URI
+              value: "http://mlflow-service.default.svc.cluster.local:5000"
+            - name: MLFLOW_EXPERIMENT_NAME
+              value: "taxi-fare-prediction-v3"
+
       nodeSelector:
-        cloud.google.com/gke-nodepool: base
+        cloud.google.com/gke-nodepool: {{ job.nodeSelector }}
         iam.gke.io/gke-metadata-server-enabled: "true"
 ---
 apiVersion: v1

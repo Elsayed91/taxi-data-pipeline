@@ -43,8 +43,7 @@ default_args = {
     "name_prefix": "",
 }
 
-KubeResourceKind.register_global_kind(SparkApplication)
-KubeResourceKind.register_global_kind(Deployment)
+
 today = datetime.today().strftime("%Y-%m-%d")
 module_path = os.path.dirname(__file__)
 POD_TEMPALTE = os.path.join(module_path, "templates", "pod_template.yaml")
@@ -187,6 +186,7 @@ with DAG(
     t5 = KubernetesJobOperator(
         task_id="serve_model",
         body_filepath="/git/repo/components/ml_serve/manifests/serving.yaml",
+        random_name_postfix_length=0,
     )
     t5
     # t1 >> t2 >> t3 >> t4  # type: ignore
