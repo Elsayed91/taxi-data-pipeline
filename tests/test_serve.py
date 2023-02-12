@@ -1,11 +1,13 @@
 import unittest
-from components.ml_serve.docker.helpers import PredictionAssistant, load_model
+from components.ml_serve.docker.serve_utils import *
 import pandas as pd
 import numpy as np
 from unittest import mock
 import json
 import requests
 import datetime
+import pytest
+import urllib3
 
 
 class TestPredictionAssistant(unittest.TestCase):
@@ -197,3 +199,13 @@ def test_load_model():
         )
         mock_load_model.assert_called_once_with(logged_model)
         assert result == "loaded_model"
+
+
+def test_check_connection():
+    # Test for a successful connection
+    url = "https://www.google.com"
+    assert check_connection(url) == True
+
+    # Test for an unsuccessful connection
+    url = "invalid_url"
+    assert check_connection(url) == False

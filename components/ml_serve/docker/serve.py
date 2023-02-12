@@ -6,7 +6,7 @@ prediction on the inputted parameters when the Predict button is clicked.
 """
 import streamlit as st
 import pandas as pd
-from helpers import PredictionAssistant, load_model
+from serve_utils import PredictionAssistant, load_model
 import os
 
 
@@ -50,20 +50,18 @@ def run(mlflow_uri: str, mlflow_experiment_name: str) -> None:
         "passengers": passengers,
     }
     input_df = pd.DataFrame([input_dict])
-
+    model = load_model(mlflow_uri, mlflow_experiment_name)
     if st.button("Predict"):
         try:
             df = PredictionAssistant(input_df, "zones.csv").prepare()
-            model = load_model(mlflow_uri, mlflow_experiment_name)
             output = model.predict(df)
             output = "$" + str(round(output[0], 2))
+            st.success(f"Estimated fare is {output}")
         except Exception as e:
             st.error(
                 "There was a problem connecting to the server. Try again later.",
                 icon="🚨",
             )
-
-    st.success(f"Estimated fare is {output}")
 
 
 if __name__ == "__main__":

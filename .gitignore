@@ -2,16 +2,15 @@
 terraform/.terraform
 terraform/.terraform.lock.hcl
 components/*/__pycache__
+components/*/*/__pycache__
+components/*/*/*/__pycache__
 terraform/modules/files/lambda_key.json
 terraform/modules/files/gcp_key_spark.json
 terraform/modules/files/lambda.zip
 components/dbt/app/.user.yml
 components/dbt/app/target
 components/dbt/app/logs
-components/spark/scripts/__pycache__
-components/docs_app/docker/__pycache__
-components/airflow/dags/__pycache__
-components/airflow/dags/addons/__pycache__
+
 tests/__pycache__
 .vscode
 tests/integration/lambda/__pycache__
@@ -23,4 +22,4 @@ tests/integration/lambda/.terraform.tfstate.lock.info
 tests/integration/lambda/terraform.tfstate.backup
 tests/integration/lambda/yellow_tripdata_2019-08.parquet
 .pytest_cache
-components/ml_serve/scripts/__pycache__
+scripts/__pycache__

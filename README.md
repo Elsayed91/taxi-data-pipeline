@@ -2,6 +2,12 @@ https://www.catchr.io/templates/google-search-console-query-insight
 https://lookerstudio.google.com/reporting/ccd9e11f-b634-4fa2-9d26-cf4f7079389f
 
 
+# Load the XGBoost model from the registry
+model = mlflow.xgboost.load_model("xgboost-predictor")
+
+# Fit the model to the training data, using the loaded model as the starting point for training
+model.fit(X_train, y_train, xgb_model=model.get_booster())
+
 ## **Testing**
 ### **Standard Unit Tests**
 - Most functions have unit tests attached, the ones that do not are ones based completely off 3rd party libraries (like great expectations)

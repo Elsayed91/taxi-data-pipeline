@@ -66,8 +66,10 @@ class PredictionAssistant:
 
         """
         r = requests.get(
-            f"http://router.project-osrm.org/route/v1/car/{df.pickup_long[0]},{df.pickup_lat[0]};{df.dropoff_long[0]},{df.dropoff_lat[0]}?overview=false"
-            ""
+            "http://router.project-osrm.org/route/v1/car/"
+            + f"{df.pickup_long[0]},{df.pickup_lat[0]};"
+            + f"{df.dropoff_long[0]},{df.dropoff_lat[0]}"
+            + "?overview=false"
         )
         routes = json.loads(r.content)
         trip_duration = routes.get("routes")[0]["duration"]
@@ -179,3 +181,40 @@ def load_model(mlflow_uri: str, mlflow_experiment_name: str) -> Optional[Any]:
     except Exception as e:
         print(f"Failed to load model: {e}")
         return None
+
+
+def check_connection(
+    url: str, timeout_connect: float = 10.0, timeout_read: Optional[float] = None
+) -> bool:
+    """
+    This function checks the connection to a URL.
+    If the connection is successful, it returns True, otherwise, it returns False.
+
+    Args:
+    - url (str): The URL to check the connection for.
+    - timeout_connect (float, optional): The time in seconds to wait for the connection to
+    be established. The default value is 10.0.
+    - timeout_read (float, optional): The time in seconds to wait for a read operation
+    from the remote end. The default value is None.
+
+    Returns:
+    - bool: Whether the connection was successful or not.
+
+    """
+    import urllib3
+    import logging
+
+    try:
+        http = urllib3.PoolManager(
+            timeout=urllib3.Timeout(connect=timeout_connect, read=timeout_read)
+        )
+        response = http.request("GET", url)
+        return True
+    except (
+        urllib3.exceptions.NewConnectionError,
+        urllib3.exceptions.MaxRetryError,
+        urllib3.exceptions.ConnectTimeoutError,
+        requests.exceptions.ConnectionError,
+    ) as e:
+        logging.error(f"Failed to establish connection: {e}")
+        return False

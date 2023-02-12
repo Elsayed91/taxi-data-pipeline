@@ -163,10 +163,11 @@ with DAG(
     #     envs={
     #         "TARGET_DATASET": os.getenv("ML_DATASET"),
     #         "TARGET_TABLE": "dbt__ml__yellow_fare",
-    #         "TRACKING_SERVICE": "mlflow-service",
+    #         "MLFLOW_URI": "http://mlflow-service.default.svc.cluster.local:5000",
     #         "MLFLOW_EXPERIMENT_NAME": "taxi-fare-prediction-v3",
     #         "TARGET_COLUMN": "fare_amount",
     #         "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET"),
+    #         "MODEL_NAME": "xgboost-fare-predictor",
     #     },
     # )
     # t5 = KubernetesJobOperator(
