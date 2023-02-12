@@ -1,10 +1,11 @@
 import unittest
-from components.ml_serve.docker.helpers import PredictionAssistant
+from components.ml_serve.docker.helpers import PredictionAssistant, load_model
 import pandas as pd
 import numpy as np
 from unittest import mock
 import json
 import requests
+import datetime
 
 
 class TestPredictionAssistant(unittest.TestCase):
@@ -17,7 +18,7 @@ class TestPredictionAssistant(unittest.TestCase):
             }
         )
 
-        pa = PredictionAssistant(inputs, "components/ml_serve/scripts/zones.csv")
+        pa = PredictionAssistant(inputs, "components/ml_serve/docker/zones.csv")
         result = pa.merge_geo_data(inputs, "pickup")
         result = pa.merge_geo_data(result, "dropoff")
         result = result.drop(
@@ -67,14 +68,14 @@ class TestPredictionAssistant(unittest.TestCase):
         # Configure the mock API call to return the predefined response
         mock_get.return_value = mock_response
 
-        pa = PredictionAssistant({}, "components/ml_serve/scripts/zones.csv")
+        pa = PredictionAssistant({}, "components/ml_serve/docker/zones.csv")
         result = pa.get_trip_duration(df)
 
         expected_result = 26  # 1579.7 / 60
         self.assertEqual(result, expected_result)
 
     def test_haversine_distance(self):
-        pa = PredictionAssistant({}, "components/ml_serve/scripts/zones.csv")
+        pa = PredictionAssistant({}, "components/ml_serve/docker/zones.csv")
         start_lat = 40.7128
         start_lng = -74.0060
         end_lat = 41.8818
@@ -113,7 +114,7 @@ class TestPredictionAssistant(unittest.TestCase):
                 "dropoff_lga_distance": [16.784075],
             }
         )
-        pa = PredictionAssistant({}, "components/ml_serve/scripts/zones.csv")
+        pa = PredictionAssistant({}, "components/ml_serve/docker/zones.csv")
         result = pa.distance_from_airport(df)
 
         # Check if the result is a pandas DataFrame
@@ -130,7 +131,7 @@ class TestPredictionAssistant(unittest.TestCase):
             "dropoff_zone": "Newark Airport",
         }
         df = pd.DataFrame(data)
-
+        now = datetime.datetime.now()
         # Expected output
         expected = {
             "passengers": [1],
@@ -139,11 +140,11 @@ class TestPredictionAssistant(unittest.TestCase):
             "dropoff_long": [-74.171533],
             "dropoff_lat": [40.689483],
             "trip_duration": [26],
-            "day": [10],
-            "month": [2],
-            "year": [2023],
-            "day_of_week": [4],
-            "hour": [15],
+            "day": [now.day],
+            "month": [now.month],
+            "year": [now.year],
+            "day_of_week": [now.weekday()],
+            "hour": [now.hour],
             "trip_distance": [2.83962],
             "pickup_jfk_distance": [22.306055],
             "dropoff_jfk_distance": [20.863664],
@@ -156,8 +157,43 @@ class TestPredictionAssistant(unittest.TestCase):
 
         # Call the prepare method
         result = PredictionAssistant(
-            df, "components/ml_serve/scripts/zones.csv"
+            df, "components/ml_serve/docker/zones.csv"
         ).prepare()
 
         # Check if the result is equal to the expected output
         pd.testing.assert_frame_equal(result, expected)
+
+
+import mlflow
+import mock
+import pandas as pd
+
+
+def test_load_model():
+    mlflow_uri = "sqlite:///mlruns.db"
+    mlflow_experiment_name = "test_experiment"
+    experiment_id = "1"
+    best_run_id = "1"
+    logged_model = f"runs:/{best_run_id}/xgb-model"
+
+    with mock.patch(
+        "mlflow.get_experiment_by_name"
+    ) as mock_get_experiment_by_name, mock.patch(
+        "mlflow.search_runs"
+    ) as mock_search_runs, mock.patch(
+        "mlflow.pyfunc.load_model"
+    ) as mock_load_model:
+        mock_get_experiment_by_name.return_value = {"experiment_id": experiment_id}
+        mock_search_runs.return_value = pd.DataFrame(
+            {"run_id": [best_run_id], "tags.mlflow.parentRunId": [None]}
+        )
+        mock_load_model.return_value = "loaded_model"
+
+        result = load_model(mlflow_uri, mlflow_experiment_name)
+
+        mock_get_experiment_by_name.assert_called_once_with(mlflow_experiment_name)
+        mock_search_runs.assert_called_once_with(
+            [experiment_id], order_by=["metrics.rmse DESC"]
+        )
+        mock_load_model.assert_called_once_with(logged_model)
+        assert result == "loaded_model"

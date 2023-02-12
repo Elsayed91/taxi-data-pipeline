@@ -1,30 +1,29 @@
-import mlflow.pyfunc
+"""
+This module is for a New York taxi fare prediction application that uses Streamlit for
+user interface and Mlflow for model deployment. The main function `run` accepts two
+parameters and starts the app by loading the zones data and creating the UI, then it runs
+prediction on the inputted parameters when the Predict button is clicked.
+"""
 import streamlit as st
 import pandas as pd
-import numpy as np
-from helpers import PredictionAssistant
+from helpers import PredictionAssistant, load_model
 import os
-import time
 
 
-mlflow.set_tracking_uri(f"http://mlflow-service.default.svc.cluster.local:5000")
-mlflow_experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME", "taxi-fare-prediction-v3")
-current_experiment = dict(mlflow.get_experiment_by_name(mlflow_experiment_name))
-experiment_id = current_experiment["experiment_id"]
-df = mlflow.search_runs([experiment_id], order_by=["metrics.rmse DESC"])
-if df.loc[0, "tags.mlflow.parentRunId"] is not None:
-    best_run_id = df.loc[0, "tags.mlflow.parentRunId"]
-else:
-    best_run_id = df.loc[0, "run_id"]
+def run(mlflow_uri: str, mlflow_experiment_name: str) -> None:
+    """
+    Starts the taxi fare prediction app. It accepts two parameters, the Mlflow URI and the
+    name of the Mlflow experiment that holds the model, then creates the user interface
+    and predicts the fare based on the inputted parameters when the Predict button is
+    clicked.
 
+    Args:
+    - mlflow_uri (str): the URI of the Mlflow server
+    - mlflow_experiment_name (str): the name of the Mlflow experiment
 
-logged_model = f"runs:/{best_run_id}/xgb-model"
-
-model = mlflow.pyfunc.load_model(logged_model)
-
-
-def run():
-
+    Returns:
+    None
+    """
     st.title("New York Taxi Fare Predictor")
     df = pd.read_csv("zones.csv")
     passengers = st.number_input("Passengers", min_value=1, max_value=7, value=1)
@@ -53,12 +52,22 @@ def run():
     input_df = pd.DataFrame([input_dict])
 
     if st.button("Predict"):
-        df = PredictionAssistant(input_df, "zones.csv").prepare()
-        output = model.predict(df)
-        output = "$" + str(round(output[0], 2))
+        try:
+            df = PredictionAssistant(input_df, "zones.csv").prepare()
+            model = load_model(mlflow_uri, mlflow_experiment_name)
+            output = model.predict(df)
+            output = "$" + str(round(output[0], 2))
+        except Exception as e:
+            st.error(
+                "There was a problem connecting to the server. Try again later.",
+                icon="🚨",
+            )
 
     st.success(f"Estimated fare is {output}")
 
 
 if __name__ == "__main__":
-    run()
+    mlflow_uri = os.getenv("MLFLOW_URI")
+    mlflow_experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME")
+
+    run(mlflow_uri, mlflow_experiment_name)
