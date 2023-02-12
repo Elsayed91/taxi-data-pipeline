@@ -3,7 +3,7 @@ google-cloud-storage
 pandas
 pyarrow
 great_expectations==0.15.31
-xgboost 
-mlflow 
-bentoml
-pykaniko
+
+
+
+

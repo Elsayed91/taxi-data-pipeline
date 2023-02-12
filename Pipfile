@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+mlflow = "==2.1.1"
+pyshp = "*"
+airflow-kubernetes-job-operator = "==2.0.12"
+apache-airflow = "==2.5.0"
+google-cloud-storage = "*"
+xgboost = "==1.7.2"
+great-expectations = "==0.15.31"
+pyarrow = "*"
+gcsfs = "*"
+pandas-gbq = "*"
+scikit-learn = "==1.2.0"
+
+[dev-packages]
+pytest = "*"
+pytest-spark = "*"
+python-dotenv = "*"
+
+[requires]
+python_version = "3.10"
