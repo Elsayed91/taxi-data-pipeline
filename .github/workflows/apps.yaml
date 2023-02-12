@@ -54,7 +54,7 @@ jobs:
           python -m pip install pipenv
       - name: Add Spark Home
         run: |
-          sed -i "s|spark_home =.*|spark_home = /home/runner/work/$PROJECT|g" pytest.ini
+          sed -i "s|spark_home =.*|spark_home = /home/runner/work/${{ github.event.repository.name }}|g" pytest.ini
           cat pytest.ini
       # - name: Cache Dependencies
       #   uses: actions/cache@v2
