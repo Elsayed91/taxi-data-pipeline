@@ -88,6 +88,4 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          ls -a
-          cat .env
-          terraform apply -var env_path=".env" -auto-approve -input=false
+          terraform apply -auto-approve -input=false

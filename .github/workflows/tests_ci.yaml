@@ -1,6 +1,14 @@
-name: tests-ci
+name: apps
 
 on:
+  push:
+    branches:
+    - main
+    paths:
+      - 'components/docs_app/docker/app.py'
+      - 'components/airflow/dags/**'
+      - 'components/ml_train/script/**'
+      - 'components/spark/scripts/**'
   pull_request:
     branches: [ "main" ]
     paths:
@@ -17,8 +25,22 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.10
-      - run: pip install pipenv && pipenv install --dev
-      - name: Run Unit tests
-        run: pipenv run pytest tests/
+      - name: Install poetry
+        run: |
+          python -m pip install poetry
+      - name: Cache the virtualenv
+        uses: actions/cache@v2
+        with:
+          path: ./.venv
+          key: ${{ runner.os }}-venv-${{ hashFiles('**/poetry.lock') }}
+      - name: Install dependencies
+        run: |
+          python -m poetry install
+      - name: Run tests [ s -> print statements ]
+        run: |
+          python -m poetry run python -m pytest -sxv
+          # s for print statements
+          # x to fail fast
+          # v to increase verbosity
       - name: Lint
         run: pipenv run pylint --recursive=y .
