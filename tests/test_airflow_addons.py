@@ -97,6 +97,7 @@ def test_get_run_date():
     assert extract_target_date("tripdata_2022-10-10.csv") == "2022-10-01"
 
 
+@pytest.mark.aws_lambda
 def test_get_conf(mocker):
     # Create a mock DAG run object
     dag_run = mocker.Mock()

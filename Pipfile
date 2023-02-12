@@ -15,6 +15,7 @@ pyarrow = "*"
 gcsfs = "*"
 pandas-gbq = "*"
 scikit-learn = "==1.2.0"
+google-api-python-client = "*"
 
 [dev-packages]
 pytest = "*"
