@@ -34,7 +34,7 @@ jobs:
         id: init
         run: terraform init
       - run: |
-        echo $GITHUB_ENV
+          echo $GITHUB_ENV
       - name: Terraform format
         id: fmt
         run: terraform fmt -check
