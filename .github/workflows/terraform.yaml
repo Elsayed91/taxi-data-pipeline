@@ -33,7 +33,8 @@ jobs:
       - name: Terraform init
         id: init
         run: terraform init
-  
+      - run: |
+        echo $GITHUB_ENV
       - name: Terraform format
         id: fmt
         run: terraform fmt -check
@@ -41,9 +42,7 @@ jobs:
       - name: Terraform validate
         id: validate
         run: |
-          touch $PWD/../.env
           echo -n "${{ secrets.ENV_FILE }}" >> $PWD/../.env
-          ls $PWD/.. -a
           terraform validate
   
       - name: Terraform plan
