@@ -87,4 +87,4 @@ jobs:
   
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -var num_of_workers="${{ env.TF_VAR_env_path }}" -auto-approve -input=false
+        run: terraform apply -var env_path="${{ env.TF_VAR_env_path }}" -auto-approve -input=false
