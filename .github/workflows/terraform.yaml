@@ -50,8 +50,6 @@ jobs:
   
       - name: Terraform plan
         id: plan
-        env:
-          TF_VAR_env_path: ${{ vars.TF_VAR_env_path }}
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color -input=false
         continue-on-error: true
@@ -89,6 +87,4 @@ jobs:
   
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        env:
-          TF_VAR_env_path: ${{ vars.TF_VAR_env_path }}
-        run: terraform apply -auto-approve -input=false
+        run: terraform apply -var num_of_workers="${{ env.TF_VAR_env_path }}" -auto-approve -input=false
