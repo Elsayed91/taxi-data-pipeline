@@ -8,6 +8,7 @@ import requests
 import datetime
 import pytest
 import urllib3
+import mlflow
 
 
 class TestPredictionAssistant(unittest.TestCase):
@@ -164,11 +165,6 @@ class TestPredictionAssistant(unittest.TestCase):
 
         # Check if the result is equal to the expected output
         pd.testing.assert_frame_equal(result, expected)
-
-
-import mlflow
-import mock
-import pandas as pd
 
 
 def test_load_model():

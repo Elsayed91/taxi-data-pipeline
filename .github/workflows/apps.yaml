@@ -30,7 +30,7 @@ on:
 
 
 jobs:
-  test:
+  test_pyapps:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
