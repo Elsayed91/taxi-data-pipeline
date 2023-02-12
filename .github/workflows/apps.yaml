@@ -6,16 +6,27 @@ on:
     - main
     paths:
       - 'components/docs_app/docker/app.py'
+      - 'components/data_validation/**'
+      - 'components/kafka/scripts/**'
       - 'components/airflow/dags/**'
       - 'components/ml_train/script/**'
       - 'components/spark/scripts/**'
+      - 'components/ml_serve/docker/*.py'
+      - 'components/ml_train/scripts/**'
+      - 'scripts/create_seed.py'
   pull_request:
-    branches: [ "main" ]
+    branches:
+    - main
     paths:
       - 'components/docs_app/docker/app.py'
+      - 'components/data_validation/**'
+      - 'components/kafka/scripts/**'
       - 'components/airflow/dags/**'
       - 'components/ml_train/script/**'
       - 'components/spark/scripts/**'
+      - 'components/ml_serve/docker/*.py'
+      - 'components/ml_train/scripts/**'
+      - 'scripts/create_seed.py'
 
 jobs:
   test:
