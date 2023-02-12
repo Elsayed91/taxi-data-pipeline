@@ -27,7 +27,7 @@ spec:
               value: "taxi-fare-prediction-v3"
 
       nodeSelector:
-        cloud.google.com/gke-nodepool: {{ job.nodeSelector }}
+        cloud.google.com/gke-nodepool: "{{ job.nodeSelector }}"
         iam.gke.io/gke-metadata-server-enabled: "true"
 ---
 apiVersion: v1
