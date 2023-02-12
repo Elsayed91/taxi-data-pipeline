@@ -63,17 +63,16 @@ jobs:
       #     key: ${{ runner.os }}-pip-${{ hashFiles('**/Pipfile.lock') }}
       #     restore-keys: |
       #       ${{ runner.os }}-pipenv
-      # - name: Install requirements
-      #   # if: steps.cache-dependencies.outputs.cache-hit != 'true'
-      #   run: |
-      #     pipenv install --dev --verbose
+      - name: Install requirements
+        # if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: |
+          pipenv install --dev --verbose
       - name: Run tests
         run: |
           export SPARK_HOME=/home/runner/work/${{ github.event.repository.name }}/spark
           export PYTHONPATH=$SPARK_HOME/python/:$PYTHONPATH
           export PYTHONPATH=$SPARK_HOME/python/lib/py4j-0.10.9-src.zip:$PYTHONPATH
-          ls -l $SPARK_HOME/python/lib/py4j-*.zip
-          # pipenv run python -m pytest -sxv
+          pipenv run python -m pytest -sxv
           # # s for print statements
           # # x to fail fast
           # # v to increase verbosity
