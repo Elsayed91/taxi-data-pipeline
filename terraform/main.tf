@@ -1,10 +1,9 @@
 
 locals {
   # sensitive_env = try({ for tuple in regexall("(.*?)=\"(.*)\"", file("${path.module}/../.env")) : tuple[0] => sensitive(tuple[1]) }, null)
-  env_path = "${path.module}/../.env"
-  envs     = { for tuple in regexall("(.*?)=\"(.*)\"", file("${var.env_path}")) : tuple[0] => tuple[1] }
-  gcp      = yamldecode(templatefile("${path.module}/configuration/gcp.yaml", local.envs))
-  aws      = yamldecode(templatefile("${path.module}/configuration/aws.yaml", local.envs))
+  envs = { for tuple in regexall("(.*?)=\"(.*)\"", file("${var.env_path}")) : tuple[0] => tuple[1] }
+  gcp  = yamldecode(templatefile("${path.module}/configuration/gcp.yaml", local.envs))
+  aws  = yamldecode(templatefile("${path.module}/configuration/aws.yaml", local.envs))
 }
 
 module "project" {
