@@ -70,6 +70,7 @@ jobs:
       - name: Run tests
         run: |
           export SPARK_HOME=/home/runner/work/${{ github.event.repository.name }}/spark/bin
+          export PYSPARK_PYTHON=/home/runner/work/${{ github.event.repository.name }}/spark/python
           pipenv run python -m pytest -sxv
           # s for print statements
           # x to fail fast
