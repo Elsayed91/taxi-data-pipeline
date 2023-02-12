@@ -50,22 +50,37 @@ def run(mlflow_uri: str, mlflow_experiment_name: str) -> None:
         "passengers": passengers,
     }
     input_df = pd.DataFrame([input_dict])
-    model = load_model(mlflow_uri, mlflow_experiment_name)
     if st.button("Predict"):
         try:
             df = PredictionAssistant(input_df, "zones.csv").prepare()
             output = model.predict(df)
             output = "$" + str(round(output[0], 2))
-            st.success(f"Estimated fare is {output}")
-        except Exception as e:
+        except:
             st.error(
-                "There was a problem connecting to the server. Try again later.",
+                "Something went wrong. Please reload the page.",
                 icon="🚨",
             )
+
+    st.success(f"Estimated fare is {output}")
+
+
+@st.cache_resource
+def cached_model(mlflow_uri, mlflow_experiment_name):
+    return load_model(mlflow_uri, mlflow_experiment_name)
 
 
 if __name__ == "__main__":
     mlflow_uri = os.getenv("MLFLOW_URI")
     mlflow_experiment_name = os.getenv("MLFLOW_EXPERIMENT_NAME")
 
-    run(mlflow_uri, mlflow_experiment_name)
+    model = cached_model(mlflow_uri, mlflow_experiment_name)
+    if model:
+        run(model)
+    else:
+        st.info(
+            "Something went wrong with the server connection."
+            + "Click on **Check Connection** to try again.",
+            icon="🚨",
+        )
+        if st.button("Check Connection"):
+            st.cache_resource.clear()
