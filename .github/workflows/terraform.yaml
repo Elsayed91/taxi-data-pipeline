@@ -31,23 +31,26 @@ jobs:
         with:
           terraform_version: 1.3.3
       - run: |
-          echo -n "${{ secrets.ENV_FILE }}" >> ./../.env
+          echo -n "${{ secrets.ENV_FILE }}" >> .env
       - name: Terraform init
         id: init
         run: terraform init
+        working-directory: ./terraform
   
       - name: Terraform format
         id: fmt
         run: terraform fmt -check
-      
+        working-directory: ./terraform
+
       - name: Terraform validate
         id: validate
         run: terraform validate
-  
+        working-directory: ./terraform
       - name: Terraform plan
         id: plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color -input=false
+        working-directory: ./terraform
         continue-on-error: true
       
       - uses: actions/github-script@v6
@@ -55,6 +58,7 @@ jobs:
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
+          working-directory: ./terraform
           script: |
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
@@ -79,8 +83,10 @@ jobs:
   
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
+        working-directory: ./terraform
         run: exit 1
   
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        working-directory: ./terraform
         run: terraform apply -auto-approve -input=false
