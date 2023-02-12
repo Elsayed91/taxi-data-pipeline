@@ -31,9 +31,8 @@ jobs:
         with:
           terraform_version: 1.3.3
       - run: |
-          echo $TF_VAR_env_path
-          echo -n "${{ secrets.ENV_FILE }}" >> ${{ vars.TF_VAR_env_path }}
-          echo "::set-env name=TF_VAR_env_path::${{ vars.TF_VAR_env_path }}"
+          echo TF_VAR_env_path=${{ vars.TF_VAR_env_path }}>> $GITHUB_ENV
+          echo -n "${{ secrets.ENV_FILE }}" >> $TF_VAR_env_path
           echo $TF_VAR_env_path
       - name: Terraform init
         id: init
