@@ -187,6 +187,10 @@ with DAG(
         task_id="serve_model",
         body_filepath="/git/repo/components/ml_serve/manifests/serving.yaml",
         random_name_postfix_length=0,
+        jinja_job_args={
+            "project": GOOGLE_CLOUD_PROJECT,
+            "nodeSelector": BASE_NODE_POOL,
+        },
     )
     t5
     # t1 >> t2 >> t3 >> t4  # type: ignore
