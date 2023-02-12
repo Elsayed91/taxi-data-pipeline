@@ -157,6 +157,7 @@ def test_schema_groups():
     assert schema_groups(df) == expected_output
 
 
+@pytest.mark.spark
 def test_cast_columns(spark_session):
     # Create a test DataFrame
     df = spark_session.createDataFrame(
