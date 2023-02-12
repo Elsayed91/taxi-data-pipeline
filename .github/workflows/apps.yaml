@@ -69,7 +69,7 @@ jobs:
           pipenv install --dev --verbose
       - name: Run tests
         run: |
-          pipenv run python -m pytest -sxv -m "not spark"
+          pipenv run python -m pytest tests/ -sxv
           # # s for print statements
           # # x to fail fast
           # # v to increase verbosity
