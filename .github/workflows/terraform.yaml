@@ -11,8 +11,7 @@ on:
     - main
     paths:
     - terraform/**
-env:
-  TF_VAR_env_path: "${{ vars.TF_VAR_env_path }}"
+
 
 jobs:
   terraform:
@@ -51,7 +50,7 @@ jobs:
       - name: Terraform plan
         id: plan
         if: github.event_name == 'pull_request'
-        run: terraform plan -no-color -input=false
+        run: terraform plan -var env_path=".env" -no-color -input=false
         continue-on-error: true
       
       - uses: actions/github-script@v6
@@ -88,4 +87,4 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          terraform apply -auto-approve -input=false
+          terraform apply -var env_path=".env" -auto-approve -input=false

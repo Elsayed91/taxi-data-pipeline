@@ -43,4 +43,4 @@ jobs:
           # x to fail fast
           # v to increase verbosity
       - name: Lint
-        run: pipenv run pylint --recursive=y .
+        run: python -m poetry run python -m pylint --recursive=y .
