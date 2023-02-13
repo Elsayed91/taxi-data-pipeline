@@ -73,7 +73,7 @@ jobs:
           pipenv install --dev --verbose
       - name: Run tests
         run: |
-          pipenv run python -m pytest tests/ -sv
+          pipenv run python -m pytest tests/ -s
           # # s for print statements
           # # v to increase verbosity
       - name: Lint
