@@ -25,7 +25,7 @@ pytest = "*"
 pytest-spark = "*"
 python-dotenv = "*"
 pylint = "*"
-
+pytest-mock = "*"
 
 [requires]
 python_version = "3.10"
