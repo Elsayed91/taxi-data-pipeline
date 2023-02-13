@@ -19,6 +19,8 @@ google-api-python-client = "*"
 kubernetes = "==25.3.0"
 aws-lambda-typing = "==2.16.3"
 boto3 = "*"
+black = "*"
+isort = "*"
 
 [dev-packages]
 pytest = "*"

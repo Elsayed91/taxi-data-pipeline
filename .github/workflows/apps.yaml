@@ -76,5 +76,12 @@ jobs:
           pipenv run python -m pytest tests/ -s
           # # s for print statements
           # # v to increase verbosity
-      - name: Lint
-        run: pipenv run python -m pylint --recursive=y .
+      - name: Format-Lint-Sort
+        run: |
+          if [[ $(git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r ${{ github.sha }} -- '*.py' | xargs) ]]; then
+          pipenv run python -m black --check $(git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r "$GITHUB_SHA" -- '*.py' | xargs)
+          pipenv run python -m isort $(git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r "$GITHUB_SHA" -- '*.py' | xargs)
+          pipenv run python -m pylint $(git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r "$GITHUB_SHA" -- '*.py' | xargs)
+          fi
+
+
