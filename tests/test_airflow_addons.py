@@ -2,7 +2,7 @@ from components.airflow.dags.addons.parse_state import (
     parse_spark_application,
     parse_deployment,
 )
-from components.lambdafn.main import extract_target_date
+from components.aws_lambda.main import extract_target_date
 from components.airflow.dags.lambda_integration import get_conf
 from datetime import datetime
 
