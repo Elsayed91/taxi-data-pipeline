@@ -74,7 +74,7 @@ with DAG(
     TRAINING_NODE_POOL = os.getenv("TRAINING_NODE_POOL")
     t1 = KubernetesJobOperator(
         task_id="aws_to_gcs",
-        body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
+        body_filepath=POD_TEMPALTE,
         command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
         arguments=[
             "--data-source",
@@ -103,7 +103,7 @@ with DAG(
 
     # t2 = KubernetesJobOperator(
     #     task_id="data_validation",
-    #     body_filepath=f"{TEMPLATES_PATH}/spark_pod_template.yaml",
+    #     body_filepath=SPARK_POD_TEMPLATE,
     #     jinja_job_args={
     #         "project": GOOGLE_CLOUD_PROJECT,
     #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
