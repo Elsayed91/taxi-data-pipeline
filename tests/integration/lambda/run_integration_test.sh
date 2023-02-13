@@ -10,7 +10,7 @@ set -e
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 cd $SCRIPT_DIR
 
-cp -r ${SCRIPT_DIR}/../../../components/lambdafn/* ${SCRIPT_DIR}/files/
+cp -r ${SCRIPT_DIR}/../../../components/aws_lambda/* ${SCRIPT_DIR}/files/
 python -m pip install --target ${SCRIPT_DIR}/files -r ${SCRIPT_DIR}/files/requirements.txt
 
 SERVICES=lambda,iam,secretsmanager,s3,logs nohup localstack start &

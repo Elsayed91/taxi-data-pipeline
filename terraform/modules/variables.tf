@@ -199,10 +199,12 @@ variable "s3-secrets" {
       name          = string
       type          = string
       secret_string = string
+      key_id        = string
     }
   ))
   default = null
 }
+
 
 variable "project" {
   type = string

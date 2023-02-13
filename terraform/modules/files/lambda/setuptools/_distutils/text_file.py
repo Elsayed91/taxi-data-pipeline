@@ -67,13 +67,13 @@ class TextFile:
     not."""
 
     default_options = {
-        'strip_comments': 1,
-        'skip_blanks': 1,
-        'lstrip_ws': 0,
-        'rstrip_ws': 1,
-        'join_lines': 0,
-        'collapse_join': 0,
-        'errors': 'strict',
+        "strip_comments": 1,
+        "skip_blanks": 1,
+        "lstrip_ws": 0,
+        "rstrip_ws": 1,
+        "join_lines": 0,
+        "collapse_join": 0,
+        "errors": "strict",
     }
 
     def __init__(self, filename=None, file=None, **options):
@@ -171,16 +171,15 @@ class TextFile:
             del self.linebuf[-1]
             return line
 
-        buildup_line = ''
+        buildup_line = ""
 
         while True:
             # read the line, make it None if EOF
             line = self.file.readline()
-            if line == '':
+            if line == "":
                 line = None
 
             if self.strip_comments and line:
-
                 # Look for the first "#" in the line.  If none, never
                 # mind.  If we find one and it's the first character, or
                 # is not preceded by "\", then it starts a comment --
@@ -202,7 +201,7 @@ class TextFile:
                     # (NB. this means that if the final line is all comment
                     # and has no trailing newline, we will think that it's
                     # EOF; I think that's OK.)
-                    eol = (line[-1] == '\n') and '\n' or ''
+                    eol = (line[-1] == "\n") and "\n" or ""
                     line = line[0:pos] + eol
 
                     # If all that's left is whitespace, then skip line
@@ -255,16 +254,16 @@ class TextFile:
 
             # blank line (whether we rstrip'ed or not)? skip to next line
             # if appropriate
-            if (line == '' or line == '\n') and self.skip_blanks:
+            if line in ("", "\n") and self.skip_blanks:
                 continue
 
             if self.join_lines:
-                if line[-1] == '\\':
+                if line[-1] == "\\":
                     buildup_line = line[:-1]
                     continue
 
-                if line[-2:] == '\\\n':
-                    buildup_line = line[0:-2] + '\n'
+                if line[-2:] == "\\\n":
+                    buildup_line = line[0:-2] + "\n"
                     continue
 
             # well, I guess there's some actual content there: return it

@@ -3,10 +3,10 @@ Functionality:
 -   The function is triggered when an object is added to an S3 bucket. It retrieves the bucket name and
     object key from the event data, constructs an object URI in the format "s3://bucket_name/key".
 -   retrieves variables data (cluster data, DAG name, and namespace) from environment variables.
--   authenticates with Google Cloud Platform (GCP) using a service account key, and uses the Google 
-    Kubernetes Engine (GKE) API to retrieve information about a specific cluster and create a 
+-   authenticates with Google Cloud Platform (GCP) using a service account key, and uses the Google
+    Kubernetes Engine (GKE) API to retrieve information about a specific cluster and create a
     Kubernetes client configuration and subsequently a Kubernetes API client.
--   retrieves a list of pods in the specified namespace, and searches for a pod with a name containing 
+-   retrieves a list of pods in the specified namespace, and searches for a pod with a name containing
     "airflow". This is done as the airflow pod unlike the deployment, is usually suffixed randomly.
     If found, it uses the Kubernetes API to execute the command string on the pod to trigger a dag.
 

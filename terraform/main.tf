@@ -1,7 +1,10 @@
 
 locals {
   # sensitive_env = try({ for tuple in regexall("(.*?)=\"(.*)\"", file("${path.module}/../.env")) : tuple[0] => sensitive(tuple[1]) }, null)
-  envs = { for tuple in regexall("(.*?)=(\"|)(.*)(\"|)", file("${var.env_path}")) : tuple[0] => tuple[2] }
+  envs = (var.cicd == true ?
+    { for tuple in regexall("(.*?)=(\"|)(.*)(\"|)", file(".env")) : tuple[0] => tuple[2] } :
+    { for tuple in regexall("(.*?)=\"(.*)\"", file("${path.module}/../.env")) : tuple[0] => tuple[1] }
+  )
   #  (\"|) matches either " or nothing, and (\"|) matches either " or nothing. So the final
   #  regex matches either (.*?)="(.*)" or (.*?)=(.*).
   gcp = yamldecode(templatefile("${path.module}/configuration/gcp.yaml", local.envs))
@@ -24,5 +27,3 @@ module "project" {
   s3-buckets       = local.aws["S3"]
   lambda           = local.aws["LAMBDA"]
 }
-
-

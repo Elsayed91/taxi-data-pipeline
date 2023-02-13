@@ -4,9 +4,32 @@
 # - IAM policy for the Lambda role to access S3, SES, Secrets Manager
 # - Lambda function permissions to access an S3 bucket
 # - Package and zip code for the Lambda function
-# - Lambda function with specified name, code, role, runtime, and environment variables
+# - Lambda function with specified name, code, role, runtime, and environment # variables
 # - S3 bucket notification to trigger the Lambda function on object creation with a
 #   specific file suffix.
+#
+#
+# The original implementation was using hashing as shown in the resource below.
+# resource "null_resource" "pack-lambda" {
+#   for_each = { for idx, val in var.lambda : idx => val if var.lambda != null }
+#   triggers = {
+# hashed_content = jsonencode({ for fn in
+# fileset("${path.module}/${each.value.code_path}", "**") :
+#     fn => filesha256("${path.module}/${each.value.code_path}/${fn}") })
+#   }
+
+#   provisioner "local-exec" {
+#     interpreter = ["/bin/bash", "-c"]
+#     command     = "chmod +x ${path.module}/files/package_lambda.sh &&
+#     ${path.module}/files/package_lambda.sh ${path.module}/${each.value.code_path}"
+#   }
+# it used Terraform to determine changes in the Lambda code by hashing the contents of
+# the code files. This approach has been changed to use the AWS CLI + GITHUB ACTIONS for
+# CI/CD purposes. Terraform will now only be used to track changes in the Lambda
+# configuration, not the code itself.
+
+
+
 
 resource "aws_iam_role" "lambda_role" {
   name = "iam_for_lambda_tf"
@@ -61,19 +84,27 @@ resource "aws_lambda_permission" "allow_bucket" {
   source_arn    = "arn:aws:s3:::${each.value.trigger_bucket}"
 }
 
+
 resource "null_resource" "pack-lambda" {
   for_each = { for idx, val in var.lambda : idx => val if var.lambda != null }
   triggers = {
-    hashed_content = jsonencode({ for fn in fileset("${path.module}/${each.value.code_path}", "**") :
-    fn => filesha256("${path.module}/${each.value.code_path}/${fn}") })
+    always_run = timestamp()
   }
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command     = "chmod +x ${path.module}/files/package_lambda.sh && ${path.module}/files/package_lambda.sh ${path.module}/${each.value.code_path}"
+    command     = <<-EOT
+      set -e
+      DIR="${path.module}/files/lambda"
+      mkdir -p $DIR
+      rm -rf $DIR/*
+      cp -r ${path.module}/${each.value.code_path}/* $DIR
+      python -m pip install --target $DIR -r $DIR/requirements.txt
+    EOT
   }
-
 }
+
+
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
@@ -84,12 +115,11 @@ data "archive_file" "lambda_zip" {
   ]
 }
 
-
 resource "aws_lambda_function" "lambda_func" {
   for_each         = { for idx, val in var.lambda : idx => val if val.trigger_bucket != null }
   function_name    = each.value.name
   filename         = "${path.module}/files/lambda.zip"
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256 # filebase64sha256("${path.module}/files/lambda.zip")
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   role             = aws_iam_role.lambda_role.arn
   runtime          = "python3.9"
   handler          = "main.lambda_handler"
@@ -152,3 +182,5 @@ resource "aws_iam_role_policy_attachment" "function_logging_policy_attachment" {
   role       = aws_iam_role.lambda_role.id
   policy_arn = aws_iam_policy.function_logging_policy.arn
 }
+
+#

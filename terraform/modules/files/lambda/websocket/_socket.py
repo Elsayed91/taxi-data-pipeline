@@ -37,12 +37,18 @@ if hasattr(socket, "TCP_KEEPCNT"):
 
 _default_timeout = None
 
-__all__ = ["DEFAULT_SOCKET_OPTION", "sock_opt", "setdefaulttimeout", "getdefaulttimeout",
-           "recv", "recv_line", "send"]
+__all__ = [
+    "DEFAULT_SOCKET_OPTION",
+    "sock_opt",
+    "setdefaulttimeout",
+    "getdefaulttimeout",
+    "recv",
+    "recv_line",
+    "send",
+]
 
 
 class sock_opt:
-
     def __init__(self, sockopt, sslopt):
         if sockopt is None:
             sockopt = []
@@ -113,14 +119,13 @@ def recv(sock, bufsize):
         raise WebSocketTimeoutException(message)
     except SSLError as e:
         message = extract_err_message(e)
-        if isinstance(message, str) and 'timed out' in message:
+        if isinstance(message, str) and "timed out" in message:
             raise WebSocketTimeoutException(message)
         else:
             raise
 
     if not bytes_:
-        raise WebSocketConnectionClosedException(
-            "Connection to remote host was lost.")
+        raise WebSocketConnectionClosedException("Connection to remote host was lost.")
 
     return bytes_
 
@@ -130,14 +135,14 @@ def recv_line(sock):
     while True:
         c = recv(sock, 1)
         line.append(c)
-        if c == b'\n':
+        if c == b"\n":
             break
-    return b''.join(line)
+    return b"".join(line)
 
 
 def send(sock, data):
     if isinstance(data, str):
-        data = data.encode('utf-8')
+        data = data.encode("utf-8")
 
     if not sock:
         raise WebSocketConnectionClosedException("socket is already closed.")
@@ -151,7 +156,7 @@ def send(sock, data):
             error_code = extract_error_code(exc)
             if error_code is None:
                 raise
-            if error_code != errno.EAGAIN or error_code != errno.EWOULDBLOCK:
+            if error_code != errno.EAGAIN and error_code != errno.EWOULDBLOCK:
                 raise
 
         sel = selectors.DefaultSelector()

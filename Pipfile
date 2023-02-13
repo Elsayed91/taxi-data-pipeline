@@ -19,8 +19,8 @@ google-api-python-client = "*"
 kubernetes = "==25.3.0"
 aws-lambda-typing = "==2.16.3"
 boto3 = "*"
-black = "*"
-isort = "*"
+
+
 
 [dev-packages]
 pytest = "*"
@@ -28,6 +28,11 @@ pytest-spark = "*"
 python-dotenv = "*"
 pylint = "*"
 pytest-mock = "*"
+yamlfix = "*"
+sqlfluff = "*"
+pre-commit = "*"
+isort = "*"
+black = "*"
 
 [requires]
 python_version = "3.10"

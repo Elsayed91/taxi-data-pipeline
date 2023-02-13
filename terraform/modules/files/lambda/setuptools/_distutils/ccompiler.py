@@ -6,6 +6,7 @@ for the Distutils compiler abstraction model."""
 import sys
 import os
 import re
+import warnings
 
 from .errors import (
     CompileError,
@@ -358,9 +359,9 @@ class CCompiler:
 
     def _get_cc_args(self, pp_opts, debug, before):
         # works for unixccompiler, cygwinccompiler
-        cc_args = pp_opts + ['-c']
+        cc_args = pp_opts + ["-c"]
         if debug:
-            cc_args[:0] = ['-g']
+            cc_args[:0] = ["-g"]
         if before:
             cc_args[:0] = before
         return cc_args
@@ -388,7 +389,7 @@ class CCompiler:
             raise TypeError("'macros' (if supplied) must be a list of tuples")
 
         if include_dirs is None:
-            include_dirs = self.include_dirs
+            include_dirs = list(self.include_dirs)
         elif isinstance(include_dirs, (list, tuple)):
             include_dirs = list(include_dirs) + (self.include_dirs or [])
         else:
@@ -477,7 +478,7 @@ class CCompiler:
             return True
         else:
             if self.dry_run:
-                newer = newer_group(objects, output_file, missing='newer')
+                newer = newer_group(objects, output_file, missing="newer")
             else:
                 newer = newer_group(objects, output_file)
             return newer
@@ -720,7 +721,7 @@ class CCompiler:
         self.link(
             CCompiler.SHARED_LIBRARY,
             objects,
-            self.library_filename(output_libname, lib_type='shared'),
+            self.library_filename(output_libname, lib_type="shared"),
             output_dir,
             libraries,
             library_dirs,
@@ -824,9 +825,19 @@ class CCompiler:
         libraries=None,
         library_dirs=None,
     ):
-        """Return a boolean indicating whether funcname is supported on
-        the current platform.  The optional arguments can be used to
-        augment the compilation environment.
+        """Return a boolean indicating whether funcname is provided as
+        a symbol on the current platform.  The optional arguments can
+        be used to augment the compilation environment.
+
+        The libraries argument is a list of flags to be passed to the
+        linker to make additional symbol definitions available for
+        linking.
+
+        The includes and include_dirs arguments are deprecated.
+        Usually, supplying include files with function declarations
+        will cause function detection to fail even in cases where the
+        symbol is available for linking.
+
         """
         # this can't be included at module scope because it tries to
         # import math which might not be available at that point - maybe
@@ -835,8 +846,12 @@ class CCompiler:
 
         if includes is None:
             includes = []
+        else:
+            warnings.warn("includes is deprecated", DeprecationWarning)
         if include_dirs is None:
             include_dirs = []
+        else:
+            warnings.warn("include_dirs is deprecated", DeprecationWarning)
         if libraries is None:
             libraries = []
         if library_dirs is None:
@@ -845,7 +860,24 @@ class CCompiler:
         f = os.fdopen(fd, "w")
         try:
             for incl in includes:
-                f.write("""#include "%s"\n""" % incl)
+                f.write("""#include %s\n""" % incl)
+            if not includes:
+                # Use "char func(void);" as the prototype to follow
+                # what autoconf does.  This prototype does not match
+                # any well-known function the compiler might recognize
+                # as a builtin, so this ends up as a true link test.
+                # Without a fake prototype, the test would need to
+                # know the exact argument types, and the has_function
+                # interface does not provide that level of information.
+                f.write(
+                    """\
+#ifdef __cplusplus
+extern "C"
+#endif
+char %s(void);
+"""
+                    % funcname
+                )
             f.write(
                 """\
 int main (int argc, char **argv) {
@@ -871,7 +903,9 @@ int main (int argc, char **argv) {
         except (LinkError, TypeError):
             return False
         else:
-            os.remove(os.path.join(self.output_dir or '', "a.out"))
+            os.remove(
+                self.executable_filename("a.out", output_dir=self.output_dir or "")
+            )
         finally:
             for fn in objects:
                 os.remove(fn)
@@ -920,9 +954,9 @@ int main (int argc, char **argv) {
     #   * exe_extension -
     #     extension for executable files, eg. '' or '.exe'
 
-    def object_filenames(self, source_filenames, strip_dir=0, output_dir=''):
+    def object_filenames(self, source_filenames, strip_dir=0, output_dir=""):
         if output_dir is None:
-            output_dir = ''
+            output_dir = ""
         return list(
             self._make_out_path(output_dir, strip_dir, src_name)
             for src_name in source_filenames
@@ -957,20 +991,20 @@ int main (int argc, char **argv) {
         # If abs, chop off leading /
         return no_drive[os.path.isabs(no_drive) :]
 
-    def shared_object_filename(self, basename, strip_dir=0, output_dir=''):
+    def shared_object_filename(self, basename, strip_dir=0, output_dir=""):
         assert output_dir is not None
         if strip_dir:
             basename = os.path.basename(basename)
         return os.path.join(output_dir, basename + self.shared_lib_extension)
 
-    def executable_filename(self, basename, strip_dir=0, output_dir=''):
+    def executable_filename(self, basename, strip_dir=0, output_dir=""):
         assert output_dir is not None
         if strip_dir:
             basename = os.path.basename(basename)
-        return os.path.join(output_dir, basename + (self.exe_extension or ''))
+        return os.path.join(output_dir, basename + (self.exe_extension or ""))
 
     def library_filename(
-        self, libname, lib_type='static', strip_dir=0, output_dir=''  # or 'shared'
+        self, libname, lib_type="static", strip_dir=0, output_dir=""  # or 'shared'
     ):
         assert output_dir is not None
         expected = '"static", "shared", "dylib", "xcode_stub"'
@@ -982,7 +1016,7 @@ int main (int argc, char **argv) {
         dir, base = os.path.split(libname)
         filename = fmt % (base, ext)
         if strip_dir:
-            dir = ''
+            dir = ""
 
         return os.path.join(output_dir, dir, filename)
 
@@ -1021,10 +1055,10 @@ _default_compilers = (
     # Platform string mappings
     # on a cygwin built python we can use gcc like an ordinary UNIXish
     # compiler
-    ('cygwin.*', 'unix'),
+    ("cygwin.*", "unix"),
     # OS name mappings
-    ('posix', 'unix'),
-    ('nt', 'msvc'),
+    ("posix", "unix"),
+    ("nt", "msvc"),
 )
 
 
@@ -1049,26 +1083,26 @@ def get_default_compiler(osname=None, platform=None):
         ):
             return compiler
     # Default to Unix compiler
-    return 'unix'
+    return "unix"
 
 
 # Map compiler types to (module_name, class_name) pairs -- ie. where to
 # find the code that implements an interface to this compiler.  (The module
 # is assumed to be in the 'distutils' package.)
 compiler_class = {
-    'unix': ('unixccompiler', 'UnixCCompiler', "standard UNIX-style compiler"),
-    'msvc': ('_msvccompiler', 'MSVCCompiler', "Microsoft Visual C++"),
-    'cygwin': (
-        'cygwinccompiler',
-        'CygwinCCompiler',
+    "unix": ("unixccompiler", "UnixCCompiler", "standard UNIX-style compiler"),
+    "msvc": ("_msvccompiler", "MSVCCompiler", "Microsoft Visual C++"),
+    "cygwin": (
+        "cygwinccompiler",
+        "CygwinCCompiler",
         "Cygwin port of GNU C Compiler for Win32",
     ),
-    'mingw32': (
-        'cygwinccompiler',
-        'Mingw32CCompiler',
+    "mingw32": (
+        "cygwinccompiler",
+        "Mingw32CCompiler",
         "Mingw32 port of GNU C Compiler for Win32",
     ),
-    'bcpp': ('bcppcompiler', 'BCPPCompiler', "Borland C++ Compiler"),
+    "bcpp": ("bcppcompiler", "BCPPCompiler", "Borland C++ Compiler"),
 }
 
 

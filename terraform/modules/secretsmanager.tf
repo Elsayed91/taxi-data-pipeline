@@ -1,6 +1,6 @@
-# Note that normally you want the secrets rotated at fixed intervals, this is 
+# Note that normally you want the secrets rotated at fixed intervals, this is
 # usually done witha lambda function, however due to billing concerns of create
-# and forget on AWS, I have set it to auto delete in 30 days for the project's 
+# and forget on AWS, I have set it to auto delete in 30 days for the project's
 # purposes.
 # creates AWS Secrets Manager secrets. The `aws_secretsmanager_secret` block creates the
 # secrets, with a name specified from the `var.s3-secrets` map and a recovery window of 30
@@ -19,8 +19,7 @@ resource "aws_secretsmanager_secret" "secret" {
 resource "aws_secretsmanager_secret_version" "secret_content" {
   for_each      = { for idx, secret in var.s3-secrets : idx => secret if var.s3-secrets != null }
   secret_id     = aws_secretsmanager_secret.secret[each.key].id
-  secret_string = each.value.type == "string" ? each.value.secret_string : file("${path.module}/${each.value.secret_string}")
-  depends_on    = [local_file.key_out]
+  secret_string = base64decode(google_service_account_key.key[each.value.key_id].private_key)
 }
 
 # resource "aws_lambda_function" "rotation_lambda" {
@@ -30,7 +29,7 @@ resource "aws_secretsmanager_secret_version" "secret_content" {
 #   handler       = "exports.handler"
 #   runtime       = "nodejs12.x"
 
-#   environment { 
+#   environment {
 #     variables = {
 #       EXAMPLE_VAR = "example value"
 #     }

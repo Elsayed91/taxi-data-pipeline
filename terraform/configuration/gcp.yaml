@@ -28,7 +28,7 @@ IAM:
       title: "LambdaRole"
       permissions: ["container.clusters.update", "container.operations.get"]
 BIGQUERY:
-  datasets: 
+  datasets:
     - dataset_id: "${STAGING_DATASET}"
       tables:
         - table_id: "${YELLOW_STAGING_TABLE}"
@@ -90,7 +90,7 @@ GKE:
     - name: "${SPARK_JOBS_NODE_POOL}"
       cluster: "${GKE_CLUSTER_NAME}"
       node_count: ~
-      autoscaling: 
+      autoscaling:
         min_node_count: 0
         max_node_count: 7
       node_config:
@@ -100,7 +100,7 @@ GKE:
     - name: "${BASE_NODE_POOL}"
       cluster: "${GKE_CLUSTER_NAME}"
       node_count: ~
-      autoscaling: 
+      autoscaling:
         min_node_count: 0
         max_node_count: 4
       node_config:
@@ -110,11 +110,10 @@ GKE:
     - name: "${TRAINING_NODE_POOL}"
       cluster: "${GKE_CLUSTER_NAME}"
       node_count: ~
-      autoscaling: 
+      autoscaling:
         min_node_count: 0
         max_node_count: 1
       node_config:
         machine_type: "n2-standard-4"
         disk_size_gb: 50
         service_account: "${CLUSTER_SA}@${PROJECT}.iam.gserviceaccount.com"
- 

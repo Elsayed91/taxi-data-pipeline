@@ -44,7 +44,7 @@ def mkpath(name, mode=0o777, verbose=1, dry_run=0):  # noqa: C901
 
     name = os.path.normpath(name)
     created_dirs = []
-    if os.path.isdir(name) or name == '':
+    if os.path.isdir(name) or name == "":
         return created_dirs
     if _path_created.get(os.path.abspath(name)):
         return created_dirs
@@ -156,7 +156,7 @@ def copy_tree(  # noqa: C901
         src_name = os.path.join(src, n)
         dst_name = os.path.join(dst, n)
 
-        if n.startswith('.nfs'):
+        if n.startswith(".nfs"):
             # skip NFS rename files
             continue
 
@@ -227,7 +227,7 @@ def remove_tree(directory, verbose=1, dry_run=0):
             # remove dir from cache if it's already there
             abspath = os.path.abspath(cmd[1])
             if abspath in _path_created:
-                del _path_created[abspath]
+                _path_created.pop(abspath)
         except OSError as exc:
             log.warning("error removing %s: %s", directory, exc)
 

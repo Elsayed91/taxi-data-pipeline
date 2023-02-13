@@ -29,21 +29,21 @@ from ._collections import RangeMap
 _msvcr_lookup = RangeMap.left(
     {
         # MSVC 7.0
-        1300: ['msvcr70'],
+        1300: ["msvcr70"],
         # MSVC 7.1
-        1310: ['msvcr71'],
+        1310: ["msvcr71"],
         # VS2005 / MSVC 8.0
-        1400: ['msvcr80'],
+        1400: ["msvcr80"],
         # VS2008 / MSVC 9.0
-        1500: ['msvcr90'],
+        1500: ["msvcr90"],
         # VS2010 / MSVC 10.0
-        1600: ['msvcr100'],
+        1600: ["msvcr100"],
         # VS2012 / MSVC 11.0
-        1700: ['msvcr110'],
+        1700: ["msvcr110"],
         # VS2013 / MSVC 12.0
-        1800: ['msvcr120'],
+        1800: ["msvcr120"],
         # VS2015 / MSVC 14.0
-        1900: ['ucrt', 'vcruntime140'],
+        1900: ["vcruntime140"],
         2000: RangeMap.undefined_value,
     },
 )
@@ -53,7 +53,7 @@ def get_msvcr():
     """Include the appropriate MSVC runtime library if Python was built
     with MSVC 7.0 or later.
     """
-    match = re.search(r'MSC v\.(\d{4})', sys.version)
+    match = re.search(r"MSC v\.(\d{4})", sys.version)
     try:
         msc_ver = int(match.group(1))
     except AttributeError:
@@ -73,7 +73,7 @@ _runtime_library_dirs_msg = (
 class CygwinCCompiler(UnixCCompiler):
     """Handles the Cygwin port of the GNU C compiler to Windows."""
 
-    compiler_type = 'cygwin'
+    compiler_type = "cygwin"
     obj_extension = ".o"
     static_lib_extension = ".a"
     shared_lib_extension = ".dll.a"
@@ -84,7 +84,6 @@ class CygwinCCompiler(UnixCCompiler):
     exe_extension = ".exe"
 
     def __init__(self, verbose=0, dry_run=0, force=0):
-
         super().__init__(verbose, dry_run, force)
 
         status, details = check_config_h()
@@ -98,18 +97,18 @@ class CygwinCCompiler(UnixCCompiler):
                 "Compiling may fail because of undefined preprocessor macros." % details
             )
 
-        self.cc = os.environ.get('CC', 'gcc')
-        self.cxx = os.environ.get('CXX', 'g++')
+        self.cc = os.environ.get("CC", "gcc")
+        self.cxx = os.environ.get("CXX", "g++")
 
         self.linker_dll = self.cc
         shared_option = "-shared"
 
         self.set_executables(
-            compiler='%s -mcygwin -O -Wall' % self.cc,
-            compiler_so='%s -mcygwin -mdll -O -Wall' % self.cc,
-            compiler_cxx='%s -mcygwin -O -Wall' % self.cxx,
-            linker_exe='%s -mcygwin' % self.cc,
-            linker_so=('{} -mcygwin {}'.format(self.linker_dll, shared_option)),
+            compiler="%s -mcygwin -O -Wall" % self.cc,
+            compiler_so="%s -mcygwin -mdll -O -Wall" % self.cc,
+            compiler_cxx="%s -mcygwin -O -Wall" % self.cxx,
+            linker_exe="%s -mcygwin" % self.cc,
+            linker_so=("{} -mcygwin {}".format(self.linker_dll, shared_option)),
         )
 
         # Include the appropriate MSVC runtime library if Python was built
@@ -118,7 +117,7 @@ class CygwinCCompiler(UnixCCompiler):
 
     @property
     def gcc_version(self):
-        # Older numpy dependend on this existing to check for ancient
+        # Older numpy depended on this existing to check for ancient
         # gcc versions. This doesn't make much sense with clang etc so
         # just hardcode to something recent.
         # https://github.com/numpy/numpy/pull/20333
@@ -133,7 +132,7 @@ class CygwinCCompiler(UnixCCompiler):
 
     def _compile(self, obj, src, ext, cc_args, extra_postargs, pp_opts):
         """Compiles the source by spawning GCC and windres if needed."""
-        if ext == '.rc' or ext == '.res':
+        if ext in (".rc", ".res"):
             # gcc needs '.res' and '.rc' compiled to object files !!!
             try:
                 self.spawn(["windres", "-i", src, "-o", obj])
@@ -142,7 +141,7 @@ class CygwinCCompiler(UnixCCompiler):
         else:  # for other files use the C-compiler
             try:
                 self.spawn(
-                    self.compiler_so + cc_args + [src, '-o', obj] + extra_postargs
+                    self.compiler_so + cc_args + [src, "-o", obj] + extra_postargs
                 )
             except DistutilsExecError as msg:
                 raise CompileError(msg)
@@ -258,7 +257,7 @@ class CygwinCCompiler(UnixCCompiler):
         """
         return {
             **super().out_extensions,
-            **{ext: ext + self.obj_extension for ext in ('.res', '.rc')},
+            **{ext: ext + self.obj_extension for ext in (".res", ".rc")},
         }
 
 
@@ -266,23 +265,22 @@ class CygwinCCompiler(UnixCCompiler):
 class Mingw32CCompiler(CygwinCCompiler):
     """Handles the Mingw32 port of the GNU C compiler to Windows."""
 
-    compiler_type = 'mingw32'
+    compiler_type = "mingw32"
 
     def __init__(self, verbose=0, dry_run=0, force=0):
-
         super().__init__(verbose, dry_run, force)
 
         shared_option = "-shared"
 
         if is_cygwincc(self.cc):
-            raise CCompilerError('Cygwin gcc cannot be used with --compiler=mingw32')
+            raise CCompilerError("Cygwin gcc cannot be used with --compiler=mingw32")
 
         self.set_executables(
-            compiler='%s -O -Wall' % self.cc,
-            compiler_so='%s -mdll -O -Wall' % self.cc,
-            compiler_cxx='%s -O -Wall' % self.cxx,
-            linker_exe='%s' % self.cc,
-            linker_so='{} {}'.format(self.linker_dll, shared_option),
+            compiler="%s -O -Wall" % self.cc,
+            compiler_so="%s -mdll -O -Wall" % self.cc,
+            compiler_cxx="%s -O -Wall" % self.cxx,
+            linker_exe="%s" % self.cc,
+            linker_so="{} {}".format(self.linker_dll, shared_option),
         )
 
     def runtime_library_dir_option(self, dir):
@@ -346,9 +344,9 @@ def check_config_h():
 
 
 def is_cygwincc(cc):
-    '''Try to determine if the compiler that would be used is from cygwin.'''
-    out_string = check_output(shlex.split(cc) + ['-dumpmachine'])
-    return out_string.strip().endswith(b'cygwin')
+    """Try to determine if the compiler that would be used is from cygwin."""
+    out_string = check_output(shlex.split(cc) + ["-dumpmachine"])
+    return out_string.strip().endswith(b"cygwin")
 
 
 get_versions = None

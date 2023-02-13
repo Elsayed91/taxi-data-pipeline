@@ -41,7 +41,7 @@ class BCPPCompiler(CCompiler):
     compiler, as defined by the CCompiler abstract class.
     """
 
-    compiler_type = 'bcpp'
+    compiler_type = "bcpp"
 
     # Just set this so CCompiler's constructor doesn't barf.  We currently
     # don't use the 'set_executables()' bureaucracy provided by CCompiler,
@@ -51,20 +51,19 @@ class BCPPCompiler(CCompiler):
     executables = {}
 
     # Private class data (need to distinguish C from C++ source for compiler)
-    _c_extensions = ['.c']
-    _cpp_extensions = ['.cc', '.cpp', '.cxx']
+    _c_extensions = [".c"]
+    _cpp_extensions = [".cc", ".cpp", ".cxx"]
 
     # Needed for the filename generation methods provided by the
     # base class, CCompiler.
     src_extensions = _c_extensions + _cpp_extensions
-    obj_extension = '.obj'
-    static_lib_extension = '.lib'
-    shared_lib_extension = '.dll'
-    static_lib_format = shared_lib_format = '%s%s'
-    exe_extension = '.exe'
+    obj_extension = ".obj"
+    static_lib_extension = ".lib"
+    shared_lib_extension = ".dll"
+    static_lib_format = shared_lib_format = "%s%s"
+    exe_extension = ".exe"
 
     def __init__(self, verbose=0, dry_run=0, force=0):
-
         super().__init__(verbose, dry_run, force)
 
         # These executables are assumed to all be in the path.
@@ -76,14 +75,14 @@ class BCPPCompiler(CCompiler):
         self.lib = "tlib.exe"
 
         self.preprocess_options = None
-        self.compile_options = ['/tWM', '/O2', '/q', '/g0']
-        self.compile_options_debug = ['/tWM', '/Od', '/q', '/g0']
+        self.compile_options = ["/tWM", "/O2", "/q", "/g0"]
+        self.compile_options_debug = ["/tWM", "/Od", "/q", "/g0"]
 
-        self.ldflags_shared = ['/Tpd', '/Gn', '/q', '/x']
-        self.ldflags_shared_debug = ['/Tpd', '/Gn', '/q', '/x']
+        self.ldflags_shared = ["/Tpd", "/Gn", "/q", "/x"]
+        self.ldflags_shared_debug = ["/Tpd", "/Gn", "/q", "/x"]
         self.ldflags_static = []
-        self.ldflags_exe = ['/Gn', '/q', '/x']
-        self.ldflags_exe_debug = ['/Gn', '/q', '/x', '/r']
+        self.ldflags_exe = ["/Gn", "/q", "/x"]
+        self.ldflags_exe_debug = ["/Gn", "/q", "/x", "/r"]
 
     # -- Worker methods ------------------------------------------------
 
@@ -98,12 +97,11 @@ class BCPPCompiler(CCompiler):
         extra_postargs=None,
         depends=None,
     ):
-
         macros, objects, extra_postargs, pp_opts, build = self._setup_compile(
             output_dir, macros, include_dirs, sources, depends, extra_postargs
         )
         compile_opts = extra_preargs or []
-        compile_opts.append('-c')
+        compile_opts.append("-c")
         if debug:
             compile_opts.extend(self.compile_options_debug)
         else:
@@ -121,10 +119,10 @@ class BCPPCompiler(CCompiler):
             # Is it possible to skip the normpath?
             self.mkpath(os.path.dirname(obj))
 
-            if ext == '.res':
+            if ext == ".res":
                 # This is already a binary file -- skip it.
                 continue  # the 'for' loop
-            if ext == '.rc':
+            if ext == ".rc":
                 # This needs to be compiled to a .res file -- do it now.
                 try:
                     self.spawn(["brcc32", "-fo", obj, src])
@@ -167,12 +165,11 @@ class BCPPCompiler(CCompiler):
     def create_static_lib(
         self, objects, output_libname, output_dir=None, debug=0, target_lang=None
     ):
-
         (objects, output_dir) = self._fix_object_args(objects, output_dir)
         output_filename = self.library_filename(output_libname, output_dir=output_dir)
 
         if self._need_link(objects, output_filename):
-            lib_args = [output_filename, '/u'] + objects
+            lib_args = [output_filename, "/u"] + objects
             if debug:
                 pass  # XXX what goes here?
             try:
@@ -200,7 +197,6 @@ class BCPPCompiler(CCompiler):
         build_temp=None,
         target_lang=None,
     ):
-
         # XXX this ignores 'build_temp'!  should follow the lead of
         # msvccompiler.py
 
@@ -219,16 +215,15 @@ class BCPPCompiler(CCompiler):
             output_filename = os.path.join(output_dir, output_filename)
 
         if self._need_link(objects, output_filename):
-
             # Figure out linker args based on type of target.
             if target_desc == CCompiler.EXECUTABLE:
-                startup_obj = 'c0w32'
+                startup_obj = "c0w32"
                 if debug:
                     ld_args = self.ldflags_exe_debug[:]
                 else:
                     ld_args = self.ldflags_exe[:]
             else:
-                startup_obj = 'c0d32'
+                startup_obj = "c0d32"
                 if debug:
                     ld_args = self.ldflags_shared_debug[:]
                 else:
@@ -236,15 +231,15 @@ class BCPPCompiler(CCompiler):
 
             # Create a temporary exports file for use by the linker
             if export_symbols is None:
-                def_file = ''
+                def_file = ""
             else:
                 head, tail = os.path.split(output_filename)
                 modname, ext = os.path.splitext(tail)
                 temp_dir = os.path.dirname(objects[0])  # preserve tree structure
-                def_file = os.path.join(temp_dir, '%s.def' % modname)
-                contents = ['EXPORTS']
+                def_file = os.path.join(temp_dir, "%s.def" % modname)
+                contents = ["EXPORTS"]
                 for sym in export_symbols or []:
-                    contents.append('  {}=_{}'.format(sym, sym))
+                    contents.append("  {}=_{}".format(sym, sym))
                 self.execute(write_file, (def_file, contents), "writing %s" % def_file)
 
             # Borland C++ has problems with '/' in paths
@@ -255,7 +250,7 @@ class BCPPCompiler(CCompiler):
             resources = []
             for file in objects2:
                 (base, ext) = os.path.splitext(os.path.normcase(file))
-                if ext == '.res':
+                if ext == ".res":
                     resources.append(file)
                 else:
                     objects.append(file)
@@ -278,9 +273,9 @@ class BCPPCompiler(CCompiler):
             # them.  Arghghh!.  Apparently it works fine as coded...
 
             # name of dll/exe file
-            ld_args.extend([',', output_filename])
+            ld_args.extend([",", output_filename])
             # no map file and start libraries
-            ld_args.append(',,')
+            ld_args.append(",,")
 
             for lib in libraries:
                 # see if we find it and if there is a bcpp specific lib
@@ -294,13 +289,12 @@ class BCPPCompiler(CCompiler):
                     ld_args.append(libfile)
 
             # some default libraries
-            ld_args.append('import32')
-            ld_args.append('cw32mt')
+            ld_args.extend(("import32", "cw32mt"))
 
             # def file for export symbols
-            ld_args.extend([',', def_file])
+            ld_args.extend([",", def_file])
             # add resource files
-            ld_args.append(',')
+            ld_args.append(",")
             ld_args.extend(resources)
 
             if extra_preargs:
@@ -347,25 +341,25 @@ class BCPPCompiler(CCompiler):
             return None
 
     # overwrite the one from CCompiler to support rc and res-files
-    def object_filenames(self, source_filenames, strip_dir=0, output_dir=''):
+    def object_filenames(self, source_filenames, strip_dir=0, output_dir=""):
         if output_dir is None:
-            output_dir = ''
+            output_dir = ""
         obj_names = []
         for src_name in source_filenames:
             # use normcase to make sure '.rc' is really '.rc' and not '.RC'
             (base, ext) = os.path.splitext(os.path.normcase(src_name))
-            if ext not in (self.src_extensions + ['.rc', '.res']):
+            if ext not in (self.src_extensions + [".rc", ".res"]):
                 raise UnknownFileError(
                     "unknown file type '{}' (from '{}')".format(ext, src_name)
                 )
             if strip_dir:
                 base = os.path.basename(base)
-            if ext == '.res':
+            if ext == ".res":
                 # these can go unchanged
                 obj_names.append(os.path.join(output_dir, base + ext))
-            elif ext == '.rc':
+            elif ext == ".rc":
                 # these need to be compiled to .res-files
-                obj_names.append(os.path.join(output_dir, base + '.res'))
+                obj_names.append(os.path.join(output_dir, base + ".res"))
             else:
                 obj_names.append(os.path.join(output_dir, base + self.obj_extension))
         return obj_names
@@ -381,12 +375,11 @@ class BCPPCompiler(CCompiler):
         extra_preargs=None,
         extra_postargs=None,
     ):
-
         (_, macros, include_dirs) = self._fix_compile_args(None, macros, include_dirs)
         pp_opts = gen_preprocess_options(macros, include_dirs)
-        pp_args = ['cpp32.exe'] + pp_opts
+        pp_args = ["cpp32.exe"] + pp_opts
         if output_file is not None:
-            pp_args.append('-o' + output_file)
+            pp_args.append("-o" + output_file)
         if extra_preargs:
             pp_args[:0] = extra_preargs
         if extra_postargs:

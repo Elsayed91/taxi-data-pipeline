@@ -1,3 +1,16 @@
+"""
+This module provides a ConfigLoader class for loading and parsing YAML configuration files
+and substituting the values of environmental variables. The environmental variables must
+match the format "${VARIABLE}" to be substituted. The class has methods for loading the
+configuration and writing the processed data to a YAML file.
+
+Additionally, the module also has a function retrieve_nested_value that can be used to
+retrieve the value associated with a given key in a nested dictionary. The function takes
+a dictionary and the key of interest as input and returns the associated value.
+
+A custom exception, ValidationError, is also defined in the module for indicating
+unsuccessful validation.
+"""
 import os
 import yaml
 from typing import Any

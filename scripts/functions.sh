@@ -62,7 +62,8 @@ gitpush() {
 
 kill_failed() {
     local namespace=${1:-default}
-    local pods=$(kubectl get pods -n $namespace | grep -E "Error|CrashLoopBackOff|Completed|ImagePullBackOff" | cut -d' ' -f 1)
+    pods=$(kubectl get pods -n "$namespace" | grep -E "Error|CrashLoopBackOff|Completed|ImagePullBackOff" | cut -d' ' -f 1)
+    local pods=($pods)
     if [ -n "$pods" ]; then
         kubectl delete pod $pods
     fi

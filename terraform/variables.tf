@@ -1,4 +1,4 @@
-variable "env_path" {
-  type    = string
-  default = "./../.env"
+variable "cicd" {
+  type    = bool
+  default = false
 }
