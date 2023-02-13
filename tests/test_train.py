@@ -13,9 +13,8 @@ table = os.getenv("SEEDS_TABLE", "seed_zones")
 
 
 def test_load_data():
-    sample_size = 20
-    query = f"""SELECT * FROM `{dataset}`.`{table}` 
-                WHERE RAND() < 0.1"""
+    sample_size = 10
+    query = f"""SELECT * FROM `{dataset}`.`{table}`"""
     df = load_data(query=query, sample_size=sample_size)
 
     # Test the shape of the returned DataFrame
