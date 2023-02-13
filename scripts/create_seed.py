@@ -1,14 +1,14 @@
 """
 - This module converts shapefiles of taxi zones in New York City to a CSV file containing
-relevant information on the zones. 
+relevant information on the zones.
 - The shapefile is read using the shapefile library and the resulting data is processed and
-stored in a pandas DataFrame. 
+stored in a pandas DataFrame.
 - The DataFrame is then exported as a CSV file, containing the following columns:
-"LocationID", "borough", "zone", "longitude", and "latitude". 
+"LocationID", "borough", "zone", "longitude", and "latitude".
 - The get_lat_lon function is used to extract the longitude and latitude values of each
 zone based on its shape data.
 - This is used to create a seed file for DBT.
-- The shapedata can be found online and you can use a tool/website like disq.us to 
+- The shapedata can be found online and you can use a tool/website like disq.us to
 conver it to proper coordinates format.
 Reference for processing shapefile: https://chih-ling-hsu.github.io/2018/05/14/NYC
 """
@@ -60,41 +60,3 @@ seed = pd.DataFrame(shp_attr).join(
 seed = seed[["LocationID", "borough", "zone", "longitude", "latitude"]]
 
 seed.to_csv(target_path, index=False)
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
