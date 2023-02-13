@@ -72,34 +72,34 @@ with DAG(
     SPARK_JOBS_NODE_POOL = os.getenv("SPARK_JOBS_NODE_POOL")
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
     TRAINING_NODE_POOL = os.getenv("TRAINING_NODE_POOL")
-    # t1 = KubernetesJobOperator(
-    #     task_id="aws_to_gcs",
-    #     body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
-    #     command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
-    #     arguments=[
-    #         "--data-source",
-    #         "{{ dag_run.conf.URI }}",
-    #         "--destination",
-    #         f"gs://{STAGING_BUCKET}/{{{{ dag_run.conf.CATEGORY }}}}",
-    #         "--creds-file",
-    #         "/etc/aws/aws_creds.json",
-    #         "--check-exists",
-    #     ],
-    #     jinja_job_args={
-    #         "image": "google/cloud-sdk:alpine",
-    #         "name": "aws-to-gcs",
-    #         "gitsync": True,
-    #         "nodeSelector": BASE_NODE_POOL,
-    #         "volumes": [
-    #             {
-    #                 "name": "aws-creds",
-    #                 "type": "secret",
-    #                 "reference": "aws-creds",
-    #                 "mountPath": "/etc/aws",
-    #             }
-    #         ],
-    #     },
-    # )
+    t1 = KubernetesJobOperator(
+        task_id="aws_to_gcs",
+        body_filepath=f"{TEMPLATES_PATH}/pod_template.yaml",
+        command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
+        arguments=[
+            "--data-source",
+            "{{ dag_run.conf.URI }}",
+            "--destination",
+            f"gs://{STAGING_BUCKET}/{{{{ dag_run.conf.CATEGORY }}}}",
+            "--creds-file",
+            "/etc/aws/aws_creds.json",
+            "--check-exists",
+        ],
+        jinja_job_args={
+            "image": "google/cloud-sdk:alpine",
+            "name": "aws-to-gcs",
+            "gitsync": True,
+            "nodeSelector": BASE_NODE_POOL,
+            "volumes": [
+                {
+                    "name": "aws-creds",
+                    "type": "secret",
+                    "reference": "aws-creds",
+                    "mountPath": "/etc/aws",
+                }
+            ],
+        },
+    )
 
     # t2 = KubernetesJobOperator(
     #     task_id="data_validation",
