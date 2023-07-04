@@ -171,20 +171,20 @@ with DAG(
             "MODEL_NAME": "xgboost-fare-predictor",
         },
     )
-    t5 = KubernetesJobOperator(
-        task_id="serve_model",
-        body_filepath=POD_TEMPALTE,
-        arguments=[
-            "apply",
-            "-f" "/git/repo/components/ml_serve/manifests/serving.yaml",
-        ],
-        jinja_job_args={
-            "name": "serve-model",
-            "image": f"bitnami/kubectl",
-            "gitsync": True,
-            "nodeSelector": BASE_NODE_POOL,
-        },
-    )
+    # t5 = KubernetesJobOperator(
+    #     task_id="serve_model",
+    #     body_filepath=POD_TEMPALTE,
+    #     arguments=[
+    #         "apply",
+    #         "-f" "/git/repo/components/ml_serve/manifests/serving.yaml",
+    #     ],
+    #     jinja_job_args={
+    #         "name": "serve-model",
+    #         "image": f"bitnami/kubectl",
+    #         "gitsync": True,
+    #         "nodeSelector": BASE_NODE_POOL,
+    #     },
+    # )
     t5 = KubernetesJobOperator(
         task_id="serve_model",
         body_filepath=ML_SERVING_MANIFEST,
@@ -194,4 +194,4 @@ with DAG(
             "nodeSelector": BASE_NODE_POOL,
         },
     )
-    t1 >> t2 >> t3 >> t4  # type: ignore
+    t1 >> t2 >> t3 >> t4  >> t5 # type: ignore
