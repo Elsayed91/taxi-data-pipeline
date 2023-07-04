@@ -207,7 +207,4 @@ tests/integration/lambda/yellow_tripdata_2019-08.parquet
 .pytest_cache
 scripts/__pycache__
 mlruns
-terraform/modules/files/lambda/*
-
-
-
+terraform/modules/files/lambda/**
