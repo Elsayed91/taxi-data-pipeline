@@ -13,6 +13,16 @@ spec:
       labels:
         app: ml-serve
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - ml-serve
+            topologyKey: kubernetes.io/hostname
       containers:
         - name: ml-serve
           image:  eu.gcr.io/{{ job.project }}/serving

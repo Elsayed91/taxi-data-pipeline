@@ -10,15 +10,23 @@ spec:
   selector:
     matchLabels:
       app: prometheus
-
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         app: prometheus
-  
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - prometheus
+            topologyKey: kubernetes.io/hostname
       containers:
         - image: prom/prometheus:latest
           args:

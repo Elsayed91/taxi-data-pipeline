@@ -6,18 +6,25 @@ metadata:
     reloader.stakater.com/auto: "true"
   labels:
     app: grafana
-    svc: external-lb
 spec:
   selector:
     matchLabels:
       app: grafana
-      svc: external-lb
   template:
     metadata:
       labels:
         app: grafana
-        svc: external-lb
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - grafana
+            topologyKey: kubernetes.io/hostname
       securityContext:
             runAsUser: 472
             runAsGroup: 472

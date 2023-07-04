@@ -17,6 +17,16 @@ spec:
         prometheus.io/port: "9102"
         prometheus.io/path: /metrics
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - metric-exporters
+            topologyKey: kubernetes.io/hostname
       containers:
         - name: statsd
           args:

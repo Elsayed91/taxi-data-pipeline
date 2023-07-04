@@ -16,6 +16,16 @@ spec:
       securityContext:
         runAsUser: 50000
         fsGroup: 0
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - airflow
+            topologyKey: kubernetes.io/hostname
       initContainers:
         - name: run-airflow-migrations
           image: eu.gcr.io/${PROJECT}/airflow #apache/airflow:2.5.0

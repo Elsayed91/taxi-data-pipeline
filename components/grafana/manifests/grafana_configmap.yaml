@@ -15,22 +15,22 @@ data:
         type: prometheus
         access: proxy
         url: http://prometheus.default.svc.cluster.local:9090
-      - name: BigQuery
-        type: grafana-bigquery-datasource
-        typeName: Google BigQuery
-        typeLogoUrl: public/plugins/grafana-bigquery-datasource/img/logo.png
-        url: ""
-        user: ""
-        database: ""
-        access: proxy
-        editable: true
-        enabled: true
-        basicAuth: false
-        isDefault: false
-        jsonData:
-          authenticationType: gce
-          defaultProject:  ${PROJECT}
-          processingLocation: ${GCP_REGION}
+      # - name: BigQuery
+      #   type: grafana-bigquery-datasource
+      #   typeName: Google BigQuery
+      #   typeLogoUrl: public/plugins/grafana-bigquery-datasource/img/logo.png
+      #   url: ""
+      #   user: ""
+      #   database: ""
+      #   access: proxy
+      #   editable: true
+      #   enabled: true
+      #   basicAuth: false
+      #   isDefault: false
+      #   jsonData:
+      #     authenticationType: gce
+      #     defaultProject:  ${PROJECT}
+      #     processingLocation: ${GCP_REGION}
 ---
 apiVersion: v1
 kind: ConfigMap

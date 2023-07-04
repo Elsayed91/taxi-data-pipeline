@@ -4,7 +4,7 @@ SHELL=/bin/bash
 include .env
 
 # List of all targets that are not files
-.PHONY: trigger_batch_dag setup pc git run_lambda_integration_test run_kafka destory_kafka all clean test
+.PHONY: trigger_batch_dag setup pc git run_lambda_integration_test run_kafka destory_kafka all clean test r rr 
 
 
 # Load environment variables from .env file
@@ -39,3 +39,11 @@ run_kafka:
 # Target to destroy the Kafka cluster
 destory_kafka:
 	@bash scripts/run_kafka.sh --kill
+
+r:
+	@kubectl delete -f ${arg} && cat ${arg} | envsubst | kubectl apply -f -
+
+rr: 
+	@cat ${arg} | envsubst | kubectl apply -f -
+schema:
+	@bq show --schema --format=prettyjson $$PROJECT:$$ML_DATASET.dbt__ml__yellow_fare > myschema.json

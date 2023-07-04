@@ -13,6 +13,16 @@ spec:
       labels:
         app: flaskapp
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - flaskapp
+            topologyKey: kubernetes.io/hostname
       containers:
         - name: flask-k8s
           image:  eu.gcr.io/${PROJECT}/flask

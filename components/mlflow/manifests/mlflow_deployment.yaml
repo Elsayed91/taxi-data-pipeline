@@ -13,6 +13,16 @@ spec:
       labels:
         app: mlflow
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - mlflow
+            topologyKey: kubernetes.io/hostname
       containers:
       - name: mlflow
         image: eu.gcr.io/${PROJECT}/mlflow
