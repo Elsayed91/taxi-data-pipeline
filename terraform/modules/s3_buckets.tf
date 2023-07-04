@@ -15,8 +15,12 @@ resource "aws_s3_bucket" "bucket" {
 
 }
 
-resource "aws_s3_bucket_acl" "bucketacl" {
+# resource "aws_s3_bucket_acl" "bucketacl" {
+#   for_each = { for idx, bucket in var.s3-buckets : idx => bucket if var.s3-buckets != null }
+#   bucket   = aws_s3_bucket.bucket[each.key].id
+# }
+
+resource "aws_s3_bucket_public_access_block" "bucket" {
   for_each = { for idx, bucket in var.s3-buckets : idx => bucket if var.s3-buckets != null }
-  bucket   = aws_s3_bucket.bucket[each.key].id
-  acl      = each.value.acl
+  bucket = aws_s3_bucket.bucket[each.key].id
 }

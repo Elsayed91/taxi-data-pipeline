@@ -16,19 +16,18 @@ templating.
   logged to mlflow.
 """
 import os
+import sys
 from datetime import datetime, timedelta
+
 import pendulum
 from airflow import DAG
-from airflow_kubernetes_job_operator.kubernetes_job_operator import (
-    KubernetesJobOperator,
-)
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
-import sys
+from airflow_kubernetes_job_operator.kubernetes_job_operator import \
+    KubernetesJobOperator
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-from addons.parse_state import SparkApplication, Deployment
-
+from addons.parse_state import Deployment, SparkApplication
 
 default_args = {
     "owner": "airflow",
@@ -68,124 +67,124 @@ with DAG(
     ML_SERVING_MANIFEST = os.getenv(
         "ML_SERVING_MANIFEST", "/git/repo/components/ml_serve/manifests/serving.yaml"
     )
-    # t1 = KubernetesJobOperator(
-    #     task_id="aws_to_gcs",
-    #     body_filepath=POD_TEMPALTE,
-    #     command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
-    #     arguments=[
-    #         "--data-source",
-    #         f"s3://{os.getenv('TARGET_S3_BUCKET')}/trip data/",
-    #         "--destination",
-    #         f"gs://{STAGING_BUCKET}/yellow",
-    #         "--creds-file",
-    #         "/etc/aws/aws_creds.json",
-    #         "--include-prefixes",
-    #         "yellow_tripdata_20",
-    #         "--exclude-prefixes",
-    #         "yellow_tripdata_2009,yellow_tripdata_2010",
-    #         "--check-exists",
-    #     ],
-    #     jinja_job_args={
-    #         "image": "google/cloud-sdk:alpine",
-    #         "name": "from-aws-to-gcs",
-    #         "gitsync": True,
-    #         "nodeSelector": BASE_NODE_POOL,
-    #         "volumes": [
-    #             {
-    #                 "name": "aws-creds",
-    #                 "type": "secret",
-    #                 "reference": "aws-creds",
-    #                 "mountPath": "/etc/aws",
-    #             }
-    #         ],
-    #     },
-    # )
+    t1 = KubernetesJobOperator(
+        task_id="aws_to_gcs",
+        body_filepath=POD_TEMPALTE,
+        command=["/bin/bash", f"{SCRIPTS_PATH}/aws_gcloud_data_transfer.sh"],
+        arguments=[
+            "--data-source",
+            f"s3://{os.getenv('TARGET_S3_BUCKET')}/trip data/",
+            "--destination",
+            f"gs://{STAGING_BUCKET}/yellow",
+            "--creds-file",
+            "/etc/aws/aws_creds.json",
+            "--include-prefixes",
+            "yellow_tripdata_20",
+            "--exclude-prefixes",
+            "yellow_tripdata_2009,yellow_tripdata_2010",
+            "--check-exists",
+        ],
+        jinja_job_args={
+            "image": "google/cloud-sdk:alpine",
+            "name": "from-aws-to-gcs",
+            "gitsync": True,
+            "nodeSelector": BASE_NODE_POOL,
+            "volumes": [
+                {
+                    "name": "aws-creds",
+                    "type": "secret",
+                    "reference": "aws-creds",
+                    "mountPath": "/etc/aws",
+                }
+            ],
+        },
+    )
 
-    # t2 = KubernetesJobOperator(
-    #     task_id="spark-etl",
-    #     body_filepath=SPARK_POD_TEMPLATE,
-    #     jinja_job_args={
-    #         "project": GOOGLE_CLOUD_PROJECT,
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-    #         "mainApplicationFile": f"local://{BASE}/spark/scripts/initial_load.py",
-    #         "name": "spark-k8s-init",
-    #         "instances": 7,
-    #         "gitsync": True,
-    #         "nodeSelector": SPARK_JOBS_NODE_POOL,
-    #         "executor_memory": "2G",
-    #         "env": {
-    #             "CATEGORY": "yellow",
-    #             "URI": f"gs://{STAGING_BUCKET}/yellow/*",
-    #             "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
-    #         },
-    #         "envFrom": [{"type": "configMapRef", "name": "spark-env"}],
-    #     },
-    # )
+    t2 = KubernetesJobOperator(
+        task_id="spark-etl",
+        body_filepath=SPARK_POD_TEMPLATE,
+        jinja_job_args={
+            "project": GOOGLE_CLOUD_PROJECT,
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
+            "mainApplicationFile": f"local://{BASE}/spark/scripts/initial_load.py",
+            "name": "spark-k8s-init",
+            "instances": 7,
+            "gitsync": True,
+            "nodeSelector": SPARK_JOBS_NODE_POOL,
+            "executor_memory": "2G",
+            "env": {
+                "CATEGORY": "yellow",
+                "URI": f"gs://{STAGING_BUCKET}/yellow/*",
+                "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
+            },
+            "envFrom": [{"type": "configMapRef", "name": "spark-env"}],
+        },
+    )
 
-    # t3 = KubernetesJobOperator(
-    #     task_id="dbt",
-    #     body_filepath=POD_TEMPALTE,
-    #     command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
-    #     arguments=[
-    #         "--deps",
-    #         "--seed",
-    #         "--commands",
-    #         "dbt run --full-refresh",
-    #         "--tests",
-    #         "--generate-docs",
-    #     ],
-    #     jinja_job_args={
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
-    #         "name": "dbt",
-    #         "gitsync": True,
-    #         "nodeSelector": BASE_NODE_POOL,
-    #         "volumes": [
-    #             {
-    #                 "name": "gcsfs-creds",
-    #                 "type": "secret",
-    #                 "reference": "gcsfs-creds",
-    #                 "mountPath": "/mnt/secrets",
-    #             }
-    #         ],
-    #         "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
-    #     },
-    #     envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app", "RUN_DATE": today},
-    # )
+    t3 = KubernetesJobOperator(
+        task_id="dbt",
+        body_filepath=POD_TEMPALTE,
+        command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
+        arguments=[
+            "--deps",
+            "--seed",
+            "--commands",
+            "dbt run --full-refresh",
+            "--tests",
+            "--generate-docs",
+        ],
+        jinja_job_args={
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
+            "name": "dbt",
+            "gitsync": True,
+            "nodeSelector": BASE_NODE_POOL,
+            "volumes": [
+                {
+                    "name": "gcsfs-creds",
+                    "type": "secret",
+                    "reference": "gcsfs-creds",
+                    "mountPath": "/mnt/secrets",
+                }
+            ],
+            "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
+        },
+        envs={"DBT_PROFILES_DIR": f"{BASE}/dbt/app", "RUN_DATE": today},
+    )
 
-    # t4 = KubernetesJobOperator(
-    #     task_id="train_model",
-    #     body_filepath=POD_TEMPALTE,
-    #     command=["python", f"{BASE}/ml_train/script/train.py"],
-    #     jinja_job_args={
-    #         "name": "xgb-model-training",
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/ml_train",
-    #         "gitsync": True,
-    #         "nodeSelector": TRAINING_NODE_POOL,
-    #     },
-    #     envs={
-    #         "TARGET_DATASET": os.getenv("ML_DATASET"),
-    #         "TARGET_TABLE": "dbt__ml__yellow_fare",
-    #         "MLFLOW_URI": "http://mlflow-service.default.svc.cluster.local:5000",
-    #         "MLFLOW_EXPERIMENT_NAME": "taxi-fare-prediction-v3",
-    #         "TARGET_COLUMN": "fare_amount",
-    #         "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET"),
-    #         "MODEL_NAME": "xgboost-fare-predictor",
-    #     },
-    # )
-    # t5 = KubernetesJobOperator(
-    #     task_id="serve_model",
-    #     body_filepath=POD_TEMPALTE,
-    #     arguments=[
-    #         "apply",
-    #         "-f" "/git/repo/components/ml_serve/manifests/serving.yaml",
-    #     ],
-    #     jinja_job_args={
-    #         "name": "serve-model",
-    #         "image": f"bitnami/kubectl",
-    #         "gitsync": True,
-    #         "nodeSelector": BASE_NODE_POOL,
-    #     },
-    # )
+    t4 = KubernetesJobOperator(
+        task_id="train_model",
+        body_filepath=POD_TEMPALTE,
+        command=["python", f"{BASE}/ml_train/script/train.py"],
+        jinja_job_args={
+            "name": "xgb-model-training",
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/ml_train",
+            "gitsync": True,
+            "nodeSelector": TRAINING_NODE_POOL,
+        },
+        envs={
+            "TARGET_DATASET": os.getenv("ML_DATASET"),
+            "TARGET_TABLE": "dbt__ml__yellow_fare",
+            "MLFLOW_URI": "http://mlflow-service.default.svc.cluster.local:5000",
+            "MLFLOW_EXPERIMENT_NAME": "taxi-fare-prediction-v3",
+            "TARGET_COLUMN": "fare_amount",
+            "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET"),
+            "MODEL_NAME": "xgboost-fare-predictor",
+        },
+    )
+    t5 = KubernetesJobOperator(
+        task_id="serve_model",
+        body_filepath=POD_TEMPALTE,
+        arguments=[
+            "apply",
+            "-f" "/git/repo/components/ml_serve/manifests/serving.yaml",
+        ],
+        jinja_job_args={
+            "name": "serve-model",
+            "image": f"bitnami/kubectl",
+            "gitsync": True,
+            "nodeSelector": BASE_NODE_POOL,
+        },
+    )
     t5 = KubernetesJobOperator(
         task_id="serve_model",
         body_filepath=ML_SERVING_MANIFEST,
@@ -195,5 +194,4 @@ with DAG(
             "nodeSelector": BASE_NODE_POOL,
         },
     )
-    t5
-    # t1 >> t2 >> t3 >> t4  # type: ignore
+    t1 >> t2 >> t3 >> t4  # type: ignore

@@ -12,7 +12,7 @@ generate_random_env ${SCRIPT_DIR}/../data/random_env.csv
 # gcloud auth application-default login --project $PROJECT -q
 
 # echo "Creating project $PROJECT"
-# # gcloud projects create $PROJECT >/dev/null
+# gcloud projects create $PROJECT >/dev/null
 
 # echo "Setting the project as default project"
 # gcloud config set project $PROJECT >/dev/null
@@ -43,8 +43,8 @@ generate_random_env ${SCRIPT_DIR}/../data/random_env.csv
 # aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
 # aws configure set aws_region $AWS_REGION
 
-## Terraform does not allow variables in remote bucket names, so we will use bash to
-## change it directly
+# Terraform does not allow variables in remote bucket names, so we will use bash to
+# change it directly
 # sed -i 's/bucket =.*/bucket = '"\"$TF_STATE_BUCKET\""'/' ${SCRIPT_DIR}/../terraform/versions.tf
 # gsutil mb -c standard -l "$GCP_REGION" "gs://$TF_STATE_BUCKET"
 # gsutil versioning set on gs://$TF_STATE_BUCKET
@@ -84,8 +84,10 @@ generate_random_env ${SCRIPT_DIR}/../data/random_env.csv
 # sleep 10
 # mass_kubectl "components/*/manifests/*_deployment.yaml"
 # clean_complete
-# wait_for_all_pods
+# sleep 120
 
 airflow_pod=$(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow)
-kubectl exec -t $airflow_pod -c scheduler -- airflow dags unpause full-refresh && airflow dags trigger full-refresh
+kubectl exec -t $airflow_pod -c scheduler -- airflow dags unpause full-refresh 
+kubectl exec -t $airflow_pod -c scheduler -- airflow dags trigger full-refresh
+# example batch dag run
 # kubectl exec -t $airflow_pod -c scheduler -- airflow dags trigger batch-dag --conf '{"URI":"s3://nyc-tlc/trip data/yellow_tripdata_2022-10.parquet", "FILENAME":"yellow_tripdata_2022-10.parquet", "RUN_DATE": "2022-10-01", "CATEGORY": "yellow"}'
