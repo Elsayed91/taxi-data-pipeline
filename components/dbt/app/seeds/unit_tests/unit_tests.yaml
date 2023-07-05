@@ -4,7 +4,7 @@ seeds:
 - name: test_dbt__ml__yellow_fare
   description: sample data to be used for unit testing dbt__ml__yellow_fare
   config:
-    schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
+    # schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
     column_types: {
         VendorID: INTEGER,
         tpep_pickup_datetime: TIMESTAMP,
@@ -29,7 +29,7 @@ seeds:
 - name: dbt__ml__yellow_fare_expected
   description: expected results for dbt__ml__yellow_fare unit test.
   config:
-    schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
+    # schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
     column_types: {
         passenger_count: INTEGER,
         trip_distance: FLOAT64,
@@ -55,7 +55,7 @@ seeds:
 - name: test_dbt__bi__yellow_m2m
   description: sample data to be used for unit testing dbt__bi__yellow_m2m
   config:
-    schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
+    # schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
     column_types: {
         VendorID: INTEGER,
         first_day_of_month: DATE,
@@ -82,7 +82,7 @@ seeds:
 - name: dbt__bi__yellow_m2m_expected
   description: expected results for dbt__bi__yellow_m2m unit test.
   config:
-    schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
+    # schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
     column_types: {
         vendors: STRING,
         year: INTEGER,
