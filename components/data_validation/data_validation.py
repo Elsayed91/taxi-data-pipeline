@@ -11,9 +11,10 @@ ValidationError is raised.
 It also builds the data docs folder in the data_docs_sites
 """
 
-from pyspark.sql import SparkSession
-from great_expectations.data_context.types.base import DataContextConfig
 from great_expectations.data_context import BaseDataContext
+from great_expectations.data_context.types.base import DataContextConfig
+from pyspark.sql import SparkSession
+
 from dv_helpers import *
 
 # Constants for configuration file paths
@@ -34,14 +35,15 @@ def main():
 
     # Create a DataContext and add the checkpoint
     data_context = BaseDataContext(DataContextConfig(**ge_config))
+    print("data_context complete")
     data_context.add_checkpoint(**cp_config)
-
+    print("data_context.add_checkpoint complete")
     # Run the checkpoint and retrieve the result
     cp_result = dict(data_context.run_checkpoint(checkpoint_name="cp"))
-
+    print("cp_result complete")
     # Build the data docs
     data_context.build_data_docs()
-
+    print("data_context.build_data_docs complete")
     # Retrieve the success percentage from the checkpoint result
     success_percentage = next(retrieve_nested_value(cp_result, "success_percent"))
     # Validate the success percentage against the threshold
