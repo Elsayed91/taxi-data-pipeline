@@ -19,15 +19,13 @@ templating.
 """
 
 import os
+import sys
 
 import pendulum
 from airflow import DAG
-
-from airflow_kubernetes_job_operator.kubernetes_job_operator import (
-    KubernetesJobOperator,
-)
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
-import sys
+from airflow_kubernetes_job_operator.kubernetes_job_operator import \
+    KubernetesJobOperator
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from addons.parse_state import SparkApplication
@@ -101,99 +99,99 @@ with DAG(
         },
     )
 
-    # t2 = KubernetesJobOperator(
-    #     task_id="data_validation",
-    #     body_filepath=SPARK_POD_TEMPLATE,
-    #     jinja_job_args={
-    #         "project": GOOGLE_CLOUD_PROJECT,
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-    #         "mainApplicationFile": f"local://{BASE}/data_validation/data_validation.py",
-    #         "name": "great-expectations",
-    #         "instances": 4,
-    #         "gitsync": True,
-    #         "nodeSelector": SPARK_JOBS_NODE_POOL,
-    #         "executor_memory": "2048m",
-    #         "env": {
-    #             "GE_CONFIG_DIR": f"{BASE}/data_validation/config",
-    #             "PROJECT": GOOGLE_CLOUD_PROJECT,
-    #             "STAGING_BUCKET": STAGING_BUCKET,
-    #             "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
-    #             "VALIDATION_THRESHOLD": "10%",
-    #         },
-    #     },
-    # )
+    t2 = KubernetesJobOperator(
+        task_id="data_validation",
+        body_filepath=SPARK_POD_TEMPLATE,
+        jinja_job_args={
+            "project": GOOGLE_CLOUD_PROJECT,
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
+            "mainApplicationFile": f"local://{BASE}/data_validation/data_validation.py",
+            "name": "great-expectations",
+            "instances": 4,
+            "gitsync": True,
+            "nodeSelector": SPARK_JOBS_NODE_POOL,
+            "executor_memory": "2048m",
+            "env": {
+                "GE_CONFIG_DIR": f"{BASE}/data_validation/config",
+                "PROJECT": GOOGLE_CLOUD_PROJECT,
+                "STAGING_BUCKET": STAGING_BUCKET,
+                "DOCS_BUCKET": os.getenv("DOCS_BUCKET"),
+                "VALIDATION_THRESHOLD": "10%",
+            },
+        },
+    )
 
-    # t3 = KubernetesJobOperator(
-    #     task_id="etl-batch",
-    #     body_filepath=SPARK_POD_TEMPLATE,
-    #     jinja_job_args={
-    #         "project": GOOGLE_CLOUD_PROJECT,
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
-    #         "mainApplicationFile": f"local://{BASE}/spark/scripts/batch.py",
-    #         "name": "spark-k8s",
-    #         "instances": 5,
-    #         "gitsync": True,
-    #         "nodeSelector": SPARK_JOBS_NODE_POOL,
-    #         "executor_memory": "2048m",
-    #         "env": {
-    #             "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
-    #             "STAGING_BUCKET": STAGING_BUCKET,
-    #         },
-    #         "envFrom": [{"type": "configMapRef", "name": "spark-env"}],
-    #     },
-    # )
+    t3 = KubernetesJobOperator(
+        task_id="etl-batch",
+        body_filepath=SPARK_POD_TEMPLATE,
+        jinja_job_args={
+            "project": GOOGLE_CLOUD_PROJECT,
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/spark",
+            "mainApplicationFile": f"local://{BASE}/spark/scripts/batch.py",
+            "name": "spark-k8s",
+            "instances": 5,
+            "gitsync": True,
+            "nodeSelector": SPARK_JOBS_NODE_POOL,
+            "executor_memory": "2048m",
+            "env": {
+                "SPARK_BUCKET": os.getenv("SPARK_BUCKET"),
+                "STAGING_BUCKET": STAGING_BUCKET,
+            },
+            "envFrom": [{"type": "configMapRef", "name": "spark-env"}],
+        },
+    )
 
-    # t4 = KubernetesJobOperator(
-    #     task_id="dbt",
-    #     body_filepath=POD_TEMPALTE,
-    #     command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
-    #     arguments=[
-    #         "--deps",
-    #         "--seed",
-    #         "--commands",
-    #         "dbt run",
-    #         "--generate-docs",
-    #     ],
-    #     jinja_job_args={
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
-    #         "name": "dbt",
-    #         "gitsync": True,
-    #         "nodeSelector": BASE_NODE_POOL,
-    #         "volumes": [
-    #             {
-    #                 "name": "gcsfs-creds",
-    #                 "type": "secret",
-    #                 "reference": "gcsfs-creds",
-    #                 "mountPath": "/mnt/secrets",
-    #             }
-    #         ],
-    #         "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
-    #     },
-    #     envs={
-    #         "DBT_PROFILES_DIR": f"{BASE}/dbt/app",
-    #         "RUN_DATE": "{{ dag_run.conf.RUN_DATE }}",
-    #     },
-    # )
+    t4 = KubernetesJobOperator(
+        task_id="dbt",
+        body_filepath=POD_TEMPALTE,
+        command=["/bin/bash", f"{SCRIPTS_PATH}/dbt_run.sh"],
+        arguments=[
+            "--deps",
+            "--seed",
+            "--commands",
+            "dbt run",
+            "--generate-docs",
+        ],
+        jinja_job_args={
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/dbt",
+            "name": "dbt",
+            "gitsync": True,
+            "nodeSelector": BASE_NODE_POOL,
+            "volumes": [
+                {
+                    "name": "gcsfs-creds",
+                    "type": "secret",
+                    "reference": "gcsfs-creds",
+                    "mountPath": "/mnt/secrets",
+                }
+            ],
+            "envFrom": [{"type": "configMapRef", "name": "dbt-env"}],
+        },
+        envs={
+            "DBT_PROFILES_DIR": f"{BASE}/dbt/app",
+            "RUN_DATE": "{{ dag_run.conf.RUN_DATE }}",
+        },
+    )
 
-    # t5 = KubernetesJobOperator(
-    #     task_id="retrain_model",
-    #     body_filepath=POD_TEMPALTE,
-    #     command=["python", f"{BASE}/ml_train/script/train.py"],
-    #     jinja_job_args={
-    #         "name": "xgb-model-training",
-    #         "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/ml_train",
-    #         "gitsync": True,
-    #         "nodeSelector": TRAINING_NODE_POOL,
-    #     },
-    #     envs={
-    #         "TARGET_DATASET": os.getenv("ML_DATASET"),
-    #         "TARGET_TABLE": "dbt__ml__yellow_fare",
-    #         "TRACKING_SERVICE": "mlflow-service",
-    #         "MLFLOW_EXPERIMENT_NAME": "taxi-fare-prediction-v3",
-    #         "TARGET_COLUMN": "fare_amount",
-    #         "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET"),
-    #     },
-    # )
+    t5 = KubernetesJobOperator(
+        task_id="retrain_model",
+        body_filepath=POD_TEMPALTE,
+        command=["python", f"{BASE}/ml_train/script/train.py"],
+        jinja_job_args={
+            "name": "xgb-model-training",
+            "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/ml_train",
+            "gitsync": True,
+            "nodeSelector": TRAINING_NODE_POOL,
+        },
+        envs={
+            "TARGET_DATASET": os.getenv("ML_DATASET"),
+            "TARGET_TABLE": "dbt__ml__yellow_fare",
+            "TRACKING_SERVICE": "mlflow-service",
+            "MLFLOW_EXPERIMENT_NAME": "taxi-fare-prediction-v3",
+            "TARGET_COLUMN": "fare_amount",
+            "MLFLOW_BUCKET": os.getenv("MLFLOW_BUCKET"),
+        },
+    )
 
     t6 = KubernetesJobOperator(
         task_id="refresh_streamlit",
@@ -205,4 +203,4 @@ with DAG(
             "nodeSelector": BASE_NODE_POOL,
         },
     )
-    # t1 >> t2 >> t3 >> t4 >> t5  # type: ignore
+    t1 >> t2 >> t3 >> t4 >> t5  # type: ignore
