@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     df = get_schema_info(blobs)
     print("df shape is")
-    print(df.shape())
+    print(len(df))
     lists = schema_groups(df)
     print(lists)
     for l in lists:
