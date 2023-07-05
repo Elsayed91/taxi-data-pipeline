@@ -104,13 +104,17 @@ def get_schema_info(links: list[str]) -> pd.DataFrame:
 #     print(df_groups.apply(lambda x: list(x)).tolist())
 #     return df_groups.apply(lambda x: list(x)).tolist()
 
-def schema_groups(df: pd.DataFrame) -> list[list[str]]:
-    df = df.astype(str)
-    columns = [value for value in list(df.columns) if value != "link"]
-    df_groups = df.groupby(columns)["link"].agg(list).reset_index()
-    grouped_links = df_groups.values.tolist()
-    return grouped_links
+# def schema_groups(df: pd.DataFrame) -> list[list[str]]:
+#     df = df.astype(str)
+#     columns = [value for value in list(df.columns) if value != "link"]
+#     df_groups = df.groupby(columns)["link"].agg(list).reset_index()
+#     grouped_links = df_groups.values.tolist()
+#     return grouped_links
 
+def schema_groups(df: pd.DataFrame) -> list:
+    df_groups = df.groupby(df.columns.tolist())["link"].agg(list).reset_index()["link"].tolist()
+    print(f"len of grouped data is: {len(df)}")
+    return df_groups
 
 def cast_columns(df: DataFrame, mapping: dict[str, str]) -> DataFrame:
     """
