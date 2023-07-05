@@ -7,7 +7,7 @@ spec:
   mode: cluster
   pythonVersion: "3"
   sparkVersion: "3.1.2"
-  imagePullPolicy: {{ job.imagePullPolicy | default('Always') }}
+  imagePullPolicy: {{ job.imagePullPolicy | default('IfNotPresent') }}
   image: "{{ job.image }}"
   restartPolicy:
     type: {{ job.restartPolicy | default('Never') }}

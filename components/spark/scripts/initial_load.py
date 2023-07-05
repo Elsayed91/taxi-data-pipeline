@@ -27,14 +27,12 @@ if __name__ == "__main__":
     blobs = list_files(blobs)
 
     df = get_schema_info(blobs)
-    print("df is")
-    print(df.head())
+    print("df shape is")
+    print(df.shape())
     lists = schema_groups(df)
-    print("lists is")
     print(lists)
     for l in lists:
         print(f"processing {l}")
         idx = lists.index(l)
-
         process_initial_load(spark, l, idx, **opts)
         print("finished processing")

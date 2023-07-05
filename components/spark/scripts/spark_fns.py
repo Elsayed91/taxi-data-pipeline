@@ -1,12 +1,12 @@
-import pandas as pd
-import google.cloud.storage as storage
-import pyarrow.parquet as pq
-import gcsfs
-import pyspark.sql.functions as F
-from pyspark.sql import DataFrame
 from typing import Union
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import to_timestamp, to_date
+
+import gcsfs
+import google.cloud.storage as storage
+import pandas as pd
+import pyarrow.parquet as pq
+import pyspark.sql.functions as F
+from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql.functions import to_date, to_timestamp
 
 
 def get_gcs_files(bucket: str, folder: str, file_prefix: str) -> list[bytes]:
@@ -93,7 +93,9 @@ def schema_groups(df: pd.DataFrame) -> list[list[str]]:
     (excluding the `link` column).
     """
     columns = [value for value in list(df.columns) if value != "link"]
+    print(columns)
     df_groups = df.groupby(columns)["link"]
+    print(df_groups.head())
     return df_groups.apply(lambda x: list(x)).tolist()
 
 
