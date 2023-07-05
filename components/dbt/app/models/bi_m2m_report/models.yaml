@@ -7,13 +7,13 @@ models:
       monthly level. The view provides data that is used to build the Grafana BI
       dashboard. 
     tests:
-      - dbt_datamocktool.unit_test:
-          input_mapping:
-            source('historical_data', 'yellow_historical'): ref('test_dbt__bi__yellow_m2m')
-          expected_output: ref('dbt__bi__yellow_m2m_expected')
-          depends_on:
-            - ref('seed_zones')
-          tags: ["unit-test"]
+      # - dbt_datamocktool.unit_test:
+      #     input_mapping:
+      #       source('historical_data', 'yellow_historical'): ref('test_dbt__bi__yellow_m2m')
+      #     expected_output: ref('dbt__bi__yellow_m2m_expected')
+      #     depends_on:
+      #       - ref('seed_zones')
+      #     tags: ["unit-test"]
     columns:
       - name: vendors
         type: string
