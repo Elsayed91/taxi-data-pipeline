@@ -226,7 +226,7 @@ sources:
             description: $1.25 for pick up only at LaGuardia and John F. Kennedy Airports
             tests:
               - dbt_expectations.expect_column_values_to_be_in_set:
-                  value_set: [0,1.25]
+                  value_set: [0,1.75]
                   quote_values: false
               - dbt_expectations.expect_column_to_exist
               - dbt_expectations.expect_column_values_to_be_of_type:
