@@ -96,6 +96,7 @@ def schema_groups(df: pd.DataFrame) -> list[list[str]]:
     same schema. The schema is determined by the column names and values in `df`
     (excluding the `link` column).
     """
+    print("DataFrame size:", len(df))
     columns = [value for value in list(df.columns) if value != "link"]
     print(columns)
     df_groups = df.groupby(columns)["link"]
