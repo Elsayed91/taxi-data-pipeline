@@ -130,7 +130,7 @@ with DAG(
             "--seed",
             "--commands",
             "dbt run --full-refresh",
-            "--tests",
+            "--test",
             "--generate-docs",
         ],
         jinja_job_args={
