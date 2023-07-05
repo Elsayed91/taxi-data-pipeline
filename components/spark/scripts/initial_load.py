@@ -25,11 +25,16 @@ if __name__ == "__main__":
 
     blobs = get_gcs_files(SRC_BUCKET, SRC_FOLDER, SRC_FOLDER)
     blobs = list_files(blobs)
-    print(f"blobs are {blobs}")
+
     df = get_schema_info(blobs)
+    print("df is")
+    print(df.head())
     lists = schema_groups(df)
+    print("lists is")
+    print(lists)
     for l in lists:
-        idx = lists.index(l)
         print(f"processing {l}")
+        idx = lists.index(l)
+
         process_initial_load(spark, l, idx, **opts)
         print("finished processing")
