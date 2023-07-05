@@ -29,7 +29,15 @@ models:
 vars:
   'dbt_date:time_zone': 'UTC'
   'disable_dbt_artifacts_autoupload': 'true'
-
+  dmt_mappings:
+    test_suite_1:
+      sources:
+        staging_data:
+          yellow_staging: test_dbt__ml__yellow_fare
+    test_suite_2:
+      sources:
+        historical_data:
+          yellow_historical: test_dbt__bi__yellow_m2m
 tests:
   # +severity: warn
   +error_if: ">10000"
