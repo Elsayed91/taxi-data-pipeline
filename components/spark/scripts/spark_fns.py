@@ -104,21 +104,24 @@ def get_schema_info(links: list[str]) -> pd.DataFrame:
 #     print(df_groups.apply(lambda x: list(x)).tolist())
 #     return df_groups.apply(lambda x: list(x)).tolist()
 
-# def schema_groups(df: pd.DataFrame) -> list[list[str]]:
-#     df = df.astype(str)
-#     columns = [value for value in list(df.columns) if value != "link"]
-#     df_groups = df.groupby(columns)["link"].agg(list).reset_index()
-#     grouped_links = df_groups.values.tolist()
-#     return grouped_links
+def schema_groups(df: pd.DataFrame) -> list[list[str]]:
+    columns = [value for value in list(df.columns) if value != "link"]
+    df = df.astype(str)
+    df_groups = df.groupby(columns)["link"].agg(list).reset_index()
+    
+    grouped_links = df_groups.values.tolist()
+    print(f"len of 1st grouped data is: {len(grouped_links)}")
+    print(grouped_links[:3])
+    return grouped_links
 
-def schema_groups(df: pd.DataFrame) -> list:
-    df_groups = df.groupby(df.columns.tolist())["link"].apply(lambda x: x.tolist()).tolist()
-    print(f"len of 1st grouped data is: {len(df)}")
-    print(df_groups[:3])
-    df_groups = df.groupby(df.columns.tolist(), as_index=False)["link"].agg(list)
-    print(f"len of 2nd grouped data is: {len(df)}")
-    print(df_groups[:3])
-    return df_groups["link"].tolist()
+# def schema_groups(df: pd.DataFrame) -> list:
+#     df_groups = df.groupby(df.columns.tolist())["link"].apply(lambda x: x.tolist()).tolist()
+#     print(f"len of 1st grouped data is: {len(df)}")
+#     print(df_groups[:3])
+#     df_groups = df.groupby(df.columns.tolist(), as_index=False)["link"].agg(list)
+#     print(f"len of 2nd grouped data is: {len(df)}")
+#     print(df_groups[:3])
+#     return df_groups["link"].tolist()
 
 
 def cast_columns(df: DataFrame, mapping: dict[str, str]) -> DataFrame:
