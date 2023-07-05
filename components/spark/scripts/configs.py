@@ -43,7 +43,7 @@ yellow_historical_transformation = """
         avg(trip_distance) as average_trip_distance,
         count(*) as trip_count,
         avg((unix_timestamp(tpep_dropoff_datetime) - unix_timestamp(tpep_pickup_datetime)) / 60) as avg_duration_minutes,
-        sum(unix_timestamp(tpep_dropoff_datetime)-unix_timestamp(tpep_pickup_datetime)) as total_duration_hours,
+        cast(sum(unix_timestamp(tpep_dropoff_datetime)-unix_timestamp(tpep_pickup_datetime)) as float) as total_duration_hours,
         (
             SELECT
             extract(HOUR FROM tpep_pickup_datetime) AS pickup_hour
