@@ -78,6 +78,10 @@ def get_schema_info(links: list[str]) -> pd.DataFrame:
                 ]
             ).astype(str)
             df_list.append(df)
+    df = pd.concat(df_list, ignore_index=True)
+    print("df head and columns are:")
+    print(df.head)
+    print(df.columns)
     return pd.concat(df_list, ignore_index=True)
 
 
@@ -95,7 +99,8 @@ def schema_groups(df: pd.DataFrame) -> list[list[str]]:
     columns = [value for value in list(df.columns) if value != "link"]
     print(columns)
     df_groups = df.groupby(columns)["link"]
-    print(df_groups.head())
+    print(df_groups)
+    print(df_groups.apply(lambda x: list(x)).tolist())
     return df_groups.apply(lambda x: list(x)).tolist()
 
 
