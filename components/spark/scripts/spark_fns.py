@@ -93,18 +93,38 @@ def get_schema_info(links: list[str]) -> pd.DataFrame:
 #     same schema. The schema is determined by the column names and values in `df`
 #     (excluding the `link` column).
 #     """
-#     print("DataFrame size:", len(df))
 #     columns = [value for value in list(df.columns) if value != "link"]
-#     print(columns)
 #     df_groups = df.groupby(columns)["link"]
-#     print(df_groups)
-#     print(df_groups.apply(lambda x: list(x)).tolist())
 #     return df_groups.apply(lambda x: list(x)).tolist()
 
 
+# def schema_groups(df: pd.DataFrame) -> list[list[str]]:
+#     columns_for_grouping = [col for col in df.columns if col != "link"]
+#     df_groups = df.groupby(columns_for_grouping)["link"].agg(list).reset_index()
+    
+#     grouped_links = df_groups["link"].tolist()
+#     print(f"len of 1st grouped data is: {len(grouped_links)}")
+#     print(grouped_links[:3])
+#     return grouped_links
+
 def schema_groups(df: pd.DataFrame) -> list[list[str]]:
-    columns_for_grouping = [col for col in df.columns if col != "link"]
-    df_groups = df.groupby(columns_for_grouping)["link"].agg(list).reset_index()
+    """
+    Groups GCS links in a DataFrame by shared schema.
+
+    Args:
+    - df: A DataFrame containing a column `link` with GCS links and columns
+          representing the fields in the schema of each link.
+
+    Returns:
+    A list of lists, where each inner list contains the GCS links that share the
+    same schema. The schema is determined by the column names and values in `df`
+    (excluding the `link` column).
+    """
+    columns = [value for value in df.columns if value != "link"]
+    df = df.astype(str)  # Convert all columns to string for grouping
+    
+    # Group by all columns except "link", then aggregate the "link" column as a list
+    df_groups = df.groupby(columns)["link"].agg(list).reset_index()
     
     grouped_links = df_groups["link"].tolist()
     print(f"len of 1st grouped data is: {len(grouped_links)}")
