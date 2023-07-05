@@ -5,12 +5,14 @@ cross-validation, and logging the model's performance, parameters and artifacts.
 """
 import logging
 import os
-import numpy as np
+
 import mlflow
+import numpy as np
+import xgboost as xgb
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import GridSearchCV, train_test_split
-import xgboost as xgb
 from xgboost import XGBRegressor
+
 from train_utils import load_data
 
 logging.basicConfig(level=logging.DEBUG)
@@ -33,8 +35,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_s
 
 # Model parameters
 param = {
-    "max_depth": [2, 4, 6],
-    "n_estimators": [15, 25, 100],
+    "max_depth": [6],
+    "n_estimators": [ 25, 100],
     "min_child_weight": [3, 5, 7],
 }
 
@@ -67,6 +69,7 @@ with mlflow.start_run(experiment_id=exp_id, run_name="XGBoostRegressor"):
 
     mlflow.log_params(grid_search.best_params_)
     mlflow.log_metrics({"RMSE": mean_squared_error(y_test, y_pred, squared=False)})
+    print("logging model to mlflow")
     mlflow.xgboost.log_model(
         xgb_model=model, artifact_path="xgb-model", registered_model_name=model_name
     )
