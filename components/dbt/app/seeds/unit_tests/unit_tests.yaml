@@ -1,110 +1,110 @@
-# version: 2
+version: 2
 
-# seeds:
-# - name: test_dbt__ml__yellow_fare
-#   description: sample data to be used for unit testing dbt__ml__yellow_fare
-#   config:
-#     schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
-#     column_types: {
-#         VendorID: INTEGER,
-#         tpep_pickup_datetime: TIMESTAMP,
-#         tpep_dropoff_datetime: TIMESTAMP,
-#         passenger_count: INTEGER,
-#         trip_distance: FLOAT,
-#         RatecodeID: INTEGER,
-#         store_and_fwd_flag: STRING,
-#         PULocationID: INTEGER,
-#         DOLocationID: INTEGER,
-#         payment_type: INTEGER,
-#         fare_amount: FLOAT,
-#         extra: FLOAT,
-#         mta_tax: FLOAT,
-#         tip_amount: FLOAT,
-#         tolls_amount: FLOAT,
-#         improvement_surcharge: FLOAT,
-#         total_amount: FLOAT,
-#         congestion_surcharge: FLOAT,
-#         airport_fee: FLOAT,
-#       }
-# - name: dbt__ml__yellow_fare_expected
-#   description: expected results for dbt__ml__yellow_fare unit test.
-#   config:
-#     schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
-#     column_types: {
-#         passenger_count: INTEGER,
-#         trip_distance: FLOAT64,
-#         fare_amount: FLOAT,
-#         pickup_long: FLOAT,
-#         pickup_lat: FLOAT,
-#         dropoff_long: FLOAT,
-#         dropoff_lat: FLOAT,
-#         date: DATE,
-#         trip_duration: INTEGER,
-#         day_of_month: INTEGER,
-#         month: INTEGER,
-#         year: INTEGER,
-#         day_of_week: INTEGER,
-#         hour_of_day: INTEGER,
-#         pickup_jfk_distance: FLOAT,
-#         dropoff_jfk_distance: FLOAT,
-#         pickup_ewr_distance: FLOAT,
-#         dropoff_ewr_distance: FLOAT,
-#         pickup_lga_distance: FLOAT,
-#         dropoff_lga_distance: FLOAT
-#       }
-# - name: test_dbt__bi__yellow_m2m
-#   description: sample data to be used for unit testing dbt__bi__yellow_m2m
-#   config:
-#     schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
-#     column_types: {
-#         VendorID: INTEGER,
-#         first_day_of_month: DATE,
-#         pickup_zone: INTEGER,
-#         dropoff_zone: INTEGER,
-#         store_and_fwd_flag: STRING,
-#         monthly_fare_amount: FLOAT,
-#         average_passenger_count: FLOAT,
-#         average_trip_distance: FLOAT,
-#         monthly_extra_amount: FLOAT,
-#         monthly_mta_tax: FLOAT,
-#         monthly_tip_amount: FLOAT,
-#         monthly_tolls_amount: FLOAT,
-#         monthly_improvement_surcharge: FLOAT,
-#         monthly_total_amount: FLOAT,
-#         payment_type: INTEGER,
-#         monthly_congestion_surcharge: FLOAT,
-#         monthly_airport_fee: FLOAT,
-#         trip_count: INTEGER,
-#         avg_duration_minutes: FLOAT,
-#         total_duration_hours: FLOAT,
-#         busiest_hour_of_day: INTEGER
-#       }
-# - name: dbt__bi__yellow_m2m_expected
-#   description: expected results for dbt__bi__yellow_m2m unit test.
-#   config:
-#     schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
-#     column_types: {
-#         vendors: STRING,
-#         year: INTEGER,
-#         month: INTEGER,
-#         monthly_fare_amount: FLOAT,
-#         average_passenger_count: FLOAT,
-#         average_trip_distance: FLOAT,
-#         monthly_extra_amount: FLOAT,
-#         monthly_mta_tax: FLOAT,
-#         monthly_tip_amount: FLOAT,
-#         monthly_tolls_amount: FLOAT,
-#         monthly_improvement_surcharge: FLOAT,
-#         monthly_total_amount: FLOAT,
-#         monthly_congestion_surcharge: FLOAT,
-#         pickup_borough: STRING,
-#         pickup_zone: STRING,
-#         dropoff_borough: STRING,
-#         dropoff_zone: STRING,
-#         airport_trip: FLOAT,
-#         payment_type: STRING,
-#         trip_count: INTEGER,
-#         avg_duration_minutes: FLOAT,
-#         total_duration_hours: FLOAT,
-#         busiest_hour_of_day: INTEGER
-#       }
+seeds:
+- name: test_dbt__ml__yellow_fare
+  description: sample data to be used for unit testing dbt__ml__yellow_fare
+  config:
+    schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
+    column_types: {
+        VendorID: INTEGER,
+        tpep_pickup_datetime: TIMESTAMP,
+        tpep_dropoff_datetime: TIMESTAMP,
+        passenger_count: INTEGER,
+        trip_distance: FLOAT,
+        RatecodeID: INTEGER,
+        store_and_fwd_flag: STRING,
+        PULocationID: INTEGER,
+        DOLocationID: INTEGER,
+        payment_type: INTEGER,
+        fare_amount: FLOAT,
+        extra: FLOAT,
+        mta_tax: FLOAT,
+        tip_amount: FLOAT,
+        tolls_amount: FLOAT,
+        improvement_surcharge: FLOAT,
+        total_amount: FLOAT,
+        congestion_surcharge: FLOAT,
+        airport_fee: FLOAT,
+      }
+- name: dbt__ml__yellow_fare_expected
+  description: expected results for dbt__ml__yellow_fare unit test.
+  config:
+    schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
+    column_types: {
+        passenger_count: INTEGER,
+        trip_distance: FLOAT64,
+        fare_amount: FLOAT,
+        pickup_long: FLOAT,
+        pickup_lat: FLOAT,
+        dropoff_long: FLOAT,
+        dropoff_lat: FLOAT,
+        date: DATE,
+        trip_duration: INTEGER,
+        day_of_month: INTEGER,
+        month: INTEGER,
+        year: INTEGER,
+        day_of_week: INTEGER,
+        hour_of_day: INTEGER,
+        pickup_jfk_distance: FLOAT,
+        dropoff_jfk_distance: FLOAT,
+        pickup_ewr_distance: FLOAT,
+        dropoff_ewr_distance: FLOAT,
+        pickup_lga_distance: FLOAT,
+        dropoff_lga_distance: FLOAT
+      }
+- name: test_dbt__bi__yellow_m2m
+  description: sample data to be used for unit testing dbt__bi__yellow_m2m
+  config:
+    schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
+    column_types: {
+        VendorID: INTEGER,
+        first_day_of_month: DATE,
+        pickup_zone: INTEGER,
+        dropoff_zone: INTEGER,
+        store_and_fwd_flag: STRING,
+        monthly_fare_amount: FLOAT,
+        average_passenger_count: FLOAT,
+        average_trip_distance: FLOAT,
+        monthly_extra_amount: FLOAT,
+        monthly_mta_tax: FLOAT,
+        monthly_tip_amount: FLOAT,
+        monthly_tolls_amount: FLOAT,
+        monthly_improvement_surcharge: FLOAT,
+        monthly_total_amount: FLOAT,
+        payment_type: INTEGER,
+        monthly_congestion_surcharge: FLOAT,
+        monthly_airport_fee: FLOAT,
+        trip_count: INTEGER,
+        avg_duration_minutes: FLOAT,
+        total_duration_hours: FLOAT,
+        busiest_hour_of_day: INTEGER
+      }
+- name: dbt__bi__yellow_m2m_expected
+  description: expected results for dbt__bi__yellow_m2m unit test.
+  config:
+    schema: "{{ env_var('UNIT_TESTS_DATASET') }}"
+    column_types: {
+        vendors: STRING,
+        year: INTEGER,
+        month: INTEGER,
+        monthly_fare_amount: FLOAT,
+        average_passenger_count: FLOAT,
+        average_trip_distance: FLOAT,
+        monthly_extra_amount: FLOAT,
+        monthly_mta_tax: FLOAT,
+        monthly_tip_amount: FLOAT,
+        monthly_tolls_amount: FLOAT,
+        monthly_improvement_surcharge: FLOAT,
+        monthly_total_amount: FLOAT,
+        monthly_congestion_surcharge: FLOAT,
+        pickup_borough: STRING,
+        pickup_zone: STRING,
+        dropoff_borough: STRING,
+        dropoff_zone: STRING,
+        airport_trip: FLOAT,
+        payment_type: STRING,
+        trip_count: INTEGER,
+        avg_duration_minutes: FLOAT,
+        total_duration_hours: FLOAT,
+        busiest_hour_of_day: INTEGER
+      }
