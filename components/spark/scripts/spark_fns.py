@@ -105,6 +105,7 @@ def get_schema_info(links: list[str]) -> pd.DataFrame:
 #     return df_groups.apply(lambda x: list(x)).tolist()
 
 def schema_groups(df: pd.DataFrame) -> list[list[str]]:
+    df = df.astype(str)
     columns = [value for value in list(df.columns) if value != "link"]
     df_groups = df.groupby(columns)["link"].agg(list).reset_index()
     grouped_links = df_groups.values.tolist()
