@@ -34,6 +34,7 @@ def main():
     cp_config = ConfigLoader(CP_CONFIG_PATH).load_config()
 
     # Create a DataContext and add the checkpoint
+    print("starting")
     data_context = BaseDataContext(DataContextConfig(**ge_config))
     print("data_context complete")
     data_context.add_checkpoint(**cp_config)
