@@ -176,7 +176,7 @@ with DAG(
     t5 = KubernetesJobOperator(
         task_id="retrain_model",
         body_filepath=POD_TEMPALTE,
-        command=["python", f"{BASE}/ml_train/script/train.py"],
+        command=["python", f"{BASE}/ml_train/scripts/train.py"],
         jinja_job_args={
             "name": "xgb-model-training",
             "image": f"eu.gcr.io/{GOOGLE_CLOUD_PROJECT}/ml_train",
