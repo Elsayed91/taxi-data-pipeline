@@ -112,13 +112,14 @@ def get_schema_info(links: list[str]) -> pd.DataFrame:
 #     return grouped_links
 
 def schema_groups(df: pd.DataFrame) -> list:
-    df_groups = df.groupby(df.columns.tolist())["link"].agg(list).reset_index()["link"].tolist()
-    print(f"len of grouped data is: {len(df)}")
-    print(df_groups[:3])
     df_groups = df.groupby(df.columns.tolist())["link"].apply(lambda x: x.tolist()).tolist()
+    print(f"len of 1st grouped data is: {len(df)}")
+    print(df_groups[:3])
+    df_groups = df.groupby(df.columns.tolist(), as_index=False)["link"].agg(list)
     print(f"len of 2nd grouped data is: {len(df)}")
     print(df_groups[:3])
-    return df_groups
+    return df_groups["link"].tolist()
+
 
 def cast_columns(df: DataFrame, mapping: dict[str, str]) -> DataFrame:
     """
