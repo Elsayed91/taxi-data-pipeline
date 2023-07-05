@@ -9,10 +9,11 @@ transformations on the data.
 environmental variables that are set when the module is run.
 """
 import os
-from spark_fns import *
-from configs import *
+
 from pyspark.sql import SparkSession
 
+from configs import *
+from spark_fns import *
 
 if __name__ == "__main__":
     spark = SparkSession.builder.getOrCreate()
@@ -24,8 +25,11 @@ if __name__ == "__main__":
 
     blobs = get_gcs_files(SRC_BUCKET, SRC_FOLDER, SRC_FOLDER)
     blobs = list_files(blobs)
+    print(f"blobs are {blobs}")
     df = get_schema_info(blobs)
     lists = schema_groups(df)
     for l in lists:
         idx = lists.index(l)
+        print(f"processing {l}")
         process_initial_load(spark, l, idx, **opts)
+        print("finished processing")

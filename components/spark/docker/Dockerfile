@@ -1,4 +1,5 @@
-FROM apache/spark-py:v3.1.3
+# FROM apache/spark-py:v3.1.3
+FROM apache/spark-py:v3.3.1
 
 WORKDIR /
 #Reset to root to run installation tasks
