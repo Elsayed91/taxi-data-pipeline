@@ -1,4 +1,4 @@
-FROM apache/spark-py
+FROM apache/spark-py:v3.1.3
 
 WORKDIR /
 #Reset to root to run installation tasks
@@ -21,3 +21,4 @@ COPY --chmod=0755 [ "conf/metrics.properties", "conf/prometheus.yaml", "/etc/met
 # Specify the User that the actual main process will run as
 USER 185
 ENTRYPOINT [ "/opt/entrypoint.sh" ]
+

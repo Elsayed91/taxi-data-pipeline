@@ -87,7 +87,7 @@ generate_random_env ${SCRIPT_DIR}/../data/random_env.csv
 # sleep 120
 
 airflow_pod=$(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow)
-kubectl exec -t $airflow_pod -c scheduler -- airflow dags unpause full-refresh 
+# kubectl exec -t $airflow_pod -c scheduler -- airflow dags unpause full-refresh 
 kubectl exec -t $airflow_pod -c scheduler -- airflow dags trigger full-refresh
 # example batch dag run
 # kubectl exec -t $airflow_pod -c scheduler -- airflow dags trigger batch-dag --conf '{"URI":"s3://nyc-tlc/trip data/yellow_tripdata_2022-10.parquet", "FILENAME":"yellow_tripdata_2022-10.parquet", "RUN_DATE": "2022-10-01", "CATEGORY": "yellow"}'
