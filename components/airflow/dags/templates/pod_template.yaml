@@ -8,7 +8,7 @@ spec:
   containers:
     - name: "{{ job.name }}-container"
       image: "{{ job.image }}"
-      imagePullPolicy: {{ job.imagePullPolicy | default('Always') }}
+      imagePullPolicy: {{ job.imagePullPolicy | default('IfNotPresent') }}
       {% if job.resources is defined %}
       resources:
           limits:
