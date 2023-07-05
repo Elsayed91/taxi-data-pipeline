@@ -44,7 +44,7 @@ default_args = {
     "owner": "airflow",
     "start_date": pendulum.yesterday(),
     "depends_on_past": False,
-    "retries": 0,
+    "retries": 2,
     "concurrency": 1,
     "max_active_runs": 1,
     "in_cluster": True,
