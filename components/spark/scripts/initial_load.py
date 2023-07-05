@@ -22,15 +22,11 @@ if __name__ == "__main__":
     _, SRC_BUCKET, _, SRC_FOLDER = uri_parser(URI)
     CATEGORY = str(os.getenv("CATEGORY"))
     opts = options[CATEGORY]
-
     blobs = get_gcs_files(SRC_BUCKET, SRC_FOLDER, SRC_FOLDER)
     blobs = list_files(blobs)
-
     df = get_schema_info(blobs)
-    print("df shape is")
-    print(len(df))
     lists = schema_groups(df)
-    print(lists)
+    print("list size:", len(lists))
     for l in lists:
         print(f"processing {l}")
         idx = lists.index(l)
