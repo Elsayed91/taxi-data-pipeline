@@ -114,6 +114,10 @@ def get_schema_info(links: list[str]) -> pd.DataFrame:
 def schema_groups(df: pd.DataFrame) -> list:
     df_groups = df.groupby(df.columns.tolist())["link"].agg(list).reset_index()["link"].tolist()
     print(f"len of grouped data is: {len(df)}")
+    print(df_groups[:3])
+    df_groups = df.groupby(df.columns.tolist())["link"].apply(lambda x: x.tolist()).tolist()
+    print(f"len of 2nd grouped data is: {len(df)}")
+    print(df_groups[:3])
     return df_groups
 
 def cast_columns(df: DataFrame, mapping: dict[str, str]) -> DataFrame:
