@@ -208,4 +208,4 @@ tests/integration/lambda/yellow_tripdata_2019-08.parquet
 scripts/__pycache__
 mlruns
 terraform/modules/files/lambda/**
-components/dbt/app/dbt_packages/**
+components/dbt/app/dbt_packages
