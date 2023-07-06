@@ -1,11 +1,9 @@
-from airflow.models import DagBag
 import glob
 import importlib.util
 import os
 
 import pytest
-
-from airflow.models import DAG
+from airflow.models import DAG, DagBag
 from airflow.utils.dag_cycle_tester import check_cycle
 
 os.environ["ML_SERVING_MANIFEST"] = "components/ml_serve/manifests/serving.yaml"
@@ -20,8 +18,8 @@ def test_retries_present():
     dag_bag = DagBag(dag_folder="components/airflow/dags", include_examples=False)
     for dag in dag_bag.dags:
         retries = dag_bag.dags[dag].default_args.get("retries", [])
-        error_msg = f"Retries not set to 0 for DAG {dag}"
-        assert retries == 0, error_msg
+        error_msg = f"Retries not set to 2 for DAG {dag}"
+        assert retries == 2, error_msg
 
 
 def test_in_cluster():
