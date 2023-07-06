@@ -73,4 +73,4 @@ with mlflow.start_run(experiment_id=exp_id, run_name="XGBoostRegressor"):
     mlflow.xgboost.log_model(
         xgb_model=model, artifact_path="xgb-model", registered_model_name=model_name
     )
-    print("logged xd model successfully.")
+    print("logged xdmodel successfully.")
