@@ -24,8 +24,9 @@ import sys
 import pendulum
 from airflow import DAG
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
-from airflow_kubernetes_job_operator.kubernetes_job_operator import \
-    KubernetesJobOperator
+from airflow_kubernetes_job_operator.kubernetes_job_operator import (
+    KubernetesJobOperator,
+)
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 from addons.parse_state import SparkApplication
@@ -60,7 +61,6 @@ with DAG(
     catchup=False,
     description="batch data pipeline",
 ) as dag:
-
     GKE_CLUSTER_NAME = os.getenv("GKE_CLUSTER_NAME")
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
     STAGING_BUCKET = os.getenv("STAGING_BUCKET")
@@ -203,4 +203,5 @@ with DAG(
             "nodeSelector": BASE_NODE_POOL,
         },
     )
-    t1 >> t2 >> t3 >> t4 >> t5 >> t6 # type: ignore
+    t1 >> t2 >> t3 >> t4 >> t5 >> t6  # type: ignore
+##xd
