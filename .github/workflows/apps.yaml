@@ -107,6 +107,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
             fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+            #https://stackoverflow.com/questions/74265821/get-modified-files-in-github-actions
       - id: 'auth'
         uses: 'google-github-actions/auth@v1'
         with:
@@ -140,23 +141,22 @@ jobs:
           echo "${{ steps.changed-files.outputs.changed_files }}"
           echo ""
           for file in ${{ steps.changed-files.outputs.changed_files }}; do
-            echo "Processing File: $file"
-            directory=$(dirname "$file")
-            test_files=$(echo "${{ matrix.tests }}" | xargs -n 1 echo | grep "$directory/")
-            if [ -n "$test_files" ]; then
-              echo "Directory: $directory"
-              echo "Test Files: $test_files"
-              echo "Running Tests..."
-              IFS=' ' read -ra test_files_array <<< "$test_files"
-              for test_file in "${test_files_array[@]}"; do
-                pipenv run python -m pytest "tests/$test_file"
-              done
-              echo ""
-            else
-              echo "No relevant test files found for $file"
-              echo ""
-            fi
-          done
+            if [[ $file == *.py ]]; then
+              echo "Processing File: $file"
+              directory=$(dirname "$file")
+              test_files=$(echo "${{ matrix.tests }}" | xargs -n 1 echo | grep "$directory/")
+              if [ -n "$test_files" ]; then
+                echo "Directory: $directory"
+                echo "Test Files: $test_files"
+                echo "Running Tests..."
+                IFS=' ' read -ra test_files_array <<< "$test_files"
+                for test_file in "${test_files_array[@]}"; do
+                  pipenv run python -m pytest "tests/$test_file"
+                done
+                echo ""
+              else
+                echo "No relevant test files found for $file"
+                echo ""
 
       #     if echo "${changed_files}" | grep -qE "^components/${{ matrix.directory }}/"; then
       #       test_directory="tests/${{ matrix.directory }}"
