@@ -2,11 +2,12 @@
 This module sets up a KafkaConsumer that consumes stream data from a Kafka topic and loads
 it into BigQuery using the BigQuery API.
 """
-from google.cloud import bigquery
 import json
-from kafka import KafkaConsumer
-import os
 import logging
+import os
+
+from google.cloud import bigquery
+from kafka import KafkaConsumer
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)

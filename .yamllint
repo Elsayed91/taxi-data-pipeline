@@ -1,0 +1,17 @@
+---
+
+extends: default
+ignore: |
+    .tox/
+    .venv/
+    dbt_modules/
+    dbt_packages/
+    .github/
+    components/airflow/dags/templates
+
+rules:
+    brackets: disable
+    document-start: disable
+    indentation:
+        indent-sequences: whatever
+    line-length: disable

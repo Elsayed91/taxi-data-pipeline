@@ -1,6 +1,7 @@
 #!/bin/bash
 # this integration test requires localstack, terraform and kubectl installed.
 # get localstack here python3 -m pip install localstack
+# docker must be running
 # this script creates pseudo-aws infrastructure to run a lambda function on for the
 # purposes of integration testing. It will check and validate results and will clean up
 # resources before exiting.
@@ -10,10 +11,19 @@ set -e
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 cd $SCRIPT_DIR
 
+input_file="create_test_infra"
+output_file="create_test_infra.tf"
+
+# Read the input file and replace environment variables with their values
+envsubst < "$input_file" > "$output_file"
+
+python3 -m pip install localstack
 cp -r ${SCRIPT_DIR}/../../../components/aws_lambda/* ${SCRIPT_DIR}/files/
 python -m pip install --target ${SCRIPT_DIR}/files -r ${SCRIPT_DIR}/files/requirements.txt
 
 SERVICES=lambda,iam,secretsmanager,s3,logs nohup localstack start &
+
+
 
 terraform init && terraform apply --auto-approve
 sleep 5
@@ -32,9 +42,11 @@ sleep 60
 max_wait_time=150
 wait_interval=10
 elapsed_time=0
+# kubectl exec -t $(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow) -c scheduler -- airflow dags unpause lambda_integration_test
 
 while true; do
     test_run_info=$(kubectl exec -t $(kubectl get pods -o name --field-selector=status.phase=Running | grep airflow) -c scheduler -- airflow dags list-runs -d lambda_integration_test -o yaml | head -6)
+    echo $test_run_info
     if [[ -n "$test_run_info" ]]; then
         start_date=$(echo "$test_run_info" | grep "start_date" | awk '{print $2}' | tr -d "'")
         state=$(echo "$test_run_info" | grep "state" | awk '{print $2}')
@@ -68,5 +80,6 @@ while true; do
 done
 
 echo "cleaning up & tearing infrastructure down."
-rm -rf .terraform terraform.tfstate terraform.tfstate.backup .terraform.lock.hcl files/* yellow_tripdata_2019-08.parquet nohup.out
+rm -rf .terraform terraform.tfstate terraform.tfstate.backup .terraform.lock.hcl files/* yellow_tripdata_2019-08.parquet nohup.out $output_file
+
 localstack stop

@@ -21,16 +21,16 @@ steps:
   #       "--destination=eu.gcr.io/$PROJECT_ID/${_FLASK_IMAGE_NAME}:$COMMIT_SHA",
   #     ]
 
-  - id: build_dbt_image
-    waitFor: ['-']
-    name: "gcr.io/kaniko-project/executor:latest"
-    args:
-      [
-        "--context=dir://${_COMPONENTS_PATH}/dbt/docker",
-        "--cache=true",
-        "--cache-ttl=6h",
-        "--destination=eu.gcr.io/$PROJECT_ID/${_DBT_IMAGE_NAME}:$COMMIT_SHA",
-      ]
+  # - id: build_dbt_image
+  #   waitFor: ['-']
+  #   name: "gcr.io/kaniko-project/executor:latest"
+  #   args:
+  #     [
+  #       "--context=dir://${_COMPONENTS_PATH}/dbt/docker",
+  #       "--cache=true",
+  #       "--cache-ttl=6h",
+  #       "--destination=eu.gcr.io/$PROJECT_ID/${_DBT_IMAGE_NAME}:$COMMIT_SHA",
+  #     ]
 
   # - id: build_spark_image
   #   waitFor: ['-']
@@ -77,16 +77,16 @@ steps:
   #       "--destination=eu.gcr.io/$PROJECT_ID/${_ML_TRAIN_IMAGE_NAME}:$COMMIT_SHA",
   #     ]
 
-  # - id: build_kafka_image
-  #   # waitFor: ['-']
-  #   name: "gcr.io/kaniko-project/executor:latest"
-  #   args:
-  #     [
-  #       "--context=dir://${_COMPONENTS_PATH}/kafka/docker",
-  #       "--cache=true",
-  #       "--cache-ttl=6h",
-  #       "--destination=eu.gcr.io/$PROJECT_ID/${_KAFKA_IMAGE_NAME}:$COMMIT_SHA",
-  #     ]
+  - id: build_kafka_image
+    # waitFor: ['-']
+    name: "gcr.io/kaniko-project/executor:latest"
+    args:
+      [
+        "--context=dir://${_COMPONENTS_PATH}/kafka/docker",
+        "--cache=true",
+        "--cache-ttl=6h",
+        "--destination=eu.gcr.io/$PROJECT_ID/${_KAFKA_IMAGE_NAME}:$COMMIT_SHA",
+      ]
 
   # - id: build_ml_serving
   #   # waitFor: ['-']
@@ -105,10 +105,10 @@ substitutions:
   # _POSTGRES_IMAGE_NAME: postgres
   # _FLASK_IMAGE_NAME: flask
   # _ML_TRAIN_IMAGE_NAME: ml_train
-  _DBT_IMAGE_NAME: dbt
+  # _DBT_IMAGE_NAME: dbt
 
   # _AIRFLOW_IMAGE_NAME: airflow
   # _MLFLOW_IMAGE_NAME: mlflow
-  # _KAFKA_IMAGE_NAME: kafka
+  _KAFKA_IMAGE_NAME: kafka
   # _ML_SERVING_IMAGE_NAME: serving
 

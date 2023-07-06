@@ -59,10 +59,10 @@ BIGQUERY:
     - dataset_id: "${SEEDS_DATASET}"
     - dataset_id: "${UNIT_TESTS_DATASET}"
     - dataset_id: "elementary"
-    # - dataset_id: "kafka_stream"
-    #   tables:
-    #     - table_id: "kafka"
-    #       schema: "files/bq_schemas/stg_yellow.json"
+    - dataset_id: "kafka_stream"
+      tables:
+        - table_id: "kafka"
+          schema: "files/bq_schemas/stg_yellow.json"
 GCS:
   buckets:
     - bucket_name: "${STAGING_BUCKET}"

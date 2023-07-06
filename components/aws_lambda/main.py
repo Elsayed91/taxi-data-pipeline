@@ -1,34 +1,38 @@
 """
 Functionality:
--   The function is triggered when an object is added to an S3 bucket. It retrieves the bucket name and
-    object key from the event data, constructs an object URI in the format "s3://bucket_name/key".
--   retrieves variables data (cluster data, DAG name, and namespace) from environment variables.
--   authenticates with Google Cloud Platform (GCP) using a service account key, and uses the Google
-    Kubernetes Engine (GKE) API to retrieve information about a specific cluster and create a
-    Kubernetes client configuration and subsequently a Kubernetes API client.
--   retrieves a list of pods in the specified namespace, and searches for a pod with a name containing
-    "airflow". This is done as the airflow pod unlike the deployment, is usually suffixed randomly.
-    If found, it uses the Kubernetes API to execute the command string on the pod to trigger a dag.
+-   The function is triggered when an object is added to an S3 bucket. It retrieves the
+    bucket name and object key from the event data, constructs an object URI in the format
+    "s3://bucket_name/key".
+-   retrieves variables data (cluster data, DAG name, and namespace) from environment
+    variables.
+-   authenticates with Google Cloud Platform (GCP) using a service account key, and uses
+    the Google Kubernetes Engine (GKE) API to retrieve information about a specific
+    cluster and create a Kubernetes client configuration and subsequently a Kubernetes API
+    client.
+-   retrieves a list of pods in the specified namespace, and searches for a pod with a
+    name containing "airflow". This is done as the airflow pod unlike the deployment, is
+    usually suffixed randomly. If found, it uses the Kubernetes API to execute the command
+    string on the pod to trigger a dag.
 
 References:
-    GKE Authentication: https://stackoverflow.com/questions/54410410/authenticating-to-gke-master-in-python
+    GKE Authentication:
+    https://stackoverflow.com/questions/54410410/authenticating-to-gke-master-in-python
 """
-import os
-from tempfile import NamedTemporaryFile
-import json
 import base64
+import json
+import os
 import re
+from tempfile import NamedTemporaryFile
 from typing import Any
 
-import kubernetes.client
-import googleapiclient.discovery
-
-import kubernetes
-from kubernetes.stream import stream
-from google.oauth2.service_account import Credentials
-from aws_lambda_typing.context import Context as LambdaContext
 import boto3
+import googleapiclient.discovery
+import kubernetes
+import kubernetes.client
+from aws_lambda_typing.context import Context as LambdaContext
 from botocore.exceptions import ClientError
+from google.oauth2.service_account import Credentials
+from kubernetes.stream import stream
 
 
 def extract_target_date(filename: str) -> str:
@@ -249,6 +253,7 @@ def lambda_handler(
     dag_trigger_command = f"""airflow dags unpause {dag} && airflow  \
         dags trigger {dag} --conf '{{"URI":"{object_uri}", \
         "FILENAME":"{key}", "RUN_DATE": "{run_date}", "CATEGORY": "{category}"}}'"""
+    print(dag_trigger_command)
     gcp_project = os.getenv("PROJECT")
     gcp_zone = os.getenv("GCP_ZONE")
     gke_name = os.getenv("GKE_CLUSTER_NAME")
