@@ -141,27 +141,43 @@ jobs:
             echo "${{ steps.changed-files.outputs.changed_files }}"
             echo ""
             for file in ${{ steps.changed-files.outputs.changed_files }}; do
-              echo "Processing File: $file"
               if [[ $file == *.py ]]; then
-                echo "File is a Python file"
+                echo "Processing File: $file"
                 directory=$(dirname "$file")
                 echo "Directory: $directory"
-                test_files=$(echo "${{ matrix.tests }}" | xargs -n 1 echo | grep "$directory/")
+                case $directory in
+                  "airflow/dags")
+                    test_files="test_airflow_addons.py test_airflow.py"
+                    ;;
+                  "data_validation")
+                    test_files="test_validation.py"
+                    ;;
+                  "docs_app/docker")
+                    test_files="test_docsapp.py"
+                    ;;
+                  "ml_train/scripts")
+                    test_files="test_train.py"
+                    ;;
+                  "ml_serve/docker")
+                    test_files="test_serve.py"
+                    ;;
+                  "scripts")
+                    test_files="test_create_seed.py"
+                    ;;
+                  *)
+                    echo "No relevant test files found for $file"
+                    continue
+                    ;;
+                esac
+
                 echo "Test Files: $test_files"
-                if [ -n "$test_files" ]; then
-                  echo "Running Tests..."
-                  IFS=' ' read -ra test_files_array <<< "$test_files"
-                  for test_file in "${test_files_array[@]}"; do
-                    echo "Running test: $test_file"
-                    pipenv run python -m pytest "tests/$test_file"
-                  done
-                  echo ""
-                else
-                  echo "No relevant test files found for $file"
-                  echo ""
-                fi
-              else
-                echo "Skipping non-Python file: $file"
+                echo "Running Tests..."
+                IFS=' ' read -ra test_files_array <<< "$test_files"
+                for test_file in "${test_files_array[@]}"; do
+                  echo "Running pytest for $test_file"
+                  pipenv run python -m pytest "tests/$directory/$test_file"
+                done
+
                 echo ""
               fi
             done
