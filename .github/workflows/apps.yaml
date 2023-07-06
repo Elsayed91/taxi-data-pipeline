@@ -73,7 +73,7 @@ jobs:
           pipenv install --dev --verbose
       - name: Run tests
         run: |
-          export PYTHONPATH=$PYTHONPATH:.
+          # export PYTHONPATH=$PYTHONPATH:.
           pipenv run python -m pytest tests/ -svx
           # # s for print statements
           # # v to increase verbosity
