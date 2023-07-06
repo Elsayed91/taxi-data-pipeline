@@ -73,6 +73,7 @@ jobs:
           pipenv install --dev --verbose
       - name: Run tests
         run: |
+          export PYTHONPATH=$PYTHONPATH:.
           pipenv run python -m pytest tests/ -svx
           # # s for print statements
           # # v to increase verbosity
@@ -83,5 +84,3 @@ jobs:
           pipenv run python -m isort $(git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r "$GITHUB_SHA" -- '*.py' | xargs)
           pipenv run python -m pylint $(git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r "$GITHUB_SHA" -- '*.py' | xargs)
           fi
-
-

@@ -1,15 +1,16 @@
-import pytest
-from unittest.mock import patch
-from components.spark.scripts.spark_fns import *
-from unittest import mock
-import pyarrow.parquet as pq
-import google.cloud.storage as storage
-from components.spark.scripts.configs import *
-import pyarrow as pa
-import unittest.mock
-import unittest
-import pandas as pd
 import tempfile
+import unittest
+import unittest.mock
+from unittest import mock
+from unittest.mock import patch
+
+import google.cloud.storage as storage
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+import pytest
+from components.spark.scripts.configs import *
+from components.spark.scripts.spark_fns import *
 
 
 @pytest.mark.parametrize(
@@ -189,7 +190,7 @@ def test_cast_columns(spark_session):
     casted_df = cast_columns(df, mapping)
 
     # Check that the data types of the columns were updated correctly
-    from pyspark.sql.types import IntegerType, TimestampType, FloatType
+    from pyspark.sql.types import FloatType, IntegerType, TimestampType
 
     assert casted_df.schema["VendorID"].dataType == IntegerType()
     assert casted_df.schema["tpep_pickup_datetime"].dataType == TimestampType()
