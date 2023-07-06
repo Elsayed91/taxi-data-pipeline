@@ -29,11 +29,12 @@ def load_data(
     The function should ideally be used using `TABLESAMPLE SYSTEM` which is more
     efficient and doesn't cause a full table read when sampling, however it returns
     inconsistent number of rows, so limiting rows using read_gbp is used.
+    this could be implemented via
+    query = SELECT * EXCEPT(date) FROM
+           ( SELECT * FROM `{dataset}`.`{table}`
+           TABLESAMPLE SYSTEM ({sample_size} PERCENT) )
     """
 
-    # query = f"""SELECT * EXCEPT(date) FROM
-    #         ( SELECT * FROM `{dataset}`.`{table}`
-    #         TABLESAMPLE SYSTEM ({sample_size} PERCENT) )"""
     if not query:
         query = f"""SELECT * EXCEPT(date) FROM `{dataset}`.`{table}` 
                 WHERE RAND() < 0.1"""

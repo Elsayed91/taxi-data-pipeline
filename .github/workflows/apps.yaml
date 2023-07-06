@@ -140,12 +140,23 @@ jobs:
           echo "Changed Files:"
           echo "${{ steps.changed-files.outputs.changed_files }}"
           echo ""
+          processed_directories=()
           for file in ${{ steps.changed-files.outputs.changed_files }}; do
             if [[ $file == *.py ]]; then
               echo "Processing File: $file"
               directory=$(dirname "$file")
               directory="$directory"
               echo "Directory: $directory"
+
+              # Check if the directory has already been processed
+              if [[ " ${processed_directories[@]} " =~ " $directory " ]]; then
+                echo "Skipping duplicate directory: $directory"
+                echo ""
+                continue
+              fi
+
+              processed_directories+=("$directory")
+
               case $directory in
                 "components/airflow/dags")
                   test_files="test_airflow_addons.py test_airflow.py"
@@ -167,6 +178,7 @@ jobs:
                   ;;
                 *)
                   echo "No relevant test files found for $file"
+                  echo ""
                   continue
                   ;;
               esac
@@ -176,7 +188,7 @@ jobs:
               IFS=' ' read -ra test_files_array <<< "$test_files"
               for test_file in "${test_files_array[@]}"; do
                 echo "Running pytest for $test_file"
-                pipenv run python -m pytest "tests/$test_file" --trace
+                pipenv run python -m pytest "tests/$directory/$test_file"
               done
 
               echo ""
