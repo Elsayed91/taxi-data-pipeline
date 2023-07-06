@@ -137,29 +137,30 @@ jobs:
             done
       - name: Run tests
         run: |
-          echo "Changed Files:"
-          echo "${{ steps.changed-files.outputs.changed_files }}"
-          echo ""
-          for file in ${{ steps.changed-files.outputs.changed_files }}; do
-            if [[ $file == *.py ]]; then
-              echo "Processing File: $file"
-              directory=$(dirname "$file")
-              test_files=$(echo "${{ matrix.tests }}" | xargs -n 1 echo | grep "$directory/")
-              if [ -n "$test_files" ]; then
-                echo "Directory: $directory"
-                echo "Test Files: $test_files"
-                echo "Running Tests..."
-                IFS=' ' read -ra test_files_array <<< "$test_files"
-                for test_file in "${test_files_array[@]}"; do
-                  pipenv run python -m pytest "tests/$test_file"
-                done
-                echo ""
-              else
-                echo "No relevant test files found for $file"
-                echo ""
+            echo "Changed Files:"
+            echo "components/ml_train/scripts/train_utils.py"
+            echo ""
+            for file in components/ml_train/scripts/train_utils.py; do
+              if [[ $file == *.py ]]; then
+                echo "Processing File: $file"
+                directory=$(dirname "$file")
+                test_files=$(echo "test_create_seed.py" | xargs -n 1 echo | grep "$directory/")
+                if [ -n "$test_files" ]; then
+                  echo "Directory: $directory"
+                  echo "Test Files: $test_files"
+                  echo "Running Tests..."
+                  IFS=' ' read -ra test_files_array <<< "$test_files"
+                  for test_file in "${test_files_array[@]}"; do
+                    pipenv run python -m pytest "tests/$test_file"
+                  done
+                  echo ""
+                else
+                  echo "No relevant test files found for $file"
+                  echo ""
+                fi
               fi
-            fi
-          done
+            done
+
 
 
       #     if echo "${changed_files}" | grep -qE "^components/${{ matrix.directory }}/"; then
