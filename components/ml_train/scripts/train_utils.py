@@ -1,4 +1,5 @@
 from typing import Optional
+
 import pandas as pd
 
 
@@ -40,3 +41,6 @@ def load_data(
         query, progress_bar_type="tqdm", use_bqstorage_api=True, max_results=sample_size
     )
     return df
+
+
+# hehehexd

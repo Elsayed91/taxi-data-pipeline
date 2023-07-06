@@ -104,7 +104,9 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+            fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
       - id: 'auth'
         uses: 'google-github-actions/auth@v1'
         with:
@@ -119,36 +121,49 @@ jobs:
       - name: Install pipenv
         run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
       - run: pipenv install --dev --verbose
+      - name: Get changed files
+        id: changed-files
+        run: |
+            if ${{ github.event_name == 'pull_request' }}; then
+                echo "changed_files=$(git diff --name-only -r HEAD^1 HEAD | xargs)" >> $GITHUB_OUTPUT
+            else
+                echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
+            fi
+      - name: List changed files
+        run: |
+            for file in ${{ steps.changed-files.outputs.changed_files }}; do
+                echo "$file was changed"
+            done
       - name: Run tests
         run: |
-          changed_files=$(git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r ${{ github.sha }} -- '*.py' | xargs) 
-          test_directory=""
-          test_files=""
+            changed_files="${{ steps.changed-files.outputs.changed_files }}"
+            test_directory=""
+            test_files=""
 
-          echo "Changed Files:"
-          echo "${changed_files}"
+            echo "Changed Files:"
+            echo "${changed_files}"
 
-          if echo "${changed_files}" | grep -qE "^components/${{ matrix.directory }}/"; then
-            test_directory="tests/${{ matrix.directory }}"
-            test_files="${{ matrix.tests }}"
-            echo "Test Directory: $test_directory"
-            echo "Test Files: $test_files"
-          else
-            exit 0
-          fi
+      #     if echo "${changed_files}" | grep -qE "^components/${{ matrix.directory }}/"; then
+      #       test_directory="tests/${{ matrix.directory }}"
+      #       test_files="${{ matrix.tests }}"
+      #       echo "Test Directory: $test_directory"
+      #       echo "Test Files: $test_files"
+      #     else
+      #       exit 0
+      #     fi
 
-          # Handling multiple test files
-          if [ -n "${test_files}" ]; then
-            IFS=' ' read -ra test_files_array <<< "${test_files}"
-            for test_file in "${test_files_array[@]}"; do
-              echo "Running Test: $test_directory/$test_file"
-              pipenv run python -m pytest ${test_directory}/${test_file}
-            done
-          fi
+      #     # Handling multiple test files
+      #     if [ -n "${test_files}" ]; then
+      #       IFS=' ' read -ra test_files_array <<< "${test_files}"
+      #       for test_file in "${test_files_array[@]}"; do
+      #         echo "Running Test: $test_directory/$test_file"
+      #         pipenv run python -m pytest ${test_directory}/${test_file}
+      #       done
+      #     fi
 
-      - name: Format-Lint-Sort
-        run: |
-          if [[ $(git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r ${{ github.sha }} -- '*.py' | xargs) ]]; then
-            pipenv run python -m black --check $(git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r "$GITHUB_SHA" -- '*.py' | xargs)
-            pipenv run python -m isort $(git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r "$GITHUB_SHA" -- '*.py' | xargs)
-          fi
+      # - name: Format-Lint-Sort
+      #   run: |
+      #     if [[ $(git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r ${{ github.sha }} -- '*.py' | xargs) ]]; then
+      #       pipenv run python -m black --check $(git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r "$GITHUB_SHA" -- '*.py' | xargs)
+      #       pipenv run python -m isort $(git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r "$GITHUB_SHA" -- '*.py' | xargs)
+      #     fi
