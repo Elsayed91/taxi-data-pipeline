@@ -36,7 +36,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_s
 # Model parameters
 param = {
     "max_depth": [6],
-    "n_estimators": [ 25, 100],
+    "n_estimators": [25, 100],
     "min_child_weight": [3, 5, 7],
 }
 
@@ -73,4 +73,4 @@ with mlflow.start_run(experiment_id=exp_id, run_name="XGBoostRegressor"):
     mlflow.xgboost.log_model(
         xgb_model=model, artifact_path="xgb-model", registered_model_name=model_name
     )
-    print("logged model successfully.")
+    print("logged the model successfully.")
