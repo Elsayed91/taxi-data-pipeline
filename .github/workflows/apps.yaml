@@ -144,7 +144,7 @@ jobs:
             if [[ $file == *.py ]]; then
               echo "Processing File: $file"
               directory=$(dirname "$file")
-              directory="components/$directory"  # Add "components" prefix
+              directory="$directory"
               echo "Directory: $directory"
               case $directory in
                 "components/airflow/dags")
