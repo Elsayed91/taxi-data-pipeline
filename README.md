@@ -1,12 +1,32 @@
-https://www.catchr.io/templates/google-search-console-query-insight
-https://lookerstudio.google.com/reporting/ccd9e11f-b634-4fa2-9d26-cf4f7079389f
 
 
-# Load the XGBoost model from the registry
-model = mlflow.xgboost.load_model("xgboost-predictor")
 
-# Fit the model to the training data, using the loaded model as the starting point for training
-model.fit(X_train, y_train, xgb_model=model.get_booster())
+
+# Overview
+This project utilizes New York City yellow taxi data to construct a scalable and automated data pipeline. It involves orchestrating the workflow using `Kubernetes` and `Apache Airflow`, transforming and loading data across various cloud service providers, and processing and loading it into `BigQuery` with the assistance of `Apache Spark`. The data stored in BigQuery serves as the foundation for creating models using `DBT`, which can be accessed by both BI users and Data Scientists for developing ML models. The pipeline not only trains these ML models but also serves them. To ensure data quality, the project implements DBT tests and leverages `Great Expectations`.
+
+## Architecture
+
+![Project Architecture]("./docs/images/setup_gcp.png")
+
+
+    
+
+
+
+## Continuous Integration and Deployment (CI/CD)
+
+The project employs CI/CD pipelines to ensure reliable and automated deployment. 
+
+### Overview of the CI/CD processes for different components:
+
+-   **Terraform and Lambda CI/CD**: The Terraform infrastructure and Lambda function have dedicated CI/CD pipelines. These pipelines apply infrastructure changes after formatting and validating, ensuring consistency and reliability.
+    
+-   **Python Applications CI/CD**: Python applications within the project have CI/CD pipelines that run tests, linting, and formatting. These pipelines ensure the code's quality and conformity to standards.
+    
+-   **Docker and Kubernetes Components CI/CD**: Docker images are built, and attached Kubernetes deployments are restarted (if they exist) through dedicated CI/CD pipelines. These pipelines facilitate the deployment and management of containerized applications.
+    
+-   **Kubernetes Manifest Changes**: Changes to Kubernetes manifests trigger restarts for relevant deployments. A tool is utilized to automatically restart deployments when config maps or secrets are modified, ensuring seamless updates.
 
 ## **Testing**
 ### **Standard Unit Tests**
