@@ -157,6 +157,10 @@ jobs:
               else
                 echo "No relevant test files found for $file"
                 echo ""
+              fi
+            fi
+          done
+
 
       #     if echo "${changed_files}" | grep -qE "^components/${{ matrix.directory }}/"; then
       #       test_directory="tests/${{ matrix.directory }}"
