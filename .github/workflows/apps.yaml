@@ -88,18 +88,18 @@ jobs:
         include:
           - directory: 'airflow/dags'
             tests:
-              - 'tests/test_airflow_addons.py'
-              - 'tests/test_airflow.py'
+              - 'test_airflow_addons.py'
+              - 'test_airflow.py'
           - directory: 'data_validation'
-            tests: 'tests/test_validation.py'
+            tests: 'test_validation.py'
           - directory: 'docs_app/docker'
-            tests: 'tests/test_docsapp.py'
+            tests: 'test_docsapp.py'
           - directory: 'ml_train/scripts'
-            tests: 'tests/test_train.py'
+            tests: 'test_train.py'
           - directory: 'ml_serve/docker'
-            tests: 'tests/test_serve.py'
+            tests: 'test_serve.py'
           - directory: 'scripts'
-            tests: 'tests/test_create_seed.py'
+            tests: 'test_create_seed.py'
 
 
     runs-on: ${{ matrix.os }}
@@ -136,46 +136,25 @@ jobs:
             done
       - name: Run tests
         run: |
-          changed_files="${{ steps.changed-files.outputs.changed_files }}"
-
           echo "Changed Files:"
-          echo "${changed_files}"
-
-          # Loop through the changed files
-          IFS=' ' read -ra files <<< "${changed_files}"
-          for file in "${files[@]}"; do
-            if [[ "${file}" != *.py ]]; then
-              echo "Skipping non-Python file: ${file}"
-              continue
-            fi
-
-            echo "Processing File: ${file}"
-
-            # Extract the directory from the changed file
-            directory=$(dirname "${file}")
-            echo "Directory: ${directory}"
-
-            # Find the matching test files based on the matrix
-            test_files=""
-            for item in ${{ matrix.tests }}; do
-              matrix_directory=$(echo "${item}" | awk -F ':' '{print $1}')
-              matrix_tests=$(echo "${item}" | awk -F ':' '{print $2}')
-
-              if [[ "${directory}" == "${matrix_directory}"* ]]; then
-                if [[ -z "${test_files}" ]]; then
-                  test_files="${matrix_tests}"
-                else
-                  test_files="${test_files} ${matrix_tests}"
-                fi
-              fi
-            done
-
-            # Run the tests if relevant test files are found
-            if [[ -n "${test_files}" ]]; then
-              echo "Running Tests: ${test_files}"
-              pipenv run python -m pytest -svx ${test_files}
+          echo "${{ steps.changed-files.outputs.changed_files }}"
+          echo ""
+          for file in ${{ steps.changed-files.outputs.changed_files }}; do
+            echo "Processing File: $file"
+            directory=$(dirname "$file")
+            test_files=$(echo "${{ matrix.tests }}" | xargs -n 1 echo | grep "$directory/")
+            if [ -n "$test_files" ]; then
+              echo "Directory: $directory"
+              echo "Test Files: $test_files"
+              echo "Running Tests..."
+              IFS=' ' read -ra test_files_array <<< "$test_files"
+              for test_file in "${test_files_array[@]}"; do
+                pipenv run python -m pytest "tests/$test_file"
+              done
+              echo ""
             else
-              echo "No relevant test files found for ${file}"
+              echo "No relevant test files found for $file"
+              echo ""
             fi
           done
 
