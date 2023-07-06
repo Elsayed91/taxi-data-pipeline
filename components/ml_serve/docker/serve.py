@@ -10,10 +10,12 @@ once it's connected, the cached model will be available for use even if Streamli
 the entire app when an element is updated. This remains the case even if there's a
 connection issue later on.
 """
-import streamlit as st
-import pandas as pd
-from serve_utils import PredictionAssistant, load_model
 import os
+
+import pandas as pd
+import streamlit as st
+
+from serve_utils import PredictionAssistant, load_model
 
 
 def run(mlflow_uri: str, mlflow_experiment_name: str) -> None:
@@ -91,3 +93,6 @@ if __name__ == "__main__":
         )
         if st.button("Check Connection"):
             st.cache_resource.clear()
+
+
+## xdxd

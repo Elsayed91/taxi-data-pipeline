@@ -88,18 +88,18 @@ jobs:
         include:
           - directory: 'airflow/dags'
             tests:
-              - 'test_airflow_addons.py'
-              - 'test_airflow.py'
+              - 'tests/test_airflow_addons.py'
+              - 'tests/test_airflow.py'
           - directory: 'data_validation'
-            tests: 'test_validation.py'
+            tests: 'tests/test_validation.py'
           - directory: 'docs_app/docker'
-            tests: 'test_docsapp.py'
+            tests: 'tests/test_docsapp.py'
           - directory: 'ml_train/scripts'
-            tests: 'test_train.py'
+            tests: 'tests/test_train.py'
           - directory: 'ml_serve/docker'
-            tests: 'test_serve.py'
+            tests: 'tests/test_serve.py'
           - directory: 'scripts'
-            tests: 'test_create_seed.py'
+            tests: 'tests/test_create_seed.py'
 
 
     runs-on: ${{ matrix.os }}
