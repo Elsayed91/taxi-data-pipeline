@@ -138,19 +138,21 @@ jobs:
       - name: Run tests
         run: |
             echo "Changed Files:"
-            echo "components/ml_train/scripts/train_utils.py"
+            echo "${{ steps.changed-files.outputs.changed_files }}"
             echo ""
-            for file in components/ml_train/scripts/train_utils.py; do
+            for file in ${{ steps.changed-files.outputs.changed_files }}; do
+              echo "Processing File: $file"
               if [[ $file == *.py ]]; then
-                echo "Processing File: $file"
+                echo "File is a Python file"
                 directory=$(dirname "$file")
-                test_files=$(echo "test_create_seed.py" | xargs -n 1 echo | grep "$directory/")
+                echo "Directory: $directory"
+                test_files=$(echo "${{ matrix.tests }}" | xargs -n 1 echo | grep "$directory/")
+                echo "Test Files: $test_files"
                 if [ -n "$test_files" ]; then
-                  echo "Directory: $directory"
-                  echo "Test Files: $test_files"
                   echo "Running Tests..."
                   IFS=' ' read -ra test_files_array <<< "$test_files"
                   for test_file in "${test_files_array[@]}"; do
+                    echo "Running test: $test_file"
                     pipenv run python -m pytest "tests/$test_file"
                   done
                   echo ""
@@ -158,6 +160,9 @@ jobs:
                   echo "No relevant test files found for $file"
                   echo ""
                 fi
+              else
+                echo "Skipping non-Python file: $file"
+                echo ""
               fi
             done
 
