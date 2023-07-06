@@ -22,8 +22,9 @@ from datetime import datetime, timedelta
 import pendulum
 from airflow import DAG
 from airflow_kubernetes_job_operator.kube_api import KubeResourceKind
-from airflow_kubernetes_job_operator.kubernetes_job_operator import \
-    KubernetesJobOperator
+from airflow_kubernetes_job_operator.kubernetes_job_operator import (
+    KubernetesJobOperator,
+)
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
@@ -33,7 +34,7 @@ default_args = {
     "owner": "airflow",
     "start_date": pendulum.yesterday(),
     "depends_on_past": False,
-    "retries": 0,
+    "retries": 2,
     "retry_delay": timedelta(minutes=60),
     "concurrency": 1,
     "max_active_runs": 1,
@@ -194,4 +195,4 @@ with DAG(
             "nodeSelector": BASE_NODE_POOL,
         },
     )
-    t1 >> t2 >> t3 >> t4  >> t5 # type: ignore
+    t1 >> t2 >> t3 >> t4 >> t5  # type: ignore
