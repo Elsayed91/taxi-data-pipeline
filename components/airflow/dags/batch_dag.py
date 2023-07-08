@@ -196,7 +196,7 @@ with DAG(
     t6 = KubernetesJobOperator(
         task_id="refresh_streamlit",
         body_filepath=POD_TEMPALTE,
-        arguments=["rollout", "restart", "deployment", "ml-serve"],
+        arguments=["rollout", "restart", "deployment", "ml_serve"],
         jinja_job_args={
             "name": "refresh-streamlit-model",
             "image": f"bitnami/kubectl",
