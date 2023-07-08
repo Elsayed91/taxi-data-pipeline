@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flaskapp
+  name: docs_app
   annotations:
     reloader.stakater.com/auto: "true"
 spec:
   selector:
     matchLabels:
-      app: flaskapp
+      app: docs_app
   template:
     metadata:
       labels:
-        app: flaskapp
+        app: docs_app
     spec:
       affinity:
         podAntiAffinity:
@@ -21,7 +21,7 @@ spec:
               - key: app
                 operator: In
                 values:
-                - flaskapp
+                - docs_app
             topologyKey: kubernetes.io/hostname
       containers:
         - name: flask-k8s
