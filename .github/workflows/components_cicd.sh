@@ -32,7 +32,7 @@ EOL
     gcloud builds submit .
     echo "Image for $component built and pushed to registry."
 
-    if [[ $(find ${BASE_DIR}/$component/manifests -name "*_deployment.yaml" | wc -l) -gt 0 ]]; then
+    if [[ $(find ${BASE_DIR}/components/$component/manifests -name "*_deployment.yaml" | wc -l) -gt 0 ]]; then
       echo "Rolling out deployment for $component..."
       kubectl rollout restart deployment $component
       echo "Deployment for $component rolled out."
