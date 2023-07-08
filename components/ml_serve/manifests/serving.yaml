@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ml_serve
+  name: ml-serve
   annotations:
     reloader.stakater.com/auto: "true"
 spec:
   selector:
     matchLabels:
-      app: ml_serve
+      app: ml-serve
   template:
     metadata:
       labels:
-        app: ml_serve
+        app: ml-serve
     spec:
       affinity:
         podAntiAffinity:
@@ -21,10 +21,10 @@ spec:
               - key: app
                 operator: In
                 values:
-                - ml_serve
+                - ml-serve
             topologyKey: kubernetes.io/hostname
       containers:
-        - name: ml_serve
+        - name: ml-serve
           image:  eu.gcr.io/{{ job.project }}/serving
           imagePullPolicy: Always
           ports:
@@ -51,4 +51,4 @@ spec:
       port: 8501
       targetPort: 8501
   selector:
-    app: ml_serve
+    app: ml-serve
