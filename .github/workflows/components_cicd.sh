@@ -7,6 +7,7 @@ gcloud container clusters get-credentials $GKE_CLUSTER_NAME --project=$PROJECT -
 
 if [[ -n ${CHANGED_DOCKER_COMPONENTS} ]]; then
   # Loop through the changed components and build their images
+  echo ${CHANGED_DOCKER_COMPONENTS}
   IFS=' ' read -r -a array <<<"$CHANGED_DOCKER_COMPONENTS"
   for component in "${array[@]}"; do
     echo "Building image for $component..."
@@ -29,7 +30,7 @@ EOL
     gcloud builds submit .
     echo "Image for $component built and pushed to registry."
 
-    if [[ $(find ${PWD}/components/$component/manifests -name "*_deployment.yaml" | wc -l) -gt 0 ]]; then
+    if [[ $(find ../manifests -name "*_deployment.yaml" | wc -l) -gt 0 ]]; then
       echo "Rolling out deployment for $component..."
       kubectl rollout restart deployment $component
       echo "Deployment for $component rolled out."
@@ -47,3 +48,4 @@ if [[ -n ${CHANGED_K8S_COMPONENTS} ]]; then
     cat $component | envsubst | kubectl apply -f -
   done
 fi
+

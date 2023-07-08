@@ -1,0 +1,1 @@
+CHANGED_K8S_COMPONENTS=components/flaskapp/manifests/docs_app_deployment.yaml components/flaskapp/manifests/docs_app_service.yamlCHANGED_K8S_COMPONENTS=components/flaskapp/manifests/docs_app_deployment.yaml components/flaskapp/manifests/docs_app_service.yaml
