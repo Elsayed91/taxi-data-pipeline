@@ -8,6 +8,7 @@ This project utilizes New York City yellow taxi data to construct a scalable and
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li><a href="#explore-some-project-deliverables">Explore Some Project Deliverables</a></li>
     <li>
       <a href="#architecture">Architecture</a>
       <ul>
@@ -82,7 +83,6 @@ flowchart LR
     D -- No --> K
 
 ```
-<br>Note: to use the workflows, a GCP service account as well as the content of your `.env` file need to be added to your Github Secrets.
 
 ### Extra Notes on Technologies Used:
 - `Flask`: Used to serve static documentation websites for `DBT`, `Great Expectation`, and `Elementary`.
@@ -142,9 +142,12 @@ make run_kafka
 ```
 * to destroy kafka instance
 ```shell
-make destory_kafka
+make destroy_kafka
 ```
 * to run the lambda integration test
 ```shell
 make run_lambda_integration_test
 ```
+
+<br>Note: to use the workflows, a GCP service account as well as the content of your `.env` file need to be added to your Github Secrets.
+

@@ -37,5 +37,8 @@ run_kafka:
 	@bash scripts/run_kafka.sh
 
 # Target to destroy the Kafka cluster
-destory_kafka:
+destroy_kafka:
 	@bash scripts/run_kafka.sh --kill
+
+
+
