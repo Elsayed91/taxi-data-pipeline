@@ -23,17 +23,6 @@ This project utilizes New York City yellow taxi data to construct a scalable and
   </ol>
 </details>
 
-## Table of Contents
-
--   [Explore Some Project Deliverables](https://chat.openai.com/c/73bbf2dc-22cc-402e-9efd-79f6cb8e86d1#explore-some-project-deliverables)
--   [Architecture](https://chat.openai.com/c/73bbf2dc-22cc-402e-9efd-79f6cb8e86d1#architecture)
-    -   [Visually Summarized Architecture](https://chat.openai.com/c/73bbf2dc-22cc-402e-9efd-79f6cb8e86d1#visually-summarized-architecture)
-    -   [Data Stack](https://chat.openai.com/c/73bbf2dc-22cc-402e-9efd-79f6cb8e86d1#data-stack)
-    -   [Airflow Job DAG Flowchart](https://chat.openai.com/c/73bbf2dc-22cc-402e-9efd-79f6cb8e86d1#airflow-job-dag-flowchart)
-    -   [CICD Pipelines](https://chat.openai.com/c/73bbf2dc-22cc-402e-9efd-79f6cb8e86d1#cicd-pipelines)
--   [Extra Notes on Technologies Used](https://chat.openai.com/c/73bbf2dc-22cc-402e-9efd-79f6cb8e86d1#extra-notes-on-technologies-used)
--   [Testing](https://chat.openai.com/c/73bbf2dc-22cc-402e-9efd-79f6cb8e86d1#testing)
--   [How to Install](https://chat.openai.com/c/73bbf2dc-22cc-402e-9efd-79f6cb8e86d1#how-to-install)
 
 ## Explore Some Project Deliverables:
 
