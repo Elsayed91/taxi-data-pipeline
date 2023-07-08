@@ -166,7 +166,7 @@ def load_model(mlflow_uri: str, mlflow_experiment_name: str) -> Optional[Any]:
     The best model from the specified experiment, or None if an exception is raised.
     """
     try:
-        mlflow.set_tracking_uri(mlflow_uri)
+        mlflow.set_tracking_uri(mlflow_uri)  # type: ignore
         current_experiment = dict(mlflow.get_experiment_by_name(mlflow_experiment_name))
         experiment_id = current_experiment["experiment_id"]
         df = mlflow.search_runs([experiment_id], order_by=["metrics.rmse DESC"])

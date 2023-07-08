@@ -16,7 +16,7 @@ To view different technologies explored in the project, check some links below. 
 
 - Grafana: [Screenshot](images/grafana-screenshot.png)
 - ML Serving Service: [Link](images/) | Screenshot
-- MLFlow: [Link]() | Screenshot
+- MLFlow: Screenshot
 
 ## Architecture
 
