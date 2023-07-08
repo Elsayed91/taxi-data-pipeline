@@ -209,3 +209,5 @@ scripts/__pycache__
 mlruns
 terraform/modules/files/lambda/**
 components/dbt/app/dbt_packages
+images/Screenshot 2023-07-08 141029.png:Zone.Identifier
+docs/New_York_Taxi_Dashboard (1).pdf:Zone.Identifier

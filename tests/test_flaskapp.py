@@ -1,6 +1,7 @@
-from components.docs_app.docker.app import load_index
-import pytest
 from unittest.mock import patch
+
+import pytest
+from components.flaskapp.docker.app import load_index
 
 
 @pytest.mark.parametrize(
@@ -16,7 +17,6 @@ from unittest.mock import patch
 )
 @patch("gcsfs.GCSFileSystem")
 def test_load_index(mock_gcsfs, bucket, index_path, expected):
-
     mock_fs = mock_gcsfs.return_value
     mock_open = mock_fs.open
     mock_file = mock_open.return_value.__enter__.return_value

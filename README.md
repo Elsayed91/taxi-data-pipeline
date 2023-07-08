@@ -5,18 +5,18 @@
 # Overview
 This project utilizes New York City yellow taxi data to construct a scalable and automated data pipeline. It involves orchestrating the workflow using `Kubernetes` and `Apache Airflow`, transforming and loading data across various cloud service providers, and processing and loading it into `BigQuery` with the assistance of `Apache Spark`. The data stored in BigQuery serves as the foundation for creating models using `DBT`, which can be accessed by both BI users and Data Scientists for developing ML models. The pipeline not only trains these ML models but also serves them. To ensure data quality, the project implements DBT tests and leverages `Great Expectations`. Additionally, the project attempts to demonstrate capability of working with Data Science and MLOps tasks. 
 
-## Components
 
-To view different technologies explored in the project, check some links below. Note that the services are hosted using free GCP quote. meaning the link could go down anytime. 
-- **Airflow:** [Initial Load DAG Screenshot](images/initial-load-dag-screenshot.png) | [Batch DAG Screenshot](images/batchdag_screenshot.png) | [Docs](docs/airflow.md)
-- **DocsApp**: 
-    * `Great Expectations`: [Link](http://35.204.125.16:5000/validations/yellow_expectations/202307080726-yellow/20230708T072645.492439Z/0a79ac4ed3c2ec10d366e04e50a2885a.html) | [Screenshot](images/great-expectations-result.png)
+## Explore Some Project Deliverables:
+
+<i>**Kindly note that the services are hosted using free GCP credits and may not be available once the credits are exhausted.</i>
+
+
+- **Static Docs**: 
+    * `Great Expectations`: [Link](http://35.204.125.16:5000/) | [Screenshot](images/great-expectations-result.png)
     * `DBT Docs`: [Link](http://35.204.125.16:5000/dbt#!/overview) | [Screenshot](images/dbt-screenshot.png) 
     * `Elementary Docs`: [Link](http://35.204.125.16:5000/elementary) | [Elementary Dashboard](images/elementary-dashboard.png)
-
-- Grafana: [Screenshot](images/grafana-screenshot.png)
-- ML Serving/Prediction Service: [Link](http://34.90.214.205:8501/) | [Screenshot](images/streamlit-prediction-app)
-- MLFlow: [Screenshot](images/mlflow-screenshot.png)
+- **ML Serving/Prediction Service**: [Link](http://34.90.214.205:8501/) | [Screenshot](images/streamlit-prediction-app)
+- **MLFlow**: [Screenshot](images/mlflow-screenshot.png)
 
 ## Architecture
 
