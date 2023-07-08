@@ -50,14 +50,16 @@
                     4,
                     5,
                     6
-                ]
+                ],
+                "mostly": 0.9
             },
             "meta": {}
         },
         {
             "expectation_type": "expect_column_values_to_not_be_null",
             "kwargs": {
-                "column": "passenger_count"
+                "column": "passenger_count",
+                "mostly": 0.9
             },
             "meta": {}
         },
@@ -87,7 +89,8 @@
                     "LongType",
                     "DECIMAL",
                     "float_"
-                ]
+                ],
+                "mostly": 0.5
             },
             "meta": {}
         },
@@ -149,8 +152,10 @@
                     2,
                     3,
                     4,
-                    5
-                ]
+                    5,
+                    6
+                ],
+                "mostly": 0.9
             },
             "meta": {}
         },

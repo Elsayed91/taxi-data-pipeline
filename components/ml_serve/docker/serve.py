@@ -15,7 +15,7 @@ import os
 import pandas as pd
 import streamlit as st
 
-from serve_utils import PredictionAssistant, load_model
+from serve_utils import PredictionAssistant, check_connection, load_model
 
 
 def run(mlflow_uri: str, mlflow_experiment_name: str) -> None:
@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
     model = cached_model(mlflow_uri, mlflow_experiment_name)
     if model:
-        run(model)
+        run(model, mlflow_experiment_name)
     else:
         st.info(
             "Something went wrong with the server connection."

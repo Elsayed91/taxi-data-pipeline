@@ -1,15 +1,16 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: load-balancer-service
-spec:
-  type: LoadBalancer
-  selector:
-    svc: external-lb
-  ports:
-    - name: flask-port
-      port: 5000
-      targetPort: 5000
-    - name: grafana-port
-      port: 3000
-      targetPort: 3000
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: load-balancer-service
+# spec:
+#   type: LoadBalancer
+#   selector:
+#     matchExpressions:
+#       - {key: app, operator: In, values: [airflow]}
+#   ports:
+#     # - name: flask-port
+#     #   port: 5000
+#     #   targetPort: 5000
+#     - name: airflow-ui
+#       port: 8080
+#       targetPort: 8080

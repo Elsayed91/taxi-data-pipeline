@@ -198,11 +198,11 @@ def test_load_model():
         assert result == "loaded_model"
 
 
-# def test_check_connection():
-#     # Test for a successful connection
-#     url = "https://www.google.com"
-#     assert check_connection(url) == True
+def test_check_connection():
+    # Test for a successful connection
+    url = "https://www.google.com"
+    assert check_connection(url) == True
 
-#     # Test for an unsuccessful connection
-#     url = "invalid_url"
-#     assert check_connection(url) == False
+    # Test for an unsuccessful connection
+    url = "invalid_url"
+    assert check_connection(url) == False

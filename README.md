@@ -3,14 +3,35 @@
 
 
 # Overview
-This project utilizes New York City yellow taxi data to construct a scalable and automated data pipeline. It involves orchestrating the workflow using `Kubernetes` and `Apache Airflow`, transforming and loading data across various cloud service providers, and processing and loading it into `BigQuery` with the assistance of `Apache Spark`. The data stored in BigQuery serves as the foundation for creating models using `DBT`, which can be accessed by both BI users and Data Scientists for developing ML models. The pipeline not only trains these ML models but also serves them. To ensure data quality, the project implements DBT tests and leverages `Great Expectations`.
+This project utilizes New York City yellow taxi data to construct a scalable and automated data pipeline. It involves orchestrating the workflow using `Kubernetes` and `Apache Airflow`, transforming and loading data across various cloud service providers, and processing and loading it into `BigQuery` with the assistance of `Apache Spark`. The data stored in BigQuery serves as the foundation for creating models using `DBT`, which can be accessed by both BI users and Data Scientists for developing ML models. The pipeline not only trains these ML models but also serves them. To ensure data quality, the project implements DBT tests and leverages `Great Expectations`. Additionally, the project attempts to demonstrate capability of working with Data Science and MLOps tasks. 
+
+## Components
+
+To view different technologies explored in the project, check some links below. Note that the services are hosted using free GCP quote. meaning the link could go down anytime. 
+- **Airflow:** [Initial Load DAG Screenshot](images/initial-load-dag-screenshot.png) | [Batch DAG Screenshot](images/batchdag_screenshot.png) | [Docs](docs/airflow.md)
+- **DocsApp**: 
+    * `Great Expectations`: [Link](http://35.204.125.16:5000/validations/yellow_expectations/202307080726-yellow/20230708T072645.492439Z/0a79ac4ed3c2ec10d366e04e50a2885a.html) | [Screenshot](images/great-expectations-result.png)
+    * `DBT Docs`: [Link](http://35.204.125.16:5000/dbt#!/overview) | [Screenshot](images/dbt-screenshot.png) 
+    * `Elementary Docs`: [Link](http://35.204.125.16:5000/elementary) | [Elementary Dashboard](images/elementary-dashboard.png)
+
+- Grafana: [Screenshot](images/grafana-screenshot.png)
+- ML Serving Service: [Link](images/) | Screenshot
+- MLFlow: [Link]() | Screenshot
 
 ## Architecture
 
-![Project Architecture]("./docs/images/setup_gcp.png")
+### **Visually Summarized Architecture**
 
+<p align="center"> <img src="images/4.png" alt="Project Architecture" width="950px"> </p>
 
-    
+### **Data Stack**
+
+<p align="center"> <img src="images/5.png" alt="Data Stack" width="950px"> </p>
+
+### **Airflow Job DAG Flowchart**
+
+<p align="center"> <img src="images/7.png" alt="Airflow Job DAG Flowchart" width="950px"> </p>
+
 
 
 
@@ -62,6 +83,8 @@ If there is a change in a manifest directory, the change is applied.
 Additionally **pre-commit** is used with a number of hooks to ensure that changes adhere to some best practices. 
 <br>Note: to use the workflows, a GCP service account as well as the content of your `.env` file need to be added to your Github Secrets.
 
+
+## How to Install:
 
 ## Thoughts
 

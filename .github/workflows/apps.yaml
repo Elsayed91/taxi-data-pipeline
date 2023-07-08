@@ -16,27 +16,7 @@ on:
 
 jobs:
   test_pyapps:
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        include:
-          - directory: 'airflow/dags'
-            tests:
-              - 'test_airflow_addons.py'
-              - 'test_airflow.py'
-          - directory: 'data_validation'
-            tests: 'test_validation.py'
-          - directory: 'docs_app/docker'
-            tests: 'test_docsapp.py'
-          - directory: 'ml_train/scripts'
-            tests: 'test_train.py'
-          - directory: 'ml_serve/docker'
-            tests: 'test_serve.py'
-          - directory: 'scripts'
-            tests: 'test_create_seed.py'
-
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:

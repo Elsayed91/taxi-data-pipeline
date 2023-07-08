@@ -15,7 +15,7 @@ on:
 
 
 jobs:
-  test_pyapps:
+  test_pysapps:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
