@@ -4,7 +4,8 @@
 
 # Overview
 
-This project showcases the orchestration of a scalable data pipeline using `Kubernetes` and `Apache Airflow`. It incorporates a comprehensive data ecosystem, including `Spark`, `Kafka`, and `DBT`, while maintaining a strong focus on data quality. Starting with NYC Taxi data stored in S3, the pipeline not only generates a standard BI dashboard but also integrates an MLOps pipeline. This MLOps pipeline produces a prediction service and data models suitable for data scientists consumption.
+This project showcases the orchestration of a scalable data pipeline using `Kubernetes` and `Apache Airflow`. It incorporates a comprehensive data ecosystem, including `Spark`, `Kafka`, and `DBT`, while maintaining a strong focus on data quality. 
+<br> With NYC Taxi data stored in S3 as the starting point, this pipeline goes beyond generating a standard BI dashboard. It also delivers a prediction service and data models tailored specifically for data scientists' needs.
 
 
 <details>
