@@ -80,6 +80,6 @@ while true; do
 done
 
 echo "cleaning up & tearing infrastructure down."
-rm -rf .terraform terraform.tfstate terraform.tfstate.backup .terraform.lock.hcl files/* yellow_tripdata_2019-08.parquet nohup.out $output_file
+rm -rf .terraform terraform.tfstate terraform.tfstate.backup dependencies.zip .terraform.lock.hcl files/* yellow_tripdata_2019-08.parquet nohup.out $output_file
 
 localstack stop

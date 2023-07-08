@@ -39,11 +39,3 @@ run_kafka:
 # Target to destroy the Kafka cluster
 destory_kafka:
 	@bash scripts/run_kafka.sh --kill
-
-r:
-	@kubectl delete -f ${arg} && cat ${arg} | envsubst | kubectl apply -f -
-
-rr: 
-	@cat ${arg} | envsubst | kubectl apply -f -
-schema:
-	@bq show --schema --format=prettyjson $$PROJECT:$$ML_DATASET.dbt__ml__yellow_fare > myschema.json
