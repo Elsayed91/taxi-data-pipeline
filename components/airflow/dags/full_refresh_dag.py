@@ -66,7 +66,8 @@ with DAG(
     BASE_NODE_POOL = os.getenv("BASE_NODE_POOL")
     TRAINING_NODE_POOL = os.getenv("TRAINING_NODE_POOL")
     ML_SERVING_MANIFEST = os.getenv(
-        "ML_SERVING_MANIFEST", "/git/repo/components/ml_serve/manifests/serving.yaml"
+        "ML_SERVING_MANIFEST",
+        "/git/repo/components/ml_serve/manifests/serving_deployment.yaml",
     )
     t1 = KubernetesJobOperator(
         task_id="aws_to_gcs",

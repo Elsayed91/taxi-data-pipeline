@@ -1,4 +1,4 @@
-streamlit
+streamlit==1.18.1
 google-cloud-storage
 xgboost==1.7.2 
 mlflow==2.1.1 
