@@ -15,8 +15,8 @@ To view different technologies explored in the project, check some links below. 
     * `Elementary Docs`: [Link](http://35.204.125.16:5000/elementary) | [Elementary Dashboard](images/elementary-dashboard.png)
 
 - Grafana: [Screenshot](images/grafana-screenshot.png)
-- ML Serving Service: [Link](images/) | Screenshot
-- MLFlow: Screenshot
+- ML Serving/Prediction Service: [Link](http://34.90.214.205:8501/) | [Screenshot](images/streamlit-prediction-app)
+- MLFlow: [Screenshot](images/mlflow-screenshot.png)
 
 ## Architecture
 

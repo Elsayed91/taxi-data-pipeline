@@ -15,7 +15,7 @@ import os
 import pandas as pd
 import streamlit as st
 
-from serve_utils import PredictionAssistant, check_connection, load_model
+from serve_utils import *
 
 
 def run(mlflow_uri: str, mlflow_experiment_name: str) -> None:
