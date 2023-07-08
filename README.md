@@ -5,7 +5,7 @@
 # Overview
 
 This project showcases the orchestration of a scalable data pipeline using `Kubernetes` and `Apache Airflow`. It makes use of well known data solutions like `Spark`, `Kafka`, and `DBT`, while maintaining a strong focus on data quality. 
-<br> With NYC Taxi data stored in S3 as the starting point, this pipeline goes beyond generating a standard BI dashboard. It also delivers a prediction service and data models tailored specifically for data scientists' needs.
+<br> With NYC Taxi data stored in S3 as the starting point, this pipeline goes beyond generating a standard BI dashboard. It also delivers a prediction service and data models tailored for data scientists' needs.
 
 
 <details>
