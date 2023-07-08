@@ -3,7 +3,9 @@
 
 
 # Overview
-This project utilizes New York City yellow taxi data to construct a scalable and automated data pipeline. It involves orchestrating the workflow using `Kubernetes` and `Apache Airflow`, transforming and loading data across various cloud service providers, and processing and loading it into `BigQuery` with the assistance of `Apache Spark`. The data stored in BigQuery serves as the foundation for creating models using `DBT`, which can be accessed by both BI users and Data Scientists for developing ML models. The pipeline not only trains these ML models but also serves them. To ensure data quality, the project implements DBT tests and leverages `Great Expectations`. Additionally, the project attempts to demonstrate capability of working with Data Science and MLOps tasks. 
+
+This project showcases the orchestration of a scalable data pipeline using `Kubernetes` and `Apache Airflow`. It incorporates a comprehensive data ecosystem, including `Spark`, `Kafka`, and `DBT`, while maintaining a strong focus on data quality. Starting with NYC Taxi data stored in S3, the pipeline not only generates a standard BI dashboard but also integrates an MLOps pipeline. This MLOps pipeline produces a prediction service and data models suitable for data scientists consumption.
+
 
 <details>
   <summary>Table of Contents</summary>
