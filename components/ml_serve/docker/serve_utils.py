@@ -1,11 +1,12 @@
-import pandas as pd
 import datetime
 import json
 import os
-import requests
-import numpy as np
+from typing import Any, Optional
+
 import mlflow.pyfunc
-from typing import Optional, Any
+import numpy as np
+import pandas as pd
+import requests
 
 
 class PredictionAssistant:
@@ -165,7 +166,7 @@ def load_model(mlflow_uri: str, mlflow_experiment_name: str) -> Optional[Any]:
     The best model from the specified experiment, or None if an exception is raised.
     """
     try:
-        mlflow.set_tracking_uri(mlflow_uri)
+        mlflow.set_tracking_uri(mlflow_uri)  # type: ignore
         current_experiment = dict(mlflow.get_experiment_by_name(mlflow_experiment_name))
         experiment_id = current_experiment["experiment_id"]
         df = mlflow.search_runs([experiment_id], order_by=["metrics.rmse DESC"])
@@ -201,8 +202,9 @@ def check_connection(
     - bool: Whether the connection was successful or not.
 
     """
-    import urllib3
     import logging
+
+    import urllib3
 
     try:
         http = urllib3.PoolManager(

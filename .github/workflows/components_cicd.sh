@@ -28,8 +28,9 @@ EOL
     # Submit the build to Google Cloud Build
     gcloud builds submit .
     echo "Image for $component built and pushed to registry."
+    cd ${PWD}/components/$component
 
-    if [[ $(find ${PWD}/components/$component/manifests -name "*_deployment.yaml" | wc -l) -gt 0 ]]; then
+    if [[ $(find manifests -name "*_deployment.yaml" | wc -l) -gt 0 ]]; then
       echo "Rolling out deployment for $component..."
       kubectl rollout restart deployment $component
       echo "Deployment for $component rolled out."
