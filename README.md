@@ -135,7 +135,7 @@ git clone https://github.com/Elsayed91/taxi-data-pipeline
 ```shell
 make setup
 ```
-4. to manually trigger the `batch-dag`:
+* to manually trigger the `batch-dag`:
 ```shell
 make trigger_batch_dag
 ```
